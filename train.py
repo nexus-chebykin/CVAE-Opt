@@ -6,6 +6,7 @@ import torch
 import numpy as np
 import time
 import datetime
+import tqdm
 import os
 import logging
 import sys
@@ -63,7 +64,7 @@ def train_epoch(model, config, epoch_idx, training_dataloader, optimizer):
     loss_KLD_values = []
 
     for batch_id, batch in enumerate(training_dataloader):
-        print("Batch {}/{}".format(batch_id, int(config.epoch_size / config.batch_size)))
+        #print("Batch {}/{}".format(batch_id, int(config.epoch_size / config.batch_size)))
 
         # Get an instance and two symmetric solutions (see the paragraph symmetry breaking in the paper)
         instances, solutions_1, solutions_2 = batch
@@ -108,7 +109,7 @@ def train(model, config):
     validation_dataloader = DataLoader(validation_dataset, batch_size=config.batch_size, num_workers=0, shuffle=True)
 
     best_avg_gap = np.inf
-    for epoch_idx in range(1, config.nb_epochs + 1):
+    for epoch_idx in tqdm.trange(1, config.nb_epochs + 1):
         train_epoch(model, config, epoch_idx, training_dataloader, optimizer)
 
         # Validate and save model every 20 epochs

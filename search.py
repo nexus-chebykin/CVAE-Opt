@@ -36,7 +36,7 @@ if __name__ == "__main__":
         logging.info("{0}: {1}".format(arg, getattr(config, arg)))
     logging.info("----------")
 
-    model_data = torch.load(config.model_path, config.device)
+    model_data = torch.load(config.model_path, config.device, weights_only=False)
 
     config.search_space_bound = model_data['Z_bound']
     logging.info(f"Setting search space bound to {config.search_space_bound}")

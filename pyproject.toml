@@ -1,0 +1,17 @@
+[project]
+name = "cvae-opt"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=2.3.3",
+    "scipy>=1.16.2",
+    "torch>=2.8.0",
+    "tqdm>=4.67.1",
+]
+
+[dependency-groups]
+dev = [
+    "basedpyright>=1.31.7",
+]

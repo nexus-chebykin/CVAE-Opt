@@ -217,7 +217,7 @@ class VAE_8(nn.Module):
             mask_fn = cvrp.update_mask
             update_fn = cvrp.update_dynamic
 
-        hidden_size = 128
+        hidden_size = 64
         self.instance_embedding = Embedding(input_size, hidden_size)
         reference_embedding = Embedding(input_size, hidden_size)
         encoder_attn = Attention(hidden_size)
