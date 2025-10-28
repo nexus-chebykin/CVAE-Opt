@@ -24,40 +24,41 @@ def evaluate(Z, model, config, instance, cost_fn):
     return costs.tolist()
 
 
-def plot_convergence(instance_idx, convergence_history, output_path):
+def plot_convergence(instance_idx, convergence_history, output_path, batch_size):
     """
-    Plot convergence history for a single instance (both linear and log scale).
+    Plot convergence history for a single instance.
 
     Args:
         instance_idx: Index of the instance
         convergence_history: List of best objective values per iteration
         output_path: Directory to save plots
+        batch_size: Population size (number of evaluations per iteration)
     """
     iterations = list(range(1, len(convergence_history) + 1))
+    evaluations = [iter_num * batch_size for iter_num in iterations]
 
-    # Create linear scale plot
+    # Plot 1: Convergence vs Iterations
     plt.figure(figsize=(10, 6))
     plt.plot(iterations, convergence_history, linewidth=2, color='#2E86AB')
     plt.xlabel('Iteration', fontsize=12)
     plt.ylabel('Best Objective Value', fontsize=12)
-    plt.title(f'Convergence - Instance {instance_idx} (Linear Scale)', fontsize=14, fontweight='bold')
+    plt.title(f'Convergence - Instance {instance_idx}', fontsize=14, fontweight='bold')
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
-    linear_path = os.path.join(output_path, f'instance_{instance_idx}_convergence.png')
-    plt.savefig(linear_path, dpi=150, bbox_inches='tight')
+    plot_path = os.path.join(output_path, f'instance_{instance_idx}_convergence.png')
+    plt.savefig(plot_path, dpi=150, bbox_inches='tight')
     plt.close()
 
-    # Create log scale plot
+    # Plot 2: Convergence vs Objective Function Evaluations
     plt.figure(figsize=(10, 6))
-    plt.plot(iterations, convergence_history, linewidth=2, color='#A23B72')
-    plt.xlabel('Iteration', fontsize=12)
-    plt.ylabel('Best Objective Value (log scale)', fontsize=12)
-    plt.title(f'Convergence - Instance {instance_idx} (Log Scale)', fontsize=14, fontweight='bold')
-    plt.yscale('log')
-    plt.grid(True, alpha=0.3, which='both')
+    plt.plot(evaluations, convergence_history, linewidth=2, color='#A23B72')
+    plt.xlabel('Objective Function Evaluations', fontsize=12)
+    plt.ylabel('Best Objective Value', fontsize=12)
+    plt.title(f'Convergence - Instance {instance_idx}', fontsize=14, fontweight='bold')
+    plt.grid(True, alpha=0.3)
     plt.tight_layout()
-    log_path = os.path.join(output_path, f'instance_{instance_idx}_convergence_log.png')
-    plt.savefig(log_path, dpi=150, bbox_inches='tight')
+    eval_plot_path = os.path.join(output_path, f'instance_{instance_idx}_convergence_evaluations.png')
+    plt.savefig(eval_plot_path, dpi=150, bbox_inches='tight')
     plt.close()
 
     logging.info(f"Saved convergence plots for instance {instance_idx}")
@@ -104,7 +105,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
 
         # Save convergence plots if enabled
         if config.save_plots:
-            plot_convergence(i, convergence_history, search_output_dir)
+            plot_convergence(i, convergence_history, search_output_dir, config.search_batch_size)
 
         if solutions:
             optimal_value = cost_fn(torch.Tensor(instance).unsqueeze(0),
