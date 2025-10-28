@@ -24,7 +24,7 @@ def evaluate(Z, model, config, instance, cost_fn):
     return costs.tolist()
 
 
-def plot_convergence(instance_idx, convergence_history, output_path, batch_size):
+def plot_convergence(instance_idx, convergence_history, output_path, batch_size, time_history):
     """
     Plot convergence history for a single instance.
 
@@ -33,6 +33,7 @@ def plot_convergence(instance_idx, convergence_history, output_path, batch_size)
         convergence_history: List of best objective values per iteration
         output_path: Directory to save plots
         batch_size: Population size (number of evaluations per iteration)
+        time_history: List of elapsed times per iteration (in seconds)
     """
     iterations = list(range(1, len(convergence_history) + 1))
     evaluations = [iter_num * batch_size for iter_num in iterations]
@@ -61,6 +62,18 @@ def plot_convergence(instance_idx, convergence_history, output_path, batch_size)
     plt.savefig(eval_plot_path, dpi=150, bbox_inches='tight')
     plt.close()
 
+    # Plot 3: Convergence vs Wall-Clock Time
+    plt.figure(figsize=(10, 6))
+    plt.plot(time_history, convergence_history, linewidth=2, color='#F77F00')
+    plt.xlabel('Wall-Clock Time (seconds)', fontsize=12)
+    plt.ylabel('Best Objective Value', fontsize=12)
+    plt.title(f'Convergence - Instance {instance_idx} (Batch Size: {batch_size})', fontsize=14, fontweight='bold')
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    time_plot_path = os.path.join(output_path, f'instance_{instance_idx}_convergence_time_bs{batch_size}.png')
+    plt.savefig(time_plot_path, dpi=150, bbox_inches='tight')
+    plt.close()
+
     logging.info(f"Saved convergence plots for instance {instance_idx} (batch size {batch_size})")
 
 
@@ -70,7 +83,7 @@ def plot_convergence_comparison(instance_idx, convergence_data, output_path):
 
     Args:
         instance_idx: Index of the instance
-        convergence_data: Dict mapping batch_size -> convergence_history
+        convergence_data: Dict mapping batch_size -> (convergence_history, time_history)
         output_path: Directory to save plots
     """
     plt.figure(figsize=(12, 7))
@@ -79,7 +92,7 @@ def plot_convergence_comparison(instance_idx, convergence_data, output_path):
     colors = ['#E63946', '#F1A208', '#2A9D8F', '#264653']
 
     # Plot each batch size
-    for idx, (batch_size, convergence_history) in enumerate(sorted(convergence_data.items())):
+    for idx, (batch_size, (convergence_history, time_history)) in enumerate(sorted(convergence_data.items())):
         iterations = list(range(1, len(convergence_history) + 1))
         evaluations = [iter_num * batch_size for iter_num in iterations]
         color = colors[idx % len(colors)]
@@ -100,18 +113,52 @@ def plot_convergence_comparison(instance_idx, convergence_data, output_path):
     logging.info(f"Saved comparison plot for instance {instance_idx}")
 
 
+def plot_convergence_comparison_time(instance_idx, convergence_data, output_path):
+    """
+    Plot comparison of convergence histories for different batch sizes vs wall-clock time.
+
+    Args:
+        instance_idx: Index of the instance
+        convergence_data: Dict mapping batch_size -> (convergence_history, time_history)
+        output_path: Directory to save plots
+    """
+    plt.figure(figsize=(12, 7))
+
+    # Define colors for different batch sizes
+    colors = ['#E63946', '#F1A208', '#2A9D8F', '#264653']
+
+    # Plot each batch size
+    for idx, (batch_size, (convergence_history, time_history)) in enumerate(sorted(convergence_data.items())):
+        color = colors[idx % len(colors)]
+        plt.plot(time_history, convergence_history, linewidth=2.5, color=color,
+                 label=f'Batch Size: {batch_size}', marker='o', markevery=max(1, len(time_history)//10), markersize=6)
+
+    plt.xlabel('Wall-Clock Time (seconds)', fontsize=13)
+    plt.ylabel('Best Objective Value', fontsize=13)
+    plt.title(f'Convergence Comparison - Instance {instance_idx}', fontsize=15, fontweight='bold')
+    plt.legend(fontsize=11, loc='best', framealpha=0.9)
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+
+    comparison_path = os.path.join(output_path, f'instance_{instance_idx}_convergence_comparison_time.png')
+    plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
+    plt.close()
+
+    logging.info(f"Saved time-based comparison plot for instance {instance_idx}")
+
+
 def solve_instance_de(model, instance, config, cost_fn, batch_size):
     instance = torch.Tensor(instance)
     instance = instance.unsqueeze(0).expand(batch_size, -1, -1)
     instance = instance.to(config.device)
     model.reset_decoder(batch_size, config)
 
-    result_cost, result_tour, convergence_history = minimize(decode, (model, config, instance, cost_fn), config.search_space_bound,
+    result_cost, result_tour, convergence_history, time_history = minimize(decode, (model, config, instance, cost_fn), config.search_space_bound,
                                         config.search_space_size, popsize=batch_size,
                                         mutate=config.de_mutate, recombination=config.de_recombine,
                                         maxiter=config.search_iterations, maxtime=config.search_timelimit)
     solution = decode(np.array([result_tour] * batch_size), model, config, instance, cost_fn)[0][0].tolist()
-    return result_cost, solution, convergence_history
+    return result_cost, solution, convergence_history, time_history
 
 
 def solve_instance_set(model, config, instances, solutions=None, verbose=True):
@@ -141,11 +188,11 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
         for batch_size in config.batch_sizes:
             logging.info(f"  Batch size: {batch_size}")
             start_time = time.time()
-            objective_value, solution, convergence_history = solve_instance_de(model, instance, config, cost_fn, batch_size)
+            objective_value, solution, convergence_history, time_history = solve_instance_de(model, instance, config, cost_fn, batch_size)
             runtime = time.time() - start_time
 
-            # Store convergence history for comparison plot
-            convergence_data[batch_size] = convergence_history
+            # Store convergence history and time history for comparison plots
+            convergence_data[batch_size] = (convergence_history, time_history)
 
             # Calculate gap if solutions provided
             if solutions:
@@ -166,11 +213,13 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
         if config.save_plots:
             # Individual plots for each batch size
             for batch_size in config.batch_sizes:
-                plot_convergence(i, convergence_data[batch_size], search_output_dir, batch_size)
+                conv_hist, time_hist = convergence_data[batch_size]
+                plot_convergence(i, conv_hist, search_output_dir, batch_size, time_hist)
 
-            # Comparison plot if multiple batch sizes
+            # Comparison plots if multiple batch sizes
             if len(config.batch_sizes) > 1:
                 plot_convergence_comparison(i, convergence_data, search_output_dir)
+                plot_convergence_comparison_time(i, convergence_data, search_output_dir)
 
     # Log final results for each batch size
     logging.info("=" * 60)

@@ -40,6 +40,7 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
     iterations_without_improvement = 0
     gen_best = np.inf
     convergence_history = []
+    time_history = []
 
     population = np.random.uniform(-search_space_bound, search_space_bound,
                                    (popsize, search_space_size))
@@ -90,6 +91,7 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
         # --- SCORE KEEPING --------------------------------+
         gen_best = min(population_cost)  # fitness of best individual
         convergence_history.append(gen_best)
+        time_history.append(time.time() - start_time)
 
-    return gen_best, population[np.argmin(population_cost)], convergence_history
+    return gen_best, population[np.argmin(population_cost)], convergence_history, time_history
 
