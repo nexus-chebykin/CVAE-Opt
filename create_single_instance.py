@@ -13,4 +13,8 @@ with open('instances/tsp/test/tsp100_single.pkl', 'wb') as f:
     pickle.dump(single_instance, f)
 
 print("Created tsp100_single.pkl with 1 instance")
-print(f"Instance shape: {instances[0].shape}")
+print(f"Instance type: {type(instances[0])}")
+if hasattr(instances[0], 'shape'):
+    print(f"Instance shape: {instances[0].shape}")
+else:
+    print(f"Instance length: {len(instances[0])}")
