@@ -39,6 +39,7 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
     children = np.zeros((popsize, search_space_size))
     iterations_without_improvement = 0
     gen_best = np.inf
+    convergence_history = []
 
     population = np.random.uniform(-search_space_bound, search_space_bound,
                                    (popsize, search_space_size))
@@ -88,6 +89,7 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
 
         # --- SCORE KEEPING --------------------------------+
         gen_best = min(population_cost)  # fitness of best individual
+        convergence_history.append(gen_best)
 
-    return gen_best, population[np.argmin(population_cost)]
+    return gen_best, population[np.argmin(population_cost)], convergence_history
 

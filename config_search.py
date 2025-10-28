@@ -17,6 +17,8 @@ def get_config(args=None):
     parser.add_argument('--search_timelimit', default=600, type=int)
     parser.add_argument('--search_space_size', default=100, type=int)  # Nb. dimensions of search space
     parser.add_argument('--search_iterations', default=300, type=int)
+    parser.add_argument('--save_plots', default=False, action='store_true',
+                        help='Save convergence plots for each instance')
 
     # Differential Evolution
     parser.add_argument('--de_mutate', default=0.3, type=float)
