@@ -12,8 +12,8 @@ from utils import read_instance_pkl
 from VAE_8 import VAE_8
 
 if __name__ == "__main__":
-    run_id = np.random.randint(10000, 99999)
     now = datetime.datetime.now()
+    run_id = f"{now.hour:02d}-{now.minute:02d}-{now.second:02d}"
 
     config = get_config()
 
