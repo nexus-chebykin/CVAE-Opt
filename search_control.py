@@ -132,6 +132,123 @@ def plot_convergence_comparison_time(instance_idx, convergence_data, output_path
     logging.info(f"Saved time-based comparison plot for instance {instance_idx}")
 
 
+def plot_convergence_comparison_iterations_pct(instance_idx, convergence_data, output_path, max_iterations):
+    """
+    Plot comparison of convergence histories as percentage of initial value vs iterations.
+
+    Args:
+        instance_idx: Index of the instance
+        convergence_data: Dict mapping batch_size -> (convergence_history, time_history)
+        output_path: Directory to save plots
+        max_iterations: Maximum number of iterations
+    """
+    plt.figure(figsize=(12, 7))
+
+    # Define colors for different batch sizes
+    colors = ['#E63946', '#F1A208', '#2A9D8F', '#264653']
+
+    # Plot each batch size
+    for idx, (batch_size, (convergence_history, time_history)) in enumerate(sorted(convergence_data.items())):
+        iterations = list(range(1, len(convergence_history) + 1))
+        initial_value = convergence_history[0]
+        # Convert to percentage of initial value
+        convergence_pct = [(value / initial_value) * 100 for value in convergence_history]
+        color = colors[idx % len(colors)]
+        plt.plot(iterations, convergence_pct, linewidth=2.5, color=color,
+                 label=f'Batch Size: {batch_size}', marker='o', markevery=max(1, len(iterations)//10), markersize=6)
+
+    plt.xlabel('Iteration', fontsize=13)
+    plt.ylabel('Objective Value (% of Initial)', fontsize=13)
+    plt.title(f'Convergence Comparison - Instance {instance_idx} (Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
+    plt.legend(fontsize=11, loc='best', framealpha=0.9)
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+
+    comparison_path = os.path.join(output_path, f'instance_{instance_idx}_convergence_comparison_iterations_pct.png')
+    plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
+    plt.close()
+
+    logging.info(f"Saved iterations-based percentage comparison plot for instance {instance_idx}")
+
+
+def plot_convergence_comparison_pct(instance_idx, convergence_data, output_path, max_iterations):
+    """
+    Plot comparison of convergence histories as percentage of initial value vs evaluations.
+
+    Args:
+        instance_idx: Index of the instance
+        convergence_data: Dict mapping batch_size -> (convergence_history, time_history)
+        output_path: Directory to save plots
+        max_iterations: Maximum number of iterations
+    """
+    plt.figure(figsize=(12, 7))
+
+    # Define colors for different batch sizes
+    colors = ['#E63946', '#F1A208', '#2A9D8F', '#264653']
+
+    # Plot each batch size
+    for idx, (batch_size, (convergence_history, time_history)) in enumerate(sorted(convergence_data.items())):
+        iterations = list(range(1, len(convergence_history) + 1))
+        evaluations = [iter_num * batch_size for iter_num in iterations]
+        initial_value = convergence_history[0]
+        # Convert to percentage of initial value
+        convergence_pct = [(value / initial_value) * 100 for value in convergence_history]
+        color = colors[idx % len(colors)]
+        plt.plot(evaluations, convergence_pct, linewidth=2.5, color=color,
+                 label=f'Batch Size: {batch_size}', marker='o', markevery=max(1, len(evaluations)//10), markersize=6)
+
+    plt.xlabel('Objective Function Evaluations', fontsize=13)
+    plt.ylabel('Objective Value (% of Initial)', fontsize=13)
+    plt.title(f'Convergence Comparison - Instance {instance_idx} (Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
+    plt.legend(fontsize=11, loc='best', framealpha=0.9)
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+
+    comparison_path = os.path.join(output_path, f'instance_{instance_idx}_convergence_comparison_pct.png')
+    plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
+    plt.close()
+
+    logging.info(f"Saved evaluations-based percentage comparison plot for instance {instance_idx}")
+
+
+def plot_convergence_comparison_time_pct(instance_idx, convergence_data, output_path, max_iterations):
+    """
+    Plot comparison of convergence histories as percentage of initial value vs wall-clock time.
+
+    Args:
+        instance_idx: Index of the instance
+        convergence_data: Dict mapping batch_size -> (convergence_history, time_history)
+        output_path: Directory to save plots
+        max_iterations: Maximum number of iterations
+    """
+    plt.figure(figsize=(12, 7))
+
+    # Define colors for different batch sizes
+    colors = ['#E63946', '#F1A208', '#2A9D8F', '#264653']
+
+    # Plot each batch size
+    for idx, (batch_size, (convergence_history, time_history)) in enumerate(sorted(convergence_data.items())):
+        initial_value = convergence_history[0]
+        # Convert to percentage of initial value
+        convergence_pct = [(value / initial_value) * 100 for value in convergence_history]
+        color = colors[idx % len(colors)]
+        plt.plot(time_history, convergence_pct, linewidth=2.5, color=color,
+                 label=f'Batch Size: {batch_size}', marker='o', markevery=max(1, len(time_history)//10), markersize=6)
+
+    plt.xlabel('Wall-Clock Time (seconds)', fontsize=13)
+    plt.ylabel('Objective Value (% of Initial)', fontsize=13)
+    plt.title(f'Convergence Comparison - Instance {instance_idx} (Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
+    plt.legend(fontsize=11, loc='best', framealpha=0.9)
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+
+    comparison_path = os.path.join(output_path, f'instance_{instance_idx}_convergence_comparison_time_pct.png')
+    plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
+    plt.close()
+
+    logging.info(f"Saved time-based percentage comparison plot for instance {instance_idx}")
+
+
 def solve_instance_de(model, instance, config, cost_fn, batch_size):
     instance = torch.Tensor(instance)
     instance = instance.unsqueeze(0).expand(batch_size, -1, -1)
@@ -196,16 +313,24 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
 
         # Save convergence comparison plots if enabled
         if config.save_plots:
-            # Only create comparison plots (all batch sizes on same graph)
+            # Create absolute value comparison plots (all batch sizes on same graph)
             if len(config.batch_sizes) > 1:
                 plot_convergence_comparison_iterations(i, convergence_data, search_output_dir, config.search_iterations)
                 plot_convergence_comparison(i, convergence_data, search_output_dir, config.search_iterations)
                 plot_convergence_comparison_time(i, convergence_data, search_output_dir, config.search_iterations)
+                # Create percentage-based comparison plots
+                plot_convergence_comparison_iterations_pct(i, convergence_data, search_output_dir, config.search_iterations)
+                plot_convergence_comparison_pct(i, convergence_data, search_output_dir, config.search_iterations)
+                plot_convergence_comparison_time_pct(i, convergence_data, search_output_dir, config.search_iterations)
             else:
                 # If single batch size, still create plots but they'll only have one curve
                 plot_convergence_comparison_iterations(i, convergence_data, search_output_dir, config.search_iterations)
                 plot_convergence_comparison(i, convergence_data, search_output_dir, config.search_iterations)
                 plot_convergence_comparison_time(i, convergence_data, search_output_dir, config.search_iterations)
+                # Create percentage-based plots
+                plot_convergence_comparison_iterations_pct(i, convergence_data, search_output_dir, config.search_iterations)
+                plot_convergence_comparison_pct(i, convergence_data, search_output_dir, config.search_iterations)
+                plot_convergence_comparison_time_pct(i, convergence_data, search_output_dir, config.search_iterations)
 
     # Log final results for each batch size
     logging.info("=" * 60)
