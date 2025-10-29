@@ -24,7 +24,7 @@ def evaluate(Z, model, config, instance, cost_fn):
     return costs.tolist()
 
 
-def plot_convergence_comparison_iterations(instance_idx, convergence_data, output_path):
+def plot_convergence_comparison_iterations(instance_idx, convergence_data, output_path, max_iterations):
     """
     Plot comparison of convergence histories for different batch sizes vs iterations.
 
@@ -32,6 +32,7 @@ def plot_convergence_comparison_iterations(instance_idx, convergence_data, outpu
         instance_idx: Index of the instance
         convergence_data: Dict mapping batch_size -> (convergence_history, time_history)
         output_path: Directory to save plots
+        max_iterations: Maximum number of iterations
     """
     plt.figure(figsize=(12, 7))
 
@@ -47,7 +48,7 @@ def plot_convergence_comparison_iterations(instance_idx, convergence_data, outpu
 
     plt.xlabel('Iteration', fontsize=13)
     plt.ylabel('Best Objective Value', fontsize=13)
-    plt.title(f'Convergence Comparison - Instance {instance_idx}', fontsize=15, fontweight='bold')
+    plt.title(f'Convergence Comparison - Instance {instance_idx} (Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
     plt.legend(fontsize=11, loc='best', framealpha=0.9)
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
@@ -59,7 +60,7 @@ def plot_convergence_comparison_iterations(instance_idx, convergence_data, outpu
     logging.info(f"Saved iterations-based comparison plot for instance {instance_idx}")
 
 
-def plot_convergence_comparison(instance_idx, convergence_data, output_path):
+def plot_convergence_comparison(instance_idx, convergence_data, output_path, max_iterations):
     """
     Plot comparison of convergence histories for different batch sizes on the same graph.
 
@@ -67,6 +68,7 @@ def plot_convergence_comparison(instance_idx, convergence_data, output_path):
         instance_idx: Index of the instance
         convergence_data: Dict mapping batch_size -> (convergence_history, time_history)
         output_path: Directory to save plots
+        max_iterations: Maximum number of iterations
     """
     plt.figure(figsize=(12, 7))
 
@@ -83,7 +85,7 @@ def plot_convergence_comparison(instance_idx, convergence_data, output_path):
 
     plt.xlabel('Objective Function Evaluations', fontsize=13)
     plt.ylabel('Best Objective Value', fontsize=13)
-    plt.title(f'Convergence Comparison - Instance {instance_idx}', fontsize=15, fontweight='bold')
+    plt.title(f'Convergence Comparison - Instance {instance_idx} (Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
     plt.legend(fontsize=11, loc='best', framealpha=0.9)
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
@@ -95,7 +97,7 @@ def plot_convergence_comparison(instance_idx, convergence_data, output_path):
     logging.info(f"Saved comparison plot for instance {instance_idx}")
 
 
-def plot_convergence_comparison_time(instance_idx, convergence_data, output_path):
+def plot_convergence_comparison_time(instance_idx, convergence_data, output_path, max_iterations):
     """
     Plot comparison of convergence histories for different batch sizes vs wall-clock time.
 
@@ -103,6 +105,7 @@ def plot_convergence_comparison_time(instance_idx, convergence_data, output_path
         instance_idx: Index of the instance
         convergence_data: Dict mapping batch_size -> (convergence_history, time_history)
         output_path: Directory to save plots
+        max_iterations: Maximum number of iterations
     """
     plt.figure(figsize=(12, 7))
 
@@ -117,7 +120,7 @@ def plot_convergence_comparison_time(instance_idx, convergence_data, output_path
 
     plt.xlabel('Wall-Clock Time (seconds)', fontsize=13)
     plt.ylabel('Best Objective Value', fontsize=13)
-    plt.title(f'Convergence Comparison - Instance {instance_idx}', fontsize=15, fontweight='bold')
+    plt.title(f'Convergence Comparison - Instance {instance_idx} (Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
     plt.legend(fontsize=11, loc='best', framealpha=0.9)
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
@@ -195,14 +198,14 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
         if config.save_plots:
             # Only create comparison plots (all batch sizes on same graph)
             if len(config.batch_sizes) > 1:
-                plot_convergence_comparison_iterations(i, convergence_data, search_output_dir)
-                plot_convergence_comparison(i, convergence_data, search_output_dir)
-                plot_convergence_comparison_time(i, convergence_data, search_output_dir)
+                plot_convergence_comparison_iterations(i, convergence_data, search_output_dir, config.search_iterations)
+                plot_convergence_comparison(i, convergence_data, search_output_dir, config.search_iterations)
+                plot_convergence_comparison_time(i, convergence_data, search_output_dir, config.search_iterations)
             else:
                 # If single batch size, still create plots but they'll only have one curve
-                plot_convergence_comparison_iterations(i, convergence_data, search_output_dir)
-                plot_convergence_comparison(i, convergence_data, search_output_dir)
-                plot_convergence_comparison_time(i, convergence_data, search_output_dir)
+                plot_convergence_comparison_iterations(i, convergence_data, search_output_dir, config.search_iterations)
+                plot_convergence_comparison(i, convergence_data, search_output_dir, config.search_iterations)
+                plot_convergence_comparison_time(i, convergence_data, search_output_dir, config.search_iterations)
 
     # Log final results for each batch size
     logging.info("=" * 60)
