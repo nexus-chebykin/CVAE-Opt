@@ -387,6 +387,132 @@ def plot_average_convergence_time_pct(averaged_data, output_path, max_iterations
     logging.info(f"Saved averaged time-based percentage comparison plot")
 
 
+def plot_sigma_comparison_iterations_pct(averaged_data, output_path, max_iterations, num_instances, batch_size):
+    """
+    Plot CMA-ES sigma comparison as percentage of initial value vs iterations.
+
+    Args:
+        averaged_data: Dict mapping sigma_value -> (avg_convergence_history, avg_time_history)
+        output_path: Directory to save plots
+        max_iterations: Maximum number of iterations
+        num_instances: Number of instances that were averaged
+        batch_size: Fixed batch size used for all sigma values
+    """
+    plt.figure(figsize=(12, 7))
+
+    # Define colors for different sigma values
+    colors = ['#E63946', '#F1A208', '#2A9D8F', '#264653', '#9B59B6']
+
+    # Find the maximum initial value across all sigma values for normalization
+    max_initial_value = max(convergence_history[0] for convergence_history, _ in averaged_data.values())
+
+    # Plot each sigma value
+    for idx, (sigma_value, (convergence_history, time_history)) in enumerate(sorted(averaged_data.items())):
+        iterations = list(range(1, len(convergence_history) + 1))
+        # Convert to percentage of maximum initial value
+        convergence_pct = [(value / max_initial_value) * 100 for value in convergence_history]
+        color = colors[idx % len(colors)]
+        plt.plot(iterations, convergence_pct, linewidth=2.5, color=color,
+                 label=f'Sigma: {sigma_value}', marker='o', markevery=max(1, len(iterations)//10), markersize=6)
+
+    plt.xlabel('Iteration', fontsize=13)
+    plt.ylabel('Objective Value (% of Max Initial)', fontsize=13)
+    plt.title(f'CMA-ES Sigma Comparison (Batch Size: {batch_size}, Across {num_instances} Instances, Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
+    plt.legend(fontsize=11, loc='best', framealpha=0.9)
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+
+    comparison_path = os.path.join(output_path, 'sigma_comparison_iterations_pct.png')
+    plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
+    plt.close()
+
+    logging.info(f"Saved sigma comparison iterations-based percentage plot")
+
+
+def plot_sigma_comparison_evaluations_pct(averaged_data, output_path, max_iterations, num_instances, batch_size):
+    """
+    Plot CMA-ES sigma comparison as percentage of initial value vs evaluations.
+
+    Args:
+        averaged_data: Dict mapping sigma_value -> (avg_convergence_history, avg_time_history)
+        output_path: Directory to save plots
+        max_iterations: Maximum number of iterations
+        num_instances: Number of instances that were averaged
+        batch_size: Fixed batch size used for all sigma values
+    """
+    plt.figure(figsize=(12, 7))
+
+    # Define colors for different sigma values
+    colors = ['#E63946', '#F1A208', '#2A9D8F', '#264653', '#9B59B6']
+
+    # Find the maximum initial value across all sigma values for normalization
+    max_initial_value = max(convergence_history[0] for convergence_history, _ in averaged_data.values())
+
+    # Plot each sigma value
+    for idx, (sigma_value, (convergence_history, time_history)) in enumerate(sorted(averaged_data.items())):
+        iterations = list(range(1, len(convergence_history) + 1))
+        evaluations = [iter_num * batch_size for iter_num in iterations]
+        # Convert to percentage of maximum initial value
+        convergence_pct = [(value / max_initial_value) * 100 for value in convergence_history]
+        color = colors[idx % len(colors)]
+        plt.plot(evaluations, convergence_pct, linewidth=2.5, color=color,
+                 label=f'Sigma: {sigma_value}', marker='o', markevery=max(1, len(evaluations)//10), markersize=6)
+
+    plt.xlabel('Objective Function Evaluations', fontsize=13)
+    plt.ylabel('Objective Value (% of Max Initial)', fontsize=13)
+    plt.title(f'CMA-ES Sigma Comparison (Batch Size: {batch_size}, Across {num_instances} Instances, Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
+    plt.legend(fontsize=11, loc='best', framealpha=0.9)
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+
+    comparison_path = os.path.join(output_path, 'sigma_comparison_evaluations_pct.png')
+    plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
+    plt.close()
+
+    logging.info(f"Saved sigma comparison evaluations-based percentage plot")
+
+
+def plot_sigma_comparison_time_pct(averaged_data, output_path, max_iterations, num_instances, batch_size):
+    """
+    Plot CMA-ES sigma comparison as percentage of initial value vs wall-clock time.
+
+    Args:
+        averaged_data: Dict mapping sigma_value -> (avg_convergence_history, avg_time_history)
+        output_path: Directory to save plots
+        max_iterations: Maximum number of iterations
+        num_instances: Number of instances that were averaged
+        batch_size: Fixed batch size used for all sigma values
+    """
+    plt.figure(figsize=(12, 7))
+
+    # Define colors for different sigma values
+    colors = ['#E63946', '#F1A208', '#2A9D8F', '#264653', '#9B59B6']
+
+    # Find the maximum initial value across all sigma values for normalization
+    max_initial_value = max(convergence_history[0] for convergence_history, _ in averaged_data.values())
+
+    # Plot each sigma value
+    for idx, (sigma_value, (convergence_history, time_history)) in enumerate(sorted(averaged_data.items())):
+        # Convert to percentage of maximum initial value
+        convergence_pct = [(value / max_initial_value) * 100 for value in convergence_history]
+        color = colors[idx % len(colors)]
+        plt.plot(time_history, convergence_pct, linewidth=2.5, color=color,
+                 label=f'Sigma: {sigma_value}', marker='o', markevery=max(1, len(time_history)//10), markersize=6)
+
+    plt.xlabel('Wall-Clock Time (seconds)', fontsize=13)
+    plt.ylabel('Objective Value (% of Max Initial)', fontsize=13)
+    plt.title(f'CMA-ES Sigma Comparison (Batch Size: {batch_size}, Across {num_instances} Instances, Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
+    plt.legend(fontsize=11, loc='best', framealpha=0.9)
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+
+    comparison_path = os.path.join(output_path, 'sigma_comparison_time_pct.png')
+    plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
+    plt.close()
+
+    logging.info(f"Saved sigma comparison time-based percentage plot")
+
+
 def compute_averaged_convergence(all_instances_data, batch_sizes):
     """
     Compute averaged convergence histories across all instances.
@@ -430,7 +556,7 @@ def compute_averaged_convergence(all_instances_data, batch_sizes):
     return averaged_data
 
 
-def solve_instance(model, instance, config, cost_fn, batch_size):
+def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None):
     """
     Solve a single instance using the configured optimizer (DE or CMA-ES).
 
@@ -440,6 +566,7 @@ def solve_instance(model, instance, config, cost_fn, batch_size):
         config: Configuration object with optimizer settings
         cost_fn: Cost function for evaluating tours
         batch_size: Population size for the optimizer
+        sigma0: Optional sigma0 for CMA-ES (overrides config.cmaes_sigma0 if provided)
 
     Returns:
         result_cost: Best objective value found
@@ -468,13 +595,15 @@ def solve_instance(model, instance, config, cost_fn, batch_size):
         )
     elif config.optimizer == 'cmaes':
         from cmaes import minimize
+        # Use provided sigma0 or fall back to config value
+        cmaes_sigma = sigma0 if sigma0 is not None else config.cmaes_sigma0
         result_cost, result_tour, convergence_history, time_history = minimize(
             decode,
             (model, config, instance, cost_fn),
             config.search_space_bound,
             config.search_space_size,
             popsize=batch_size,
-            sigma0=config.cmaes_sigma0,
+            sigma0=cmaes_sigma,
             maxiter=config.search_iterations,
             maxtime=config.search_timelimit
         )
@@ -500,46 +629,96 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
         search_output_dir = os.path.join(config.output_path, "search")
         os.makedirs(search_output_dir, exist_ok=True)
 
-    # Store results for each batch size
-    all_results = {bs: {'gap_values': [], 'cost_values': [], 'runtime_values': []}
-                   for bs in config.batch_sizes}
+    # Detect sigma sweep mode
+    sigma_sweep_mode = config.cmaes_sigma_sweep is not None
 
-    # Accumulator for averaging convergence data across instances
-    all_instances_data = {bs: {'convergence': [], 'time': []}
-                          for bs in config.batch_sizes}
+    if sigma_sweep_mode:
+        # Sigma sweep mode: loop over sigma values with fixed batch size
+        sweep_values = config.cmaes_sigma_sweep
+        fixed_batch_size = config.batch_sizes[0]
+        logging.info(f"Running CMA-ES sigma sweep mode with batch size {fixed_batch_size}")
+        logging.info(f"Sigma values: {sweep_values}")
+
+        # Store results for each sigma value
+        all_results = {sigma: {'gap_values': [], 'cost_values': [], 'runtime_values': []}
+                       for sigma in sweep_values}
+
+        # Accumulator for averaging convergence data across instances
+        all_instances_data = {sigma: {'convergence': [], 'time': []}
+                              for sigma in sweep_values}
+    else:
+        # Normal mode: loop over batch sizes
+        # Store results for each batch size
+        all_results = {bs: {'gap_values': [], 'cost_values': [], 'runtime_values': []}
+                       for bs in config.batch_sizes}
+
+        # Accumulator for averaging convergence data across instances
+        all_instances_data = {bs: {'convergence': [], 'time': []}
+                              for bs in config.batch_sizes}
 
     for i, instance in enumerate(instances):
         logging.info(f"Solving instance {i + 1}/{len(instances)}")
         convergence_data = {}
 
-        # Run search for each batch size
-        for batch_size in config.batch_sizes:
-            logging.info(f"  Batch size: {batch_size}")
-            start_time = time.time()
-            objective_value, solution, convergence_history, time_history = solve_instance(model, instance, config, cost_fn, batch_size)
-            runtime = time.time() - start_time
+        if sigma_sweep_mode:
+            # Run search for each sigma value with fixed batch size
+            for sigma_value in sweep_values:
+                logging.info(f"  Sigma: {sigma_value}")
+                start_time = time.time()
+                objective_value, solution, convergence_history, time_history = solve_instance(
+                    model, instance, config, cost_fn, fixed_batch_size, sigma0=sigma_value)
+                runtime = time.time() - start_time
 
-            # Store convergence history and time history for comparison plots
-            convergence_data[batch_size] = (convergence_history, time_history)
+                # Store convergence history and time history for comparison plots
+                convergence_data[sigma_value] = (convergence_history, time_history)
 
-            # Accumulate data for averaging across instances
-            all_instances_data[batch_size]['convergence'].append(convergence_history)
-            all_instances_data[batch_size]['time'].append(time_history)
+                # Accumulate data for averaging across instances
+                all_instances_data[sigma_value]['convergence'].append(convergence_history)
+                all_instances_data[sigma_value]['time'].append(time_history)
 
-            # Calculate gap if solutions provided
-            if solutions:
-                optimal_value = cost_fn(torch.Tensor(instance).unsqueeze(0),
-                                        torch.Tensor(solutions[i]).long().unsqueeze(0)).item()
-                gap = (objective_value / optimal_value - 1) * 100
-                all_results[batch_size]['gap_values'].append(gap)
-                logging.info(f"    Objective: {objective_value:.4f}, Optimal: {optimal_value:.4f}, Gap: {gap:.2f}%")
-            else:
-                all_results[batch_size]['gap_values'].append(0)
-                logging.info(f"    Objective: {objective_value:.4f}")
+                # Calculate gap if solutions provided
+                if solutions:
+                    optimal_value = cost_fn(torch.Tensor(instance).unsqueeze(0),
+                                            torch.Tensor(solutions[i]).long().unsqueeze(0)).item()
+                    gap = (objective_value / optimal_value - 1) * 100
+                    all_results[sigma_value]['gap_values'].append(gap)
+                    logging.info(f"    Objective: {objective_value:.4f}, Optimal: {optimal_value:.4f}, Gap: {gap:.2f}%")
+                else:
+                    all_results[sigma_value]['gap_values'].append(0)
+                    logging.info(f"    Objective: {objective_value:.4f}")
 
-            all_results[batch_size]['cost_values'].append(objective_value)
-            all_results[batch_size]['runtime_values'].append(runtime)
-            logging.info(f"    Runtime: {runtime:.2f}s")
+                all_results[sigma_value]['cost_values'].append(objective_value)
+                all_results[sigma_value]['runtime_values'].append(runtime)
+                logging.info(f"    Runtime: {runtime:.2f}s")
+        else:
+            # Run search for each batch size
+            for batch_size in config.batch_sizes:
+                logging.info(f"  Batch size: {batch_size}")
+                start_time = time.time()
+                objective_value, solution, convergence_history, time_history = solve_instance(model, instance, config, cost_fn, batch_size)
+                runtime = time.time() - start_time
+
+                # Store convergence history and time history for comparison plots
+                convergence_data[batch_size] = (convergence_history, time_history)
+
+                # Accumulate data for averaging across instances
+                all_instances_data[batch_size]['convergence'].append(convergence_history)
+                all_instances_data[batch_size]['time'].append(time_history)
+
+                # Calculate gap if solutions provided
+                if solutions:
+                    optimal_value = cost_fn(torch.Tensor(instance).unsqueeze(0),
+                                            torch.Tensor(solutions[i]).long().unsqueeze(0)).item()
+                    gap = (objective_value / optimal_value - 1) * 100
+                    all_results[batch_size]['gap_values'].append(gap)
+                    logging.info(f"    Objective: {objective_value:.4f}, Optimal: {optimal_value:.4f}, Gap: {gap:.2f}%")
+                else:
+                    all_results[batch_size]['gap_values'].append(0)
+                    logging.info(f"    Objective: {objective_value:.4f}")
+
+                all_results[batch_size]['cost_values'].append(objective_value)
+                all_results[batch_size]['runtime_values'].append(runtime)
+                logging.info(f"    Runtime: {runtime:.2f}s")
 
         # Save convergence comparison plots if enabled (only for per-instance mode)
         if config.save_plots and config.plot_mode == 'per_instance':
@@ -566,39 +745,71 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 plot_convergence_comparison_time_pct(i, convergence_data, search_output_dir, config.search_iterations, optimizer_name)
 
     # Generate averaged plots if in average mode
-    if config.save_plots and config.plot_mode == 'average' and len(config.batch_sizes) > 1:
-        logging.info("Computing averaged convergence data across all instances...")
-        averaged_data = compute_averaged_convergence(all_instances_data, config.batch_sizes)
+    if config.save_plots and config.plot_mode == 'average':
+        if sigma_sweep_mode:
+            # Sigma sweep mode: generate sigma comparison plots
+            logging.info("Computing averaged convergence data across all instances for sigma sweep...")
+            averaged_data = compute_averaged_convergence(all_instances_data, sweep_values)
 
-        # Format optimizer name for display
-        optimizer_name = 'CMA-ES' if config.optimizer == 'cmaes' else 'DE'
+            # Generate sigma comparison plots
+            plot_sigma_comparison_iterations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size)
+            plot_sigma_comparison_evaluations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size)
+            plot_sigma_comparison_time_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size)
+        elif len(config.batch_sizes) > 1:
+            # Normal mode: generate batch size comparison plots
+            logging.info("Computing averaged convergence data across all instances...")
+            averaged_data = compute_averaged_convergence(all_instances_data, config.batch_sizes)
 
-        # Generate averaged percentage plots
-        plot_average_convergence_iterations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), optimizer_name)
-        plot_average_convergence_evaluations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), optimizer_name)
-        plot_average_convergence_time_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), optimizer_name)
+            # Format optimizer name for display
+            optimizer_name = 'CMA-ES' if config.optimizer == 'cmaes' else 'DE'
 
-    # Log final results for each batch size
+            # Generate averaged percentage plots
+            plot_average_convergence_iterations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), optimizer_name)
+            plot_average_convergence_evaluations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), optimizer_name)
+            plot_average_convergence_time_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), optimizer_name)
+
+    # Log final results
     logging.info("=" * 60)
     logging.info("Final search results:")
-    for batch_size in config.batch_sizes:
-        results = all_results[batch_size]
-        logging.info(f"\nBatch size {batch_size}:")
-        logging.info(f"  Mean cost: {np.mean(results['cost_values']):.4f}")
-        logging.info(f"  Mean runtime: {np.mean(results['runtime_values']):.2f}s")
-        if solutions:
-            logging.info(f"  Mean gap: {np.mean(results['gap_values']):.2f}%")
-            logging.info(f"  Std gap: {np.std(results['gap_values']):.2f}%")
 
-        # Save results to file
-        if verbose and not solutions:
-            output_file = os.path.join(config.output_path, "search", f'results_bs{batch_size}.txt')
-            results_array = np.array(list(zip(results['cost_values'], results['runtime_values'])))
-            np.savetxt(output_file, results_array, delimiter=',', fmt=['%s', '%s'],
-                       header="cost, runtime")
+    if sigma_sweep_mode:
+        # Log results for each sigma value
+        for sigma_value in sweep_values:
+            results = all_results[sigma_value]
+            logging.info(f"\nSigma: {sigma_value}:")
+            logging.info(f"  Mean cost: {np.mean(results['cost_values']):.4f}")
+            logging.info(f"  Mean runtime: {np.mean(results['runtime_values']):.2f}s")
+            if solutions:
+                logging.info(f"  Mean gap: {np.mean(results['gap_values']):.2f}%")
+                logging.info(f"  Std gap: {np.std(results['gap_values']):.2f}%")
+    else:
+        # Log results for each batch size
+        for batch_size in config.batch_sizes:
+            results = all_results[batch_size]
+            logging.info(f"\nBatch size {batch_size}:")
+            logging.info(f"  Mean cost: {np.mean(results['cost_values']):.4f}")
+            logging.info(f"  Mean runtime: {np.mean(results['runtime_values']):.2f}s")
+            if solutions:
+                logging.info(f"  Mean gap: {np.mean(results['gap_values']):.2f}%")
+                logging.info(f"  Std gap: {np.std(results['gap_values']):.2f}%")
 
-    # Return results for the first batch size (for backward compatibility)
-    first_batch_size = config.batch_sizes[0]
-    return (np.mean(all_results[first_batch_size]['gap_values']),
-            np.mean(all_results[first_batch_size]['runtime_values']),
-            all_results[first_batch_size]['cost_values'])
+            # Save results to file
+            if verbose and not solutions:
+                output_file = os.path.join(config.output_path, "search", f'results_bs{batch_size}.txt')
+                results_array = np.array(list(zip(results['cost_values'], results['runtime_values'])))
+                np.savetxt(output_file, results_array, delimiter=',', fmt=['%s', '%s'],
+                           header="cost, runtime")
+
+    # Return results (for backward compatibility)
+    if sigma_sweep_mode:
+        # Return results for the first sigma value
+        first_sigma = sweep_values[0]
+        return (np.mean(all_results[first_sigma]['gap_values']),
+                np.mean(all_results[first_sigma]['runtime_values']),
+                all_results[first_sigma]['cost_values'])
+    else:
+        # Return results for the first batch size
+        first_batch_size = config.batch_sizes[0]
+        return (np.mean(all_results[first_batch_size]['gap_values']),
+                np.mean(all_results[first_batch_size]['runtime_values']),
+                all_results[first_batch_size]['cost_values'])

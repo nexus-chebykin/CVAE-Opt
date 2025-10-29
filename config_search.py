@@ -40,6 +40,9 @@ def get_config(args=None):
     # CMA-ES parameters
     parser.add_argument('--cmaes_sigma0', default=0.5, type=float,
                         help='Initial step size for CMA-ES (default: 0.5, typically 0.2-0.5 of search range)')
+    parser.add_argument('--cmaes_sigma_sweep', nargs='+', type=float, default=None,
+                        help='List of sigma values to test for CMA-ES comparison (e.g., --cmaes_sigma_sweep 0.3 0.5 1.0 1.5). '
+                             'When provided, runs CMA-ES with each sigma value using a single fixed batch size.')
 
     config = parser.parse_args()
     config.device = torch.device(config.device)
@@ -47,5 +50,12 @@ def get_config(args=None):
     # If batch_sizes not specified, use search_batch_size as default
     if config.batch_sizes is None:
         config.batch_sizes = [config.search_batch_size]
+
+    # Validate sigma sweep mode
+    if config.cmaes_sigma_sweep is not None:
+        if config.optimizer != 'cmaes':
+            parser.error("--cmaes_sigma_sweep can only be used with --optimizer cmaes")
+        if len(config.batch_sizes) != 1:
+            parser.error("--cmaes_sigma_sweep requires exactly one batch size (use --batch_sizes 600)")
 
     return config
