@@ -24,7 +24,7 @@ def evaluate(Z, model, config, instance, cost_fn):
     return costs.tolist()
 
 
-def plot_convergence_comparison_iterations(instance_idx, convergence_data, output_path, max_iterations):
+def plot_convergence_comparison_iterations(instance_idx, convergence_data, output_path, max_iterations, optimizer='DE'):
     """
     Plot comparison of convergence histories for different batch sizes vs iterations.
 
@@ -33,6 +33,7 @@ def plot_convergence_comparison_iterations(instance_idx, convergence_data, outpu
         convergence_data: Dict mapping batch_size -> (convergence_history, time_history)
         output_path: Directory to save plots
         max_iterations: Maximum number of iterations
+        optimizer: Optimizer name for plot title (default: 'DE')
     """
     plt.figure(figsize=(12, 7))
 
@@ -48,7 +49,7 @@ def plot_convergence_comparison_iterations(instance_idx, convergence_data, outpu
 
     plt.xlabel('Iteration', fontsize=13)
     plt.ylabel('Best Objective Value', fontsize=13)
-    plt.title(f'Convergence Comparison - Instance {instance_idx} (Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
+    plt.title(f'Convergence Comparison [{optimizer}] - Instance {instance_idx} (Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
     plt.legend(fontsize=11, loc='best', framealpha=0.9)
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
@@ -60,7 +61,7 @@ def plot_convergence_comparison_iterations(instance_idx, convergence_data, outpu
     logging.info(f"Saved iterations-based comparison plot for instance {instance_idx}")
 
 
-def plot_convergence_comparison(instance_idx, convergence_data, output_path, max_iterations):
+def plot_convergence_comparison(instance_idx, convergence_data, output_path, max_iterations, optimizer='DE'):
     """
     Plot comparison of convergence histories for different batch sizes on the same graph.
 
@@ -69,6 +70,7 @@ def plot_convergence_comparison(instance_idx, convergence_data, output_path, max
         convergence_data: Dict mapping batch_size -> (convergence_history, time_history)
         output_path: Directory to save plots
         max_iterations: Maximum number of iterations
+        optimizer: Optimizer name for plot title (default: 'DE')
     """
     plt.figure(figsize=(12, 7))
 
@@ -85,7 +87,7 @@ def plot_convergence_comparison(instance_idx, convergence_data, output_path, max
 
     plt.xlabel('Objective Function Evaluations', fontsize=13)
     plt.ylabel('Best Objective Value', fontsize=13)
-    plt.title(f'Convergence Comparison - Instance {instance_idx} (Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
+    plt.title(f'Convergence Comparison [{optimizer}] - Instance {instance_idx} (Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
     plt.legend(fontsize=11, loc='best', framealpha=0.9)
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
@@ -97,7 +99,7 @@ def plot_convergence_comparison(instance_idx, convergence_data, output_path, max
     logging.info(f"Saved comparison plot for instance {instance_idx}")
 
 
-def plot_convergence_comparison_time(instance_idx, convergence_data, output_path, max_iterations):
+def plot_convergence_comparison_time(instance_idx, convergence_data, output_path, max_iterations, optimizer='DE'):
     """
     Plot comparison of convergence histories for different batch sizes vs wall-clock time.
 
@@ -106,6 +108,7 @@ def plot_convergence_comparison_time(instance_idx, convergence_data, output_path
         convergence_data: Dict mapping batch_size -> (convergence_history, time_history)
         output_path: Directory to save plots
         max_iterations: Maximum number of iterations
+        optimizer: Optimizer name for plot title (default: 'DE')
     """
     plt.figure(figsize=(12, 7))
 
@@ -120,7 +123,7 @@ def plot_convergence_comparison_time(instance_idx, convergence_data, output_path
 
     plt.xlabel('Wall-Clock Time (seconds)', fontsize=13)
     plt.ylabel('Best Objective Value', fontsize=13)
-    plt.title(f'Convergence Comparison - Instance {instance_idx} (Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
+    plt.title(f'Convergence Comparison [{optimizer}] - Instance {instance_idx} (Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
     plt.legend(fontsize=11, loc='best', framealpha=0.9)
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
@@ -132,7 +135,7 @@ def plot_convergence_comparison_time(instance_idx, convergence_data, output_path
     logging.info(f"Saved time-based comparison plot for instance {instance_idx}")
 
 
-def plot_convergence_comparison_iterations_pct(instance_idx, convergence_data, output_path, max_iterations):
+def plot_convergence_comparison_iterations_pct(instance_idx, convergence_data, output_path, max_iterations, optimizer='DE'):
     """
     Plot comparison of convergence histories as percentage of initial value vs iterations.
 
@@ -141,6 +144,7 @@ def plot_convergence_comparison_iterations_pct(instance_idx, convergence_data, o
         convergence_data: Dict mapping batch_size -> (convergence_history, time_history)
         output_path: Directory to save plots
         max_iterations: Maximum number of iterations
+        optimizer: Optimizer name for plot title (default: 'DE')
     """
     plt.figure(figsize=(12, 7))
 
@@ -161,7 +165,7 @@ def plot_convergence_comparison_iterations_pct(instance_idx, convergence_data, o
 
     plt.xlabel('Iteration', fontsize=13)
     plt.ylabel('Objective Value (% of Max Initial)', fontsize=13)
-    plt.title(f'Convergence Comparison - Instance {instance_idx} (Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
+    plt.title(f'Convergence Comparison [{optimizer}] - Instance {instance_idx} (Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
     plt.legend(fontsize=11, loc='best', framealpha=0.9)
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
@@ -173,7 +177,7 @@ def plot_convergence_comparison_iterations_pct(instance_idx, convergence_data, o
     logging.info(f"Saved iterations-based percentage comparison plot for instance {instance_idx}")
 
 
-def plot_convergence_comparison_pct(instance_idx, convergence_data, output_path, max_iterations):
+def plot_convergence_comparison_pct(instance_idx, convergence_data, output_path, max_iterations, optimizer='DE'):
     """
     Plot comparison of convergence histories as percentage of initial value vs evaluations.
 
@@ -182,6 +186,7 @@ def plot_convergence_comparison_pct(instance_idx, convergence_data, output_path,
         convergence_data: Dict mapping batch_size -> (convergence_history, time_history)
         output_path: Directory to save plots
         max_iterations: Maximum number of iterations
+        optimizer: Optimizer name for plot title (default: 'DE')
     """
     plt.figure(figsize=(12, 7))
 
@@ -203,7 +208,7 @@ def plot_convergence_comparison_pct(instance_idx, convergence_data, output_path,
 
     plt.xlabel('Objective Function Evaluations', fontsize=13)
     plt.ylabel('Objective Value (% of Max Initial)', fontsize=13)
-    plt.title(f'Convergence Comparison - Instance {instance_idx} (Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
+    plt.title(f'Convergence Comparison [{optimizer}] - Instance {instance_idx} (Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
     plt.legend(fontsize=11, loc='best', framealpha=0.9)
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
@@ -215,7 +220,7 @@ def plot_convergence_comparison_pct(instance_idx, convergence_data, output_path,
     logging.info(f"Saved evaluations-based percentage comparison plot for instance {instance_idx}")
 
 
-def plot_convergence_comparison_time_pct(instance_idx, convergence_data, output_path, max_iterations):
+def plot_convergence_comparison_time_pct(instance_idx, convergence_data, output_path, max_iterations, optimizer='DE'):
     """
     Plot comparison of convergence histories as percentage of initial value vs wall-clock time.
 
@@ -224,6 +229,7 @@ def plot_convergence_comparison_time_pct(instance_idx, convergence_data, output_
         convergence_data: Dict mapping batch_size -> (convergence_history, time_history)
         output_path: Directory to save plots
         max_iterations: Maximum number of iterations
+        optimizer: Optimizer name for plot title (default: 'DE')
     """
     plt.figure(figsize=(12, 7))
 
@@ -243,7 +249,7 @@ def plot_convergence_comparison_time_pct(instance_idx, convergence_data, output_
 
     plt.xlabel('Wall-Clock Time (seconds)', fontsize=13)
     plt.ylabel('Objective Value (% of Max Initial)', fontsize=13)
-    plt.title(f'Convergence Comparison - Instance {instance_idx} (Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
+    plt.title(f'Convergence Comparison [{optimizer}] - Instance {instance_idx} (Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
     plt.legend(fontsize=11, loc='best', framealpha=0.9)
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
@@ -255,7 +261,7 @@ def plot_convergence_comparison_time_pct(instance_idx, convergence_data, output_
     logging.info(f"Saved time-based percentage comparison plot for instance {instance_idx}")
 
 
-def plot_average_convergence_iterations_pct(averaged_data, output_path, max_iterations, num_instances):
+def plot_average_convergence_iterations_pct(averaged_data, output_path, max_iterations, num_instances, optimizer='DE'):
     """
     Plot averaged convergence histories as percentage of initial value vs iterations.
 
@@ -264,6 +270,7 @@ def plot_average_convergence_iterations_pct(averaged_data, output_path, max_iter
         output_path: Directory to save plots
         max_iterations: Maximum number of iterations
         num_instances: Number of instances that were averaged
+        optimizer: Optimizer name for plot title (default: 'DE')
     """
     plt.figure(figsize=(12, 7))
 
@@ -284,7 +291,7 @@ def plot_average_convergence_iterations_pct(averaged_data, output_path, max_iter
 
     plt.xlabel('Iteration', fontsize=13)
     plt.ylabel('Objective Value (% of Max Initial)', fontsize=13)
-    plt.title(f'Average Convergence Comparison (Across {num_instances} Instances, Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
+    plt.title(f'Average Convergence Comparison [{optimizer}] (Across {num_instances} Instances, Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
     plt.legend(fontsize=11, loc='best', framealpha=0.9)
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
@@ -296,7 +303,7 @@ def plot_average_convergence_iterations_pct(averaged_data, output_path, max_iter
     logging.info(f"Saved averaged iterations-based percentage comparison plot")
 
 
-def plot_average_convergence_evaluations_pct(averaged_data, output_path, max_iterations, num_instances):
+def plot_average_convergence_evaluations_pct(averaged_data, output_path, max_iterations, num_instances, optimizer='DE'):
     """
     Plot averaged convergence histories as percentage of initial value vs evaluations.
 
@@ -305,6 +312,7 @@ def plot_average_convergence_evaluations_pct(averaged_data, output_path, max_ite
         output_path: Directory to save plots
         max_iterations: Maximum number of iterations
         num_instances: Number of instances that were averaged
+        optimizer: Optimizer name for plot title (default: 'DE')
     """
     plt.figure(figsize=(12, 7))
 
@@ -326,7 +334,7 @@ def plot_average_convergence_evaluations_pct(averaged_data, output_path, max_ite
 
     plt.xlabel('Objective Function Evaluations', fontsize=13)
     plt.ylabel('Objective Value (% of Max Initial)', fontsize=13)
-    plt.title(f'Average Convergence Comparison (Across {num_instances} Instances, Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
+    plt.title(f'Average Convergence Comparison [{optimizer}] (Across {num_instances} Instances, Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
     plt.legend(fontsize=11, loc='best', framealpha=0.9)
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
@@ -338,7 +346,7 @@ def plot_average_convergence_evaluations_pct(averaged_data, output_path, max_ite
     logging.info(f"Saved averaged evaluations-based percentage comparison plot")
 
 
-def plot_average_convergence_time_pct(averaged_data, output_path, max_iterations, num_instances):
+def plot_average_convergence_time_pct(averaged_data, output_path, max_iterations, num_instances, optimizer='DE'):
     """
     Plot averaged convergence histories as percentage of initial value vs wall-clock time.
 
@@ -347,6 +355,7 @@ def plot_average_convergence_time_pct(averaged_data, output_path, max_iterations
         output_path: Directory to save plots
         max_iterations: Maximum number of iterations
         num_instances: Number of instances that were averaged
+        optimizer: Optimizer name for plot title (default: 'DE')
     """
     plt.figure(figsize=(12, 7))
 
@@ -366,7 +375,7 @@ def plot_average_convergence_time_pct(averaged_data, output_path, max_iterations
 
     plt.xlabel('Wall-Clock Time (seconds)', fontsize=13)
     plt.ylabel('Objective Value (% of Max Initial)', fontsize=13)
-    plt.title(f'Average Convergence Comparison (Across {num_instances} Instances, Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
+    plt.title(f'Average Convergence Comparison [{optimizer}] (Across {num_instances} Instances, Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
     plt.legend(fontsize=11, loc='best', framealpha=0.9)
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
@@ -421,16 +430,57 @@ def compute_averaged_convergence(all_instances_data, batch_sizes):
     return averaged_data
 
 
-def solve_instance_de(model, instance, config, cost_fn, batch_size):
+def solve_instance(model, instance, config, cost_fn, batch_size):
+    """
+    Solve a single instance using the configured optimizer (DE or CMA-ES).
+
+    Args:
+        model: Neural network model
+        instance: Problem instance to solve
+        config: Configuration object with optimizer settings
+        cost_fn: Cost function for evaluating tours
+        batch_size: Population size for the optimizer
+
+    Returns:
+        result_cost: Best objective value found
+        solution: Best solution (tour)
+        convergence_history: History of best fitness per iteration
+        time_history: History of elapsed time per iteration
+    """
     instance = torch.Tensor(instance)
     instance = instance.unsqueeze(0).expand(batch_size, -1, -1)
     instance = instance.to(config.device)
     model.reset_decoder(batch_size, config)
 
-    result_cost, result_tour, convergence_history, time_history = minimize(decode, (model, config, instance, cost_fn), config.search_space_bound,
-                                        config.search_space_size, popsize=batch_size,
-                                        mutate=config.de_mutate, recombination=config.de_recombine,
-                                        maxiter=config.search_iterations, maxtime=config.search_timelimit)
+    # Select optimizer based on config
+    if config.optimizer == 'de':
+        from de import minimize
+        result_cost, result_tour, convergence_history, time_history = minimize(
+            decode,
+            (model, config, instance, cost_fn),
+            config.search_space_bound,
+            config.search_space_size,
+            popsize=batch_size,
+            mutate=config.de_mutate,
+            recombination=config.de_recombine,
+            maxiter=config.search_iterations,
+            maxtime=config.search_timelimit
+        )
+    elif config.optimizer == 'cmaes':
+        from cmaes import minimize
+        result_cost, result_tour, convergence_history, time_history = minimize(
+            decode,
+            (model, config, instance, cost_fn),
+            config.search_space_bound,
+            config.search_space_size,
+            popsize=batch_size,
+            sigma0=config.cmaes_sigma0,
+            maxiter=config.search_iterations,
+            maxtime=config.search_timelimit
+        )
+    else:
+        raise ValueError(f"Unknown optimizer: {config.optimizer}")
+
     solution = decode(np.array([result_tour] * batch_size), model, config, instance, cost_fn)[0][0].tolist()
     return result_cost, solution, convergence_history, time_history
 
@@ -466,7 +516,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
         for batch_size in config.batch_sizes:
             logging.info(f"  Batch size: {batch_size}")
             start_time = time.time()
-            objective_value, solution, convergence_history, time_history = solve_instance_de(model, instance, config, cost_fn, batch_size)
+            objective_value, solution, convergence_history, time_history = solve_instance(model, instance, config, cost_fn, batch_size)
             runtime = time.time() - start_time
 
             # Store convergence history and time history for comparison plots
@@ -493,34 +543,40 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
 
         # Save convergence comparison plots if enabled (only for per-instance mode)
         if config.save_plots and config.plot_mode == 'per_instance':
+            # Format optimizer name for display
+            optimizer_name = 'CMA-ES' if config.optimizer == 'cmaes' else 'DE'
+
             # Create absolute value comparison plots (all batch sizes on same graph)
             if len(config.batch_sizes) > 1:
-                plot_convergence_comparison_iterations(i, convergence_data, search_output_dir, config.search_iterations)
-                plot_convergence_comparison(i, convergence_data, search_output_dir, config.search_iterations)
-                plot_convergence_comparison_time(i, convergence_data, search_output_dir, config.search_iterations)
+                plot_convergence_comparison_iterations(i, convergence_data, search_output_dir, config.search_iterations, optimizer_name)
+                plot_convergence_comparison(i, convergence_data, search_output_dir, config.search_iterations, optimizer_name)
+                plot_convergence_comparison_time(i, convergence_data, search_output_dir, config.search_iterations, optimizer_name)
                 # Create percentage-based comparison plots
-                plot_convergence_comparison_iterations_pct(i, convergence_data, search_output_dir, config.search_iterations)
-                plot_convergence_comparison_pct(i, convergence_data, search_output_dir, config.search_iterations)
-                plot_convergence_comparison_time_pct(i, convergence_data, search_output_dir, config.search_iterations)
+                plot_convergence_comparison_iterations_pct(i, convergence_data, search_output_dir, config.search_iterations, optimizer_name)
+                plot_convergence_comparison_pct(i, convergence_data, search_output_dir, config.search_iterations, optimizer_name)
+                plot_convergence_comparison_time_pct(i, convergence_data, search_output_dir, config.search_iterations, optimizer_name)
             else:
                 # If single batch size, still create plots but they'll only have one curve
-                plot_convergence_comparison_iterations(i, convergence_data, search_output_dir, config.search_iterations)
-                plot_convergence_comparison(i, convergence_data, search_output_dir, config.search_iterations)
-                plot_convergence_comparison_time(i, convergence_data, search_output_dir, config.search_iterations)
+                plot_convergence_comparison_iterations(i, convergence_data, search_output_dir, config.search_iterations, optimizer_name)
+                plot_convergence_comparison(i, convergence_data, search_output_dir, config.search_iterations, optimizer_name)
+                plot_convergence_comparison_time(i, convergence_data, search_output_dir, config.search_iterations, optimizer_name)
                 # Create percentage-based plots
-                plot_convergence_comparison_iterations_pct(i, convergence_data, search_output_dir, config.search_iterations)
-                plot_convergence_comparison_pct(i, convergence_data, search_output_dir, config.search_iterations)
-                plot_convergence_comparison_time_pct(i, convergence_data, search_output_dir, config.search_iterations)
+                plot_convergence_comparison_iterations_pct(i, convergence_data, search_output_dir, config.search_iterations, optimizer_name)
+                plot_convergence_comparison_pct(i, convergence_data, search_output_dir, config.search_iterations, optimizer_name)
+                plot_convergence_comparison_time_pct(i, convergence_data, search_output_dir, config.search_iterations, optimizer_name)
 
     # Generate averaged plots if in average mode
     if config.save_plots and config.plot_mode == 'average' and len(config.batch_sizes) > 1:
         logging.info("Computing averaged convergence data across all instances...")
         averaged_data = compute_averaged_convergence(all_instances_data, config.batch_sizes)
 
+        # Format optimizer name for display
+        optimizer_name = 'CMA-ES' if config.optimizer == 'cmaes' else 'DE'
+
         # Generate averaged percentage plots
-        plot_average_convergence_iterations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances))
-        plot_average_convergence_evaluations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances))
-        plot_average_convergence_time_pct(averaged_data, search_output_dir, config.search_iterations, len(instances))
+        plot_average_convergence_iterations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), optimizer_name)
+        plot_average_convergence_evaluations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), optimizer_name)
+        plot_average_convergence_time_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), optimizer_name)
 
     # Log final results for each batch size
     logging.info("=" * 60)
