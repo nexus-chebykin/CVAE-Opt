@@ -147,18 +147,20 @@ def plot_convergence_comparison_iterations_pct(instance_idx, convergence_data, o
     # Define colors for different batch sizes
     colors = ['#E63946', '#F1A208', '#2A9D8F', '#264653']
 
+    # Find the maximum initial value across all batch sizes for normalization
+    max_initial_value = max(convergence_history[0] for convergence_history, _ in convergence_data.values())
+
     # Plot each batch size
     for idx, (batch_size, (convergence_history, time_history)) in enumerate(sorted(convergence_data.items())):
         iterations = list(range(1, len(convergence_history) + 1))
-        initial_value = convergence_history[0]
-        # Convert to percentage of initial value
-        convergence_pct = [(value / initial_value) * 100 for value in convergence_history]
+        # Convert to percentage of maximum initial value
+        convergence_pct = [(value / max_initial_value) * 100 for value in convergence_history]
         color = colors[idx % len(colors)]
         plt.plot(iterations, convergence_pct, linewidth=2.5, color=color,
                  label=f'Batch Size: {batch_size}', marker='o', markevery=max(1, len(iterations)//10), markersize=6)
 
     plt.xlabel('Iteration', fontsize=13)
-    plt.ylabel('Objective Value (% of Initial)', fontsize=13)
+    plt.ylabel('Objective Value (% of Max Initial)', fontsize=13)
     plt.title(f'Convergence Comparison - Instance {instance_idx} (Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
     plt.legend(fontsize=11, loc='best', framealpha=0.9)
     plt.grid(True, alpha=0.3)
@@ -186,19 +188,21 @@ def plot_convergence_comparison_pct(instance_idx, convergence_data, output_path,
     # Define colors for different batch sizes
     colors = ['#E63946', '#F1A208', '#2A9D8F', '#264653']
 
+    # Find the maximum initial value across all batch sizes for normalization
+    max_initial_value = max(convergence_history[0] for convergence_history, _ in convergence_data.values())
+
     # Plot each batch size
     for idx, (batch_size, (convergence_history, time_history)) in enumerate(sorted(convergence_data.items())):
         iterations = list(range(1, len(convergence_history) + 1))
         evaluations = [iter_num * batch_size for iter_num in iterations]
-        initial_value = convergence_history[0]
-        # Convert to percentage of initial value
-        convergence_pct = [(value / initial_value) * 100 for value in convergence_history]
+        # Convert to percentage of maximum initial value
+        convergence_pct = [(value / max_initial_value) * 100 for value in convergence_history]
         color = colors[idx % len(colors)]
         plt.plot(evaluations, convergence_pct, linewidth=2.5, color=color,
                  label=f'Batch Size: {batch_size}', marker='o', markevery=max(1, len(evaluations)//10), markersize=6)
 
     plt.xlabel('Objective Function Evaluations', fontsize=13)
-    plt.ylabel('Objective Value (% of Initial)', fontsize=13)
+    plt.ylabel('Objective Value (% of Max Initial)', fontsize=13)
     plt.title(f'Convergence Comparison - Instance {instance_idx} (Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
     plt.legend(fontsize=11, loc='best', framealpha=0.9)
     plt.grid(True, alpha=0.3)
@@ -226,17 +230,19 @@ def plot_convergence_comparison_time_pct(instance_idx, convergence_data, output_
     # Define colors for different batch sizes
     colors = ['#E63946', '#F1A208', '#2A9D8F', '#264653']
 
+    # Find the maximum initial value across all batch sizes for normalization
+    max_initial_value = max(convergence_history[0] for convergence_history, _ in convergence_data.values())
+
     # Plot each batch size
     for idx, (batch_size, (convergence_history, time_history)) in enumerate(sorted(convergence_data.items())):
-        initial_value = convergence_history[0]
-        # Convert to percentage of initial value
-        convergence_pct = [(value / initial_value) * 100 for value in convergence_history]
+        # Convert to percentage of maximum initial value
+        convergence_pct = [(value / max_initial_value) * 100 for value in convergence_history]
         color = colors[idx % len(colors)]
         plt.plot(time_history, convergence_pct, linewidth=2.5, color=color,
                  label=f'Batch Size: {batch_size}', marker='o', markevery=max(1, len(time_history)//10), markersize=6)
 
     plt.xlabel('Wall-Clock Time (seconds)', fontsize=13)
-    plt.ylabel('Objective Value (% of Initial)', fontsize=13)
+    plt.ylabel('Objective Value (% of Max Initial)', fontsize=13)
     plt.title(f'Convergence Comparison - Instance {instance_idx} (Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
     plt.legend(fontsize=11, loc='best', framealpha=0.9)
     plt.grid(True, alpha=0.3)
