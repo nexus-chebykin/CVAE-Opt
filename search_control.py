@@ -255,6 +255,172 @@ def plot_convergence_comparison_time_pct(instance_idx, convergence_data, output_
     logging.info(f"Saved time-based percentage comparison plot for instance {instance_idx}")
 
 
+def plot_average_convergence_iterations_pct(averaged_data, output_path, max_iterations, num_instances):
+    """
+    Plot averaged convergence histories as percentage of initial value vs iterations.
+
+    Args:
+        averaged_data: Dict mapping batch_size -> (avg_convergence_history, avg_time_history)
+        output_path: Directory to save plots
+        max_iterations: Maximum number of iterations
+        num_instances: Number of instances that were averaged
+    """
+    plt.figure(figsize=(12, 7))
+
+    # Define colors for different batch sizes
+    colors = ['#E63946', '#F1A208', '#2A9D8F', '#264653']
+
+    # Find the maximum initial value across all batch sizes for normalization
+    max_initial_value = max(convergence_history[0] for convergence_history, _ in averaged_data.values())
+
+    # Plot each batch size
+    for idx, (batch_size, (convergence_history, time_history)) in enumerate(sorted(averaged_data.items())):
+        iterations = list(range(1, len(convergence_history) + 1))
+        # Convert to percentage of maximum initial value
+        convergence_pct = [(value / max_initial_value) * 100 for value in convergence_history]
+        color = colors[idx % len(colors)]
+        plt.plot(iterations, convergence_pct, linewidth=2.5, color=color,
+                 label=f'Batch Size: {batch_size}', marker='o', markevery=max(1, len(iterations)//10), markersize=6)
+
+    plt.xlabel('Iteration', fontsize=13)
+    plt.ylabel('Objective Value (% of Max Initial)', fontsize=13)
+    plt.title(f'Average Convergence Comparison (Across {num_instances} Instances, Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
+    plt.legend(fontsize=11, loc='best', framealpha=0.9)
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+
+    comparison_path = os.path.join(output_path, 'average_convergence_iterations_pct.png')
+    plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
+    plt.close()
+
+    logging.info(f"Saved averaged iterations-based percentage comparison plot")
+
+
+def plot_average_convergence_evaluations_pct(averaged_data, output_path, max_iterations, num_instances):
+    """
+    Plot averaged convergence histories as percentage of initial value vs evaluations.
+
+    Args:
+        averaged_data: Dict mapping batch_size -> (avg_convergence_history, avg_time_history)
+        output_path: Directory to save plots
+        max_iterations: Maximum number of iterations
+        num_instances: Number of instances that were averaged
+    """
+    plt.figure(figsize=(12, 7))
+
+    # Define colors for different batch sizes
+    colors = ['#E63946', '#F1A208', '#2A9D8F', '#264653']
+
+    # Find the maximum initial value across all batch sizes for normalization
+    max_initial_value = max(convergence_history[0] for convergence_history, _ in averaged_data.values())
+
+    # Plot each batch size
+    for idx, (batch_size, (convergence_history, time_history)) in enumerate(sorted(averaged_data.items())):
+        iterations = list(range(1, len(convergence_history) + 1))
+        evaluations = [iter_num * batch_size for iter_num in iterations]
+        # Convert to percentage of maximum initial value
+        convergence_pct = [(value / max_initial_value) * 100 for value in convergence_history]
+        color = colors[idx % len(colors)]
+        plt.plot(evaluations, convergence_pct, linewidth=2.5, color=color,
+                 label=f'Batch Size: {batch_size}', marker='o', markevery=max(1, len(evaluations)//10), markersize=6)
+
+    plt.xlabel('Objective Function Evaluations', fontsize=13)
+    plt.ylabel('Objective Value (% of Max Initial)', fontsize=13)
+    plt.title(f'Average Convergence Comparison (Across {num_instances} Instances, Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
+    plt.legend(fontsize=11, loc='best', framealpha=0.9)
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+
+    comparison_path = os.path.join(output_path, 'average_convergence_evaluations_pct.png')
+    plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
+    plt.close()
+
+    logging.info(f"Saved averaged evaluations-based percentage comparison plot")
+
+
+def plot_average_convergence_time_pct(averaged_data, output_path, max_iterations, num_instances):
+    """
+    Plot averaged convergence histories as percentage of initial value vs wall-clock time.
+
+    Args:
+        averaged_data: Dict mapping batch_size -> (avg_convergence_history, avg_time_history)
+        output_path: Directory to save plots
+        max_iterations: Maximum number of iterations
+        num_instances: Number of instances that were averaged
+    """
+    plt.figure(figsize=(12, 7))
+
+    # Define colors for different batch sizes
+    colors = ['#E63946', '#F1A208', '#2A9D8F', '#264653']
+
+    # Find the maximum initial value across all batch sizes for normalization
+    max_initial_value = max(convergence_history[0] for convergence_history, _ in averaged_data.values())
+
+    # Plot each batch size
+    for idx, (batch_size, (convergence_history, time_history)) in enumerate(sorted(averaged_data.items())):
+        # Convert to percentage of maximum initial value
+        convergence_pct = [(value / max_initial_value) * 100 for value in convergence_history]
+        color = colors[idx % len(colors)]
+        plt.plot(time_history, convergence_pct, linewidth=2.5, color=color,
+                 label=f'Batch Size: {batch_size}', marker='o', markevery=max(1, len(time_history)//10), markersize=6)
+
+    plt.xlabel('Wall-Clock Time (seconds)', fontsize=13)
+    plt.ylabel('Objective Value (% of Max Initial)', fontsize=13)
+    plt.title(f'Average Convergence Comparison (Across {num_instances} Instances, Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
+    plt.legend(fontsize=11, loc='best', framealpha=0.9)
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+
+    comparison_path = os.path.join(output_path, 'average_convergence_time_pct.png')
+    plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
+    plt.close()
+
+    logging.info(f"Saved averaged time-based percentage comparison plot")
+
+
+def compute_averaged_convergence(all_instances_data, batch_sizes):
+    """
+    Compute averaged convergence histories across all instances.
+
+    Args:
+        all_instances_data: Dict {batch_size: {'convergence': [...], 'time': [...]}}
+                          where each list contains convergence/time histories from all instances
+        batch_sizes: List of batch sizes
+
+    Returns:
+        averaged_data: Dict {batch_size: (avg_convergence_history, avg_time_history)}
+    """
+    averaged_data = {}
+
+    for batch_size in batch_sizes:
+        convergence_histories = all_instances_data[batch_size]['convergence']
+        time_histories = all_instances_data[batch_size]['time']
+
+        # Find maximum length across all instances for this batch size
+        max_conv_len = max(len(h) for h in convergence_histories)
+        max_time_len = max(len(h) for h in time_histories)
+
+        # Pad convergence histories with last value to make them same length
+        padded_convergence = []
+        for history in convergence_histories:
+            padded = history + [history[-1]] * (max_conv_len - len(history))
+            padded_convergence.append(padded)
+
+        # Pad time histories with last value to make them same length
+        padded_time = []
+        for history in time_histories:
+            padded = history + [history[-1]] * (max_time_len - len(history))
+            padded_time.append(padded)
+
+        # Compute element-wise average
+        avg_convergence = np.mean(padded_convergence, axis=0).tolist()
+        avg_time = np.mean(padded_time, axis=0).tolist()
+
+        averaged_data[batch_size] = (avg_convergence, avg_time)
+
+    return averaged_data
+
+
 def solve_instance_de(model, instance, config, cost_fn, batch_size):
     instance = torch.Tensor(instance)
     instance = instance.unsqueeze(0).expand(batch_size, -1, -1)
@@ -288,6 +454,10 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
     all_results = {bs: {'gap_values': [], 'cost_values': [], 'runtime_values': []}
                    for bs in config.batch_sizes}
 
+    # Accumulator for averaging convergence data across instances
+    all_instances_data = {bs: {'convergence': [], 'time': []}
+                          for bs in config.batch_sizes}
+
     for i, instance in enumerate(instances):
         logging.info(f"Solving instance {i + 1}/{len(instances)}")
         convergence_data = {}
@@ -301,6 +471,10 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
 
             # Store convergence history and time history for comparison plots
             convergence_data[batch_size] = (convergence_history, time_history)
+
+            # Accumulate data for averaging across instances
+            all_instances_data[batch_size]['convergence'].append(convergence_history)
+            all_instances_data[batch_size]['time'].append(time_history)
 
             # Calculate gap if solutions provided
             if solutions:
@@ -317,8 +491,8 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
             all_results[batch_size]['runtime_values'].append(runtime)
             logging.info(f"    Runtime: {runtime:.2f}s")
 
-        # Save convergence comparison plots if enabled
-        if config.save_plots:
+        # Save convergence comparison plots if enabled (only for per-instance mode)
+        if config.save_plots and config.plot_mode == 'per_instance':
             # Create absolute value comparison plots (all batch sizes on same graph)
             if len(config.batch_sizes) > 1:
                 plot_convergence_comparison_iterations(i, convergence_data, search_output_dir, config.search_iterations)
@@ -337,6 +511,16 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 plot_convergence_comparison_iterations_pct(i, convergence_data, search_output_dir, config.search_iterations)
                 plot_convergence_comparison_pct(i, convergence_data, search_output_dir, config.search_iterations)
                 plot_convergence_comparison_time_pct(i, convergence_data, search_output_dir, config.search_iterations)
+
+    # Generate averaged plots if in average mode
+    if config.save_plots and config.plot_mode == 'average' and len(config.batch_sizes) > 1:
+        logging.info("Computing averaged convergence data across all instances...")
+        averaged_data = compute_averaged_convergence(all_instances_data, config.batch_sizes)
+
+        # Generate averaged percentage plots
+        plot_average_convergence_iterations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances))
+        plot_average_convergence_evaluations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances))
+        plot_average_convergence_time_pct(averaged_data, search_output_dir, config.search_iterations, len(instances))
 
     # Log final results for each batch size
     logging.info("=" * 60)

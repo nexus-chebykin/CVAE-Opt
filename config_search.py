@@ -21,6 +21,10 @@ def get_config(args=None):
     parser.add_argument('--search_iterations', default=300, type=int)
     parser.add_argument('--save_plots', default=False, action='store_true',
                         help='Save convergence plots for each instance')
+    parser.add_argument('--plot_mode', type=str, default='per_instance',
+                        choices=['per_instance', 'average'],
+                        help='Plotting mode: "per_instance" creates all plots (absolute and percentage) for each instance, '
+                             '"average" skips per-instance plots and creates only 3 averaged percentage plots across all instances.')
 
     # Differential Evolution
     parser.add_argument('--de_mutate', default=0.3, type=float)
