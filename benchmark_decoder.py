@@ -129,6 +129,9 @@ def decode_batch(model, config, instance, batch_size):
     # Get cost function
     cost_fn = get_cost_function(config)
 
+    # Reset decoder before decoding (initializes dummy_solution and instance_hidden)
+    model.reset_decoder(batch_size, config)
+
     # Time the decode operation
     torch.cuda.synchronize() if config.device.type == 'cuda' else None
     start_time = time.time()
