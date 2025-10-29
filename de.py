@@ -39,6 +39,7 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
     children = np.zeros((popsize, search_space_size))
     iterations_without_improvement = 0
     gen_best = np.inf
+    best_over_time = []
 
     population = np.random.uniform(-search_space_bound, search_space_bound,
                                    (popsize, search_space_size))
@@ -79,8 +80,13 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
         scores_trial = np.array(scores_trial)
 
         iterations_without_improvement += 1
-        if min(population_cost) > min(scores_trial):
+        new_best = np.min(scores_trial)
+        if new_best + 0.001 < np.min(population_cost):
             iterations_without_improvement = 0
+        if iterations_without_improvement >= 25:
+            break
+
+        best_over_time.append(new_best)
 
         improvement = population_cost > scores_trial
         population[improvement] = children[improvement]
@@ -89,5 +95,5 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
         # --- SCORE KEEPING --------------------------------+
         gen_best = min(population_cost)  # fitness of best individual
 
-    return gen_best, population[np.argmin(population_cost)]
+    return gen_best, population[np.argmin(population_cost)], best_over_time
 

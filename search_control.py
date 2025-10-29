@@ -30,11 +30,12 @@ def solve_instance_de(model, instance, config, cost_fn):
     instance = instance.to(config.device)
     model.reset_decoder(batch_size, config)
 
-    result_cost, result_tour = minimize(decode, (model, config, instance, cost_fn), config.search_space_bound,
+    result_cost, result_tour, best_over_time = minimize(decode, (model, config, instance, cost_fn), config.search_space_bound,
                                         config.search_space_size, popsize=batch_size,
                                         mutate=config.de_mutate, recombination=config.de_recombine,
                                         maxiter=config.search_iterations, maxtime=config.search_timelimit)
-    solution = decode(np.array([result_tour] * batch_size), model, config, instance, cost_fn)[0][0].tolist()
+    # solution = decode(np.array([result_tour] * batch_size), model, config, instance, cost_fn)[0][0].tolist()
+    solution = None
     return result_cost, solution
 
 
@@ -45,7 +46,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
         cost_fn = tsp.tours_length
     elif config.problem == "CVRP":
         cost_fn = cvrp.tours_length
-        if solutions:
+        if solutions is not None:
             solutions = [cvrp.solution_to_single_tour(solution) for solution in solutions]
 
     gap_values = np.zeros((len(instances)))
@@ -56,19 +57,19 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
         objective_value, solution = solve_instance_de(model, instance, config, cost_fn)
         runtime = time.time() - start_time
 
-        if solutions:
+        if solutions is not None:
             optimal_value = cost_fn(torch.Tensor(instance).unsqueeze(0),
                                     torch.Tensor(solutions[i]).long().unsqueeze(0)).item()
-            print(objective_value, optimal_value)
-            print("Opt " + str(solutions[i]))
+            # print(objective_value, optimal_value)
+            # print("Opt " + str(solutions[i]))
             gap = (objective_value / optimal_value - 1) * 100
-            print("Gap " + str(gap) + "%")
+            # print("Gap " + str(gap) + "%")
             gap_values[i] = gap
         cost_values.append(objective_value)
         print("Costs " + str(objective_value))
         runtime_values.append(runtime)
 
-    if not solutions and verbose:
+    if solutions is None and verbose:
         results = np.array(list(zip(cost_values, runtime_values)))
         np.savetxt(os.path.join(config.output_path, "search", 'results.txt'), results, delimiter=',', fmt=['%s', '%s'],
                    header="cost, runtime")
