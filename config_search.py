@@ -44,6 +44,10 @@ def get_config(args=None):
                         help='List of sigma values to test for CMA-ES comparison (e.g., --cmaes_sigma_sweep 0.3 0.5 1.0 1.5). '
                              'When provided, runs CMA-ES with each sigma value using a single fixed batch size.')
 
+    # Optimizer comparison
+    parser.add_argument('--compare_optimizers', default=False, action='store_true',
+                        help='Compare DE vs CMA-ES with the same batch size. Requires --plot_mode average and exactly one batch size.')
+
     config = parser.parse_args()
     config.device = torch.device(config.device)
 
@@ -57,5 +61,14 @@ def get_config(args=None):
             parser.error("--cmaes_sigma_sweep can only be used with --optimizer cmaes")
         if len(config.batch_sizes) != 1:
             parser.error("--cmaes_sigma_sweep requires exactly one batch size (use --batch_sizes 600)")
+
+    # Validate optimizer comparison mode
+    if config.compare_optimizers:
+        if len(config.batch_sizes) != 1:
+            parser.error("--compare_optimizers requires exactly one batch size (use --batch_sizes 600)")
+        if config.plot_mode != 'average':
+            parser.error("--compare_optimizers requires --plot_mode average")
+        if config.cmaes_sigma_sweep is not None:
+            parser.error("--compare_optimizers cannot be used with --cmaes_sigma_sweep")
 
     return config

@@ -513,6 +513,132 @@ def plot_sigma_comparison_time_pct(averaged_data, output_path, max_iterations, n
     logging.info(f"Saved sigma comparison time-based percentage plot")
 
 
+def plot_optimizer_comparison_iterations_pct(optimizer_data, output_path, max_iterations, num_instances, batch_size):
+    """
+    Plot DE vs CMA-ES comparison as percentage of initial value vs iterations.
+
+    Args:
+        optimizer_data: Dict mapping optimizer_name -> (avg_convergence_history, avg_time_history)
+        output_path: Directory to save plots
+        max_iterations: Maximum number of iterations
+        num_instances: Number of instances that were averaged
+        batch_size: Fixed batch size used for both optimizers
+    """
+    plt.figure(figsize=(12, 7))
+
+    # Define colors for optimizers
+    colors = {'DE': '#E63946', 'CMA-ES': '#2A9D8F'}
+
+    # Find the maximum initial value across both optimizers for normalization
+    max_initial_value = max(convergence_history[0] for convergence_history, _ in optimizer_data.values())
+
+    # Plot each optimizer
+    for optimizer_name, (convergence_history, time_history) in sorted(optimizer_data.items()):
+        iterations = list(range(1, len(convergence_history) + 1))
+        # Convert to percentage of maximum initial value
+        convergence_pct = [(value / max_initial_value) * 100 for value in convergence_history]
+        color = colors.get(optimizer_name, '#264653')
+        plt.plot(iterations, convergence_pct, linewidth=2.5, color=color,
+                 label=optimizer_name, marker='o', markevery=max(1, len(iterations)//10), markersize=6)
+
+    plt.xlabel('Iteration', fontsize=13)
+    plt.ylabel('Objective Value (% of Max Initial)', fontsize=13)
+    plt.title(f'Optimizer Comparison (Batch Size: {batch_size}, Across {num_instances} Instances, Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
+    plt.legend(fontsize=11, loc='best', framealpha=0.9)
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+
+    comparison_path = os.path.join(output_path, 'optimizer_comparison_iterations_pct.png')
+    plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
+    plt.close()
+
+    logging.info(f"Saved optimizer comparison iterations-based percentage plot")
+
+
+def plot_optimizer_comparison_evaluations_pct(optimizer_data, output_path, max_iterations, num_instances, batch_size):
+    """
+    Plot DE vs CMA-ES comparison as percentage of initial value vs evaluations.
+
+    Args:
+        optimizer_data: Dict mapping optimizer_name -> (avg_convergence_history, avg_time_history)
+        output_path: Directory to save plots
+        max_iterations: Maximum number of iterations
+        num_instances: Number of instances that were averaged
+        batch_size: Fixed batch size used for both optimizers
+    """
+    plt.figure(figsize=(12, 7))
+
+    # Define colors for optimizers
+    colors = {'DE': '#E63946', 'CMA-ES': '#2A9D8F'}
+
+    # Find the maximum initial value across both optimizers for normalization
+    max_initial_value = max(convergence_history[0] for convergence_history, _ in optimizer_data.values())
+
+    # Plot each optimizer
+    for optimizer_name, (convergence_history, time_history) in sorted(optimizer_data.items()):
+        iterations = list(range(1, len(convergence_history) + 1))
+        evaluations = [iter_num * batch_size for iter_num in iterations]
+        # Convert to percentage of maximum initial value
+        convergence_pct = [(value / max_initial_value) * 100 for value in convergence_history]
+        color = colors.get(optimizer_name, '#264653')
+        plt.plot(evaluations, convergence_pct, linewidth=2.5, color=color,
+                 label=optimizer_name, marker='o', markevery=max(1, len(evaluations)//10), markersize=6)
+
+    plt.xlabel('Objective Function Evaluations', fontsize=13)
+    plt.ylabel('Objective Value (% of Max Initial)', fontsize=13)
+    plt.title(f'Optimizer Comparison (Batch Size: {batch_size}, Across {num_instances} Instances, Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
+    plt.legend(fontsize=11, loc='best', framealpha=0.9)
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+
+    comparison_path = os.path.join(output_path, 'optimizer_comparison_evaluations_pct.png')
+    plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
+    plt.close()
+
+    logging.info(f"Saved optimizer comparison evaluations-based percentage plot")
+
+
+def plot_optimizer_comparison_time_pct(optimizer_data, output_path, max_iterations, num_instances, batch_size):
+    """
+    Plot DE vs CMA-ES comparison as percentage of initial value vs wall-clock time.
+
+    Args:
+        optimizer_data: Dict mapping optimizer_name -> (avg_convergence_history, avg_time_history)
+        output_path: Directory to save plots
+        max_iterations: Maximum number of iterations
+        num_instances: Number of instances that were averaged
+        batch_size: Fixed batch size used for both optimizers
+    """
+    plt.figure(figsize=(12, 7))
+
+    # Define colors for optimizers
+    colors = {'DE': '#E63946', 'CMA-ES': '#2A9D8F'}
+
+    # Find the maximum initial value across both optimizers for normalization
+    max_initial_value = max(convergence_history[0] for convergence_history, _ in optimizer_data.values())
+
+    # Plot each optimizer
+    for optimizer_name, (convergence_history, time_history) in sorted(optimizer_data.items()):
+        # Convert to percentage of maximum initial value
+        convergence_pct = [(value / max_initial_value) * 100 for value in convergence_history]
+        color = colors.get(optimizer_name, '#264653')
+        plt.plot(time_history, convergence_pct, linewidth=2.5, color=color,
+                 label=optimizer_name, marker='o', markevery=max(1, len(time_history)//10), markersize=6)
+
+    plt.xlabel('Wall-Clock Time (seconds)', fontsize=13)
+    plt.ylabel('Objective Value (% of Max Initial)', fontsize=13)
+    plt.title(f'Optimizer Comparison (Batch Size: {batch_size}, Across {num_instances} Instances, Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
+    plt.legend(fontsize=11, loc='best', framealpha=0.9)
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+
+    comparison_path = os.path.join(output_path, 'optimizer_comparison_time_pct.png')
+    plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
+    plt.close()
+
+    logging.info(f"Saved optimizer comparison time-based percentage plot")
+
+
 def compute_averaged_convergence(all_instances_data, batch_sizes):
     """
     Compute averaged convergence histories across all instances.
@@ -629,10 +755,24 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
         search_output_dir = os.path.join(config.output_path, "search")
         os.makedirs(search_output_dir, exist_ok=True)
 
-    # Detect sigma sweep mode
+    # Detect special modes
+    optimizer_comparison_mode = config.compare_optimizers
     sigma_sweep_mode = config.cmaes_sigma_sweep is not None
 
-    if sigma_sweep_mode:
+    if optimizer_comparison_mode:
+        # Optimizer comparison mode: run both DE and CMA-ES with fixed batch size
+        fixed_batch_size = config.batch_sizes[0]
+        logging.info(f"Running optimizer comparison mode with batch size {fixed_batch_size}")
+        logging.info(f"Comparing DE vs CMA-ES (sigma={config.cmaes_sigma0})")
+
+        # Store results for each optimizer
+        all_results = {'DE': {'gap_values': [], 'cost_values': [], 'runtime_values': []},
+                       'CMA-ES': {'gap_values': [], 'cost_values': [], 'runtime_values': []}}
+
+        # Accumulator for averaging convergence data across instances
+        all_instances_data = {'DE': {'convergence': [], 'time': []},
+                              'CMA-ES': {'convergence': [], 'time': []}}
+    elif sigma_sweep_mode:
         # Sigma sweep mode: loop over sigma values with fixed batch size
         sweep_values = config.cmaes_sigma_sweep
         fixed_batch_size = config.batch_sizes[0]
@@ -660,7 +800,45 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
         logging.info(f"Solving instance {i + 1}/{len(instances)}")
         convergence_data = {}
 
-        if sigma_sweep_mode:
+        if optimizer_comparison_mode:
+            # Run both DE and CMA-ES
+            for optimizer_name in ['DE', 'CMA-ES']:
+                logging.info(f"  Optimizer: {optimizer_name}")
+                start_time = time.time()
+
+                # Temporarily change config.optimizer for solve_instance
+                original_optimizer = config.optimizer
+                config.optimizer = 'de' if optimizer_name == 'DE' else 'cmaes'
+
+                objective_value, solution, convergence_history, time_history = solve_instance(
+                    model, instance, config, cost_fn, fixed_batch_size)
+
+                # Restore original optimizer
+                config.optimizer = original_optimizer
+                runtime = time.time() - start_time
+
+                # Store convergence history and time history for comparison plots
+                convergence_data[optimizer_name] = (convergence_history, time_history)
+
+                # Accumulate data for averaging across instances
+                all_instances_data[optimizer_name]['convergence'].append(convergence_history)
+                all_instances_data[optimizer_name]['time'].append(time_history)
+
+                # Calculate gap if solutions provided
+                if solutions:
+                    optimal_value = cost_fn(torch.Tensor(instance).unsqueeze(0),
+                                            torch.Tensor(solutions[i]).long().unsqueeze(0)).item()
+                    gap = (objective_value / optimal_value - 1) * 100
+                    all_results[optimizer_name]['gap_values'].append(gap)
+                    logging.info(f"    Objective: {objective_value:.4f}, Optimal: {optimal_value:.4f}, Gap: {gap:.2f}%")
+                else:
+                    all_results[optimizer_name]['gap_values'].append(0)
+                    logging.info(f"    Objective: {objective_value:.4f}")
+
+                all_results[optimizer_name]['cost_values'].append(objective_value)
+                all_results[optimizer_name]['runtime_values'].append(runtime)
+                logging.info(f"    Runtime: {runtime:.2f}s")
+        elif sigma_sweep_mode:
             # Run search for each sigma value with fixed batch size
             for sigma_value in sweep_values:
                 logging.info(f"  Sigma: {sigma_value}")
@@ -746,7 +924,16 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
 
     # Generate averaged plots if in average mode
     if config.save_plots and config.plot_mode == 'average':
-        if sigma_sweep_mode:
+        if optimizer_comparison_mode:
+            # Optimizer comparison mode: generate optimizer comparison plots
+            logging.info("Computing averaged convergence data across all instances for optimizer comparison...")
+            averaged_data = compute_averaged_convergence(all_instances_data, ['CMA-ES', 'DE'])
+
+            # Generate optimizer comparison plots
+            plot_optimizer_comparison_iterations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size)
+            plot_optimizer_comparison_evaluations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size)
+            plot_optimizer_comparison_time_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size)
+        elif sigma_sweep_mode:
             # Sigma sweep mode: generate sigma comparison plots
             logging.info("Computing averaged convergence data across all instances for sigma sweep...")
             averaged_data = compute_averaged_convergence(all_instances_data, sweep_values)
@@ -772,7 +959,17 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
     logging.info("=" * 60)
     logging.info("Final search results:")
 
-    if sigma_sweep_mode:
+    if optimizer_comparison_mode:
+        # Log results for each optimizer
+        for optimizer_name in ['DE', 'CMA-ES']:
+            results = all_results[optimizer_name]
+            logging.info(f"\n{optimizer_name}:")
+            logging.info(f"  Mean cost: {np.mean(results['cost_values']):.4f}")
+            logging.info(f"  Mean runtime: {np.mean(results['runtime_values']):.2f}s")
+            if solutions:
+                logging.info(f"  Mean gap: {np.mean(results['gap_values']):.2f}%")
+                logging.info(f"  Std gap: {np.std(results['gap_values']):.2f}%")
+    elif sigma_sweep_mode:
         # Log results for each sigma value
         for sigma_value in sweep_values:
             results = all_results[sigma_value]
@@ -801,7 +998,12 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                            header="cost, runtime")
 
     # Return results (for backward compatibility)
-    if sigma_sweep_mode:
+    if optimizer_comparison_mode:
+        # Return results for DE (first optimizer)
+        return (np.mean(all_results['DE']['gap_values']),
+                np.mean(all_results['DE']['runtime_values']),
+                all_results['DE']['cost_values'])
+    elif sigma_sweep_mode:
         # Return results for the first sigma value
         first_sigma = sweep_values[0]
         return (np.mean(all_results[first_sigma]['gap_values']),
