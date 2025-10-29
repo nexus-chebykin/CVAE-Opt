@@ -639,6 +639,132 @@ def plot_optimizer_comparison_time_pct(optimizer_data, output_path, max_iteratio
     logging.info(f"Saved optimizer comparison time-based percentage plot")
 
 
+def plot_optimizer_comparison_iterations_pct_per_instance(optimizer_results, output_path, max_iterations, batch_size, instance_idx, problem, problem_size):
+    """
+    Plot DE vs CMA-ES comparison for a single instance as percentage of initial value vs iterations.
+
+    Args:
+        optimizer_results: Dict mapping optimizer_name -> (convergence_history, time_history)
+        output_path: Directory to save plots
+        max_iterations: Maximum number of iterations
+        batch_size: Fixed batch size used for both optimizers
+        instance_idx: Index of the instance
+        problem: Problem name
+        problem_size: Problem size
+    """
+    plt.figure(figsize=(12, 7))
+
+    # Define colors for optimizers
+    colors = {'DE': '#E63946', 'CMA-ES': '#2A9D8F'}
+
+    # Find the maximum initial value across both optimizers for normalization
+    max_initial_value = max(convergence_history[0] for convergence_history, _ in optimizer_results.values())
+
+    # Plot each optimizer
+    for optimizer_name, (convergence_history, time_history) in sorted(optimizer_results.items()):
+        iterations = list(range(1, len(convergence_history) + 1))
+        # Convert to percentage of maximum initial value
+        convergence_pct = [(value / max_initial_value) * 100 for value in convergence_history]
+        color = colors.get(optimizer_name, '#264653')
+        plt.plot(iterations, convergence_pct, linewidth=2.5, color=color,
+                 label=optimizer_name, marker='o', markevery=max(1, len(iterations)//10), markersize=6)
+
+    plt.xlabel('Iteration', fontsize=13)
+    plt.ylabel('Objective Value (% of Max Initial)', fontsize=13)
+    plt.title(f'Optimizer Comparison - Instance {instance_idx} ({problem}{problem_size}, Batch Size: {batch_size}, Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
+    plt.legend(fontsize=11, loc='best', framealpha=0.9)
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+
+    comparison_path = os.path.join(output_path, f'optimizer_comparison_iterations_pct_inst{instance_idx}.png')
+    plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
+    plt.close()
+
+
+def plot_optimizer_comparison_evaluations_pct_per_instance(optimizer_results, output_path, max_iterations, batch_size, instance_idx, problem, problem_size):
+    """
+    Plot DE vs CMA-ES comparison for a single instance as percentage of initial value vs evaluations.
+
+    Args:
+        optimizer_results: Dict mapping optimizer_name -> (convergence_history, time_history)
+        output_path: Directory to save plots
+        max_iterations: Maximum number of iterations
+        batch_size: Fixed batch size used for both optimizers
+        instance_idx: Index of the instance
+        problem: Problem name
+        problem_size: Problem size
+    """
+    plt.figure(figsize=(12, 7))
+
+    # Define colors for optimizers
+    colors = {'DE': '#E63946', 'CMA-ES': '#2A9D8F'}
+
+    # Find the maximum initial value across both optimizers for normalization
+    max_initial_value = max(convergence_history[0] for convergence_history, _ in optimizer_results.values())
+
+    # Plot each optimizer
+    for optimizer_name, (convergence_history, time_history) in sorted(optimizer_results.items()):
+        # Calculate number of evaluations per iteration
+        evaluations = [i * batch_size for i in range(1, len(convergence_history) + 1)]
+        # Convert to percentage of maximum initial value
+        convergence_pct = [(value / max_initial_value) * 100 for value in convergence_history]
+        color = colors.get(optimizer_name, '#264653')
+        plt.plot(evaluations, convergence_pct, linewidth=2.5, color=color,
+                 label=optimizer_name, marker='o', markevery=max(1, len(evaluations)//10), markersize=6)
+
+    plt.xlabel('Number of Evaluations', fontsize=13)
+    plt.ylabel('Objective Value (% of Max Initial)', fontsize=13)
+    plt.title(f'Optimizer Comparison - Instance {instance_idx} ({problem}{problem_size}, Batch Size: {batch_size}, Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
+    plt.legend(fontsize=11, loc='best', framealpha=0.9)
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+
+    comparison_path = os.path.join(output_path, f'optimizer_comparison_evaluations_pct_inst{instance_idx}.png')
+    plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
+    plt.close()
+
+
+def plot_optimizer_comparison_time_pct_per_instance(optimizer_results, output_path, max_iterations, batch_size, instance_idx, problem, problem_size):
+    """
+    Plot DE vs CMA-ES comparison for a single instance as percentage of initial value vs wall-clock time.
+
+    Args:
+        optimizer_results: Dict mapping optimizer_name -> (convergence_history, time_history)
+        output_path: Directory to save plots
+        max_iterations: Maximum number of iterations
+        batch_size: Fixed batch size used for both optimizers
+        instance_idx: Index of the instance
+        problem: Problem name
+        problem_size: Problem size
+    """
+    plt.figure(figsize=(12, 7))
+
+    # Define colors for optimizers
+    colors = {'DE': '#E63946', 'CMA-ES': '#2A9D8F'}
+
+    # Find the maximum initial value across both optimizers for normalization
+    max_initial_value = max(convergence_history[0] for convergence_history, _ in optimizer_results.values())
+
+    # Plot each optimizer
+    for optimizer_name, (convergence_history, time_history) in sorted(optimizer_results.items()):
+        # Convert to percentage of maximum initial value
+        convergence_pct = [(value / max_initial_value) * 100 for value in convergence_history]
+        color = colors.get(optimizer_name, '#264653')
+        plt.plot(time_history, convergence_pct, linewidth=2.5, color=color,
+                 label=optimizer_name, marker='o', markevery=max(1, len(time_history)//10), markersize=6)
+
+    plt.xlabel('Wall-Clock Time (seconds)', fontsize=13)
+    plt.ylabel('Objective Value (% of Max Initial)', fontsize=13)
+    plt.title(f'Optimizer Comparison - Instance {instance_idx} ({problem}{problem_size}, Batch Size: {batch_size}, Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
+    plt.legend(fontsize=11, loc='best', framealpha=0.9)
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+
+    comparison_path = os.path.join(output_path, f'optimizer_comparison_time_pct_inst{instance_idx}.png')
+    plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
+    plt.close()
+
+
 def compute_averaged_convergence(all_instances_data, batch_sizes):
     """
     Compute averaged convergence histories across all instances.
@@ -838,6 +964,18 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 all_results[optimizer_name]['cost_values'].append(objective_value)
                 all_results[optimizer_name]['runtime_values'].append(runtime)
                 logging.info(f"    Runtime: {runtime:.2f}s")
+
+            # Generate per-instance optimizer comparison plots if in per_instance mode
+            if config.save_plots and config.plot_mode == 'per_instance':
+                plot_optimizer_comparison_iterations_pct_per_instance(
+                    convergence_data, search_output_dir, config.search_iterations,
+                    fixed_batch_size, i, config.problem, config.problem_size)
+                plot_optimizer_comparison_evaluations_pct_per_instance(
+                    convergence_data, search_output_dir, config.search_iterations,
+                    fixed_batch_size, i, config.problem, config.problem_size)
+                plot_optimizer_comparison_time_pct_per_instance(
+                    convergence_data, search_output_dir, config.search_iterations,
+                    fixed_batch_size, i, config.problem, config.problem_size)
         elif sigma_sweep_mode:
             # Run search for each sigma value with fixed batch size
             for sigma_value in sweep_values:
@@ -922,10 +1060,12 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 plot_convergence_comparison_pct(i, convergence_data, search_output_dir, config.search_iterations, optimizer_name)
                 plot_convergence_comparison_time_pct(i, convergence_data, search_output_dir, config.search_iterations, optimizer_name)
 
-    # Generate averaged plots if in average mode
-    if config.save_plots and config.plot_mode == 'average':
+    # Generate averaged plots
+    # For optimizer_comparison_mode and sigma_sweep_mode, always generate averaged plots regardless of plot_mode
+    # For normal mode, only generate averaged plots if plot_mode == 'average'
+    if config.save_plots:
         if optimizer_comparison_mode:
-            # Optimizer comparison mode: generate optimizer comparison plots
+            # Optimizer comparison mode: generate optimizer comparison plots (always, regardless of plot_mode)
             logging.info("Computing averaged convergence data across all instances for optimizer comparison...")
             averaged_data = compute_averaged_convergence(all_instances_data, ['CMA-ES', 'DE'])
 
@@ -934,7 +1074,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
             plot_optimizer_comparison_evaluations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size)
             plot_optimizer_comparison_time_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size)
         elif sigma_sweep_mode:
-            # Sigma sweep mode: generate sigma comparison plots
+            # Sigma sweep mode: generate sigma comparison plots (always, regardless of plot_mode)
             logging.info("Computing averaged convergence data across all instances for sigma sweep...")
             averaged_data = compute_averaged_convergence(all_instances_data, sweep_values)
 
@@ -942,8 +1082,8 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
             plot_sigma_comparison_iterations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size)
             plot_sigma_comparison_evaluations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size)
             plot_sigma_comparison_time_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size)
-        elif len(config.batch_sizes) > 1:
-            # Normal mode: generate batch size comparison plots
+        elif config.plot_mode == 'average' and len(config.batch_sizes) > 1:
+            # Normal mode with average plot_mode: generate batch size comparison plots
             logging.info("Computing averaged convergence data across all instances...")
             averaged_data = compute_averaged_convergence(all_instances_data, config.batch_sizes)
 

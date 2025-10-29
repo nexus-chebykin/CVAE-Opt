@@ -66,8 +66,6 @@ def get_config(args=None):
     if config.compare_optimizers:
         if len(config.batch_sizes) != 1:
             parser.error("--compare_optimizers requires exactly one batch size (use --batch_sizes 600)")
-        if config.plot_mode != 'average':
-            parser.error("--compare_optimizers requires --plot_mode average")
         if config.cmaes_sigma_sweep is not None:
             parser.error("--compare_optimizers cannot be used with --cmaes_sigma_sweep")
 
