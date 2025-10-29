@@ -94,9 +94,9 @@ def load_instance(instances_path, config):
 def get_cost_function(config):
     """Get the cost function based on problem type."""
     if config.problem == 'TSP':
-        return tsp.get_costs
+        return tsp.tours_length
     elif config.problem == 'CVRP':
-        return cvrp.get_costs
+        return cvrp.tours_length
     else:
         raise ValueError(f"Unknown problem type: {config.problem}")
 
