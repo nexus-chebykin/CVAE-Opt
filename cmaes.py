@@ -10,7 +10,7 @@ import time
 import cma
 
 
-def minimize(cost_func, args, search_space_bound, search_space_size, popsize, sigma0, maxiter, maxtime):
+def minimize(cost_func, args, search_space_bound, search_space_size, popsize, sigma0, maxiter, maxtime, maxevaluations=None):
     """
     CMA-ES optimizer matching DE interface.
 
@@ -35,6 +35,7 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, si
     start_time = time.time()
     convergence_history = []
     time_history = []
+    evaluations_done = 0  # Track total number of evaluations
 
     # Initial mean: start at origin (center of search space)
     x0 = np.zeros(search_space_size)
@@ -55,8 +56,10 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, si
     # --- OPTIMIZE WITH ASK-TELL PATTERN ----------------+
 
     while not es.stop():
-        # Check time limit
+        # Check stopping criteria
         if time.time() - start_time > maxtime:
+            break
+        if maxevaluations and evaluations_done >= maxevaluations:
             break
 
         # ASK: Generate new population of candidate solutions
@@ -66,6 +69,7 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, si
         solutions_array = np.array(solutions)
         _, fitness_values = cost_func(solutions_array, *args)
         fitness_values = np.array(fitness_values)
+        evaluations_done += popsize  # Increment evaluation counter
 
         # TELL: Update CMA-ES distribution based on fitness values
         es.tell(solutions, fitness_values.tolist())

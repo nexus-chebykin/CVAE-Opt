@@ -843,7 +843,8 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None):
             mutate=config.de_mutate,
             recombination=config.de_recombine,
             maxiter=config.search_iterations,
-            maxtime=config.search_timelimit
+            maxtime=config.search_timelimit,
+            maxevaluations=config.search_evaluations
         )
     elif config.optimizer == 'cmaes':
         from cmaes import minimize
@@ -857,7 +858,8 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None):
             popsize=batch_size,
             sigma0=cmaes_sigma,
             maxiter=config.search_iterations,
-            maxtime=config.search_timelimit
+            maxtime=config.search_timelimit,
+            maxevaluations=config.search_evaluations
         )
     else:
         raise ValueError(f"Unknown optimizer: {config.optimizer}")

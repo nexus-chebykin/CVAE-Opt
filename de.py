@@ -31,7 +31,7 @@ from random import sample
 import numpy as np
 import time
 
-def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mutate, recombination, maxiter, maxtime):
+def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mutate, recombination, maxiter, maxtime, maxevaluations=None):
 
     # --- INITIALIZE A POPULATION (step #1) ----------------+
     start_time = time.time()
@@ -41,6 +41,7 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
     gen_best = np.inf
     convergence_history = []
     time_history = []
+    evaluations_done = 0  # Track total number of evaluations
 
     population = np.random.uniform(-search_space_bound, search_space_bound,
                                    (popsize, search_space_size))
@@ -49,7 +50,10 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
 
     # cycle through each generation (step #2)
     for i in range(1, maxiter + 1):
+        # Check stopping criteria
         if time.time() - start_time > maxtime:
+            break
+        if maxevaluations and evaluations_done >= maxevaluations:
             break
 
         # cycle through each individual in the population
@@ -79,6 +83,7 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
 
         _, scores_trial = cost_func(children, *args)
         scores_trial = np.array(scores_trial)
+        evaluations_done += popsize  # Increment evaluation counter
 
         iterations_without_improvement += 1
         if min(population_cost) > min(scores_trial):
