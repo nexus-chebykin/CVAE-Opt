@@ -49,11 +49,19 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
     # --- SOLVE --------------------------------------------+
 
     # cycle through each generation (step #2)
-    for i in range(1, maxiter + 1):
+    iteration = 0
+    while True:
+        iteration += 1
+
         # Check stopping criteria
+        # Always check time limit
         if time.time() - start_time > maxtime:
             break
-        if maxevaluations and evaluations_done >= maxevaluations:
+        # Only check iteration limit if specified (overrides time)
+        if maxiter is not None and iteration > maxiter:
+            break
+        # Only check evaluation limit if specified (overrides time)
+        if maxevaluations is not None and evaluations_done >= maxevaluations:
             break
 
         # cycle through each individual in the population

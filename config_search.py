@@ -16,11 +16,13 @@ def get_config(args=None):
     parser.add_argument('--batch_sizes', nargs='+', type=int, default=None,
                         help='List of batch sizes to test (e.g., --batch_sizes 50 100 300 600). If not specified, uses search_batch_size.')
     parser.add_argument('--instances_path', type=str, default="")
-    parser.add_argument('--search_timelimit', default=600, type=int)
+    parser.add_argument('--search_timelimit', default=40, type=int,
+                        help='Maximum wall-clock time in seconds (default: 40)')
     parser.add_argument('--search_space_size', default=100, type=int)  # Nb. dimensions of search space
-    parser.add_argument('--search_iterations', default=300, type=int)
+    parser.add_argument('--search_iterations', default=None, type=int,
+                        help='Maximum number of iterations (None = no limit, overrides time limit if set)')
     parser.add_argument('--search_evaluations', default=None, type=int,
-                        help='Maximum number of objective function evaluations (None = no limit)')
+                        help='Maximum number of objective function evaluations (None = no limit, overrides time limit if set)')
     parser.add_argument('--save_plots', default=False, action='store_true',
                         help='Save convergence plots for each instance')
     parser.add_argument('--plot_mode', type=str, default='per_instance',

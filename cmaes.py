@@ -41,10 +41,13 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, si
     x0 = np.zeros(search_space_size)
 
     # CMA-ES options
+    # If maxiter is None, use a very large number so time limit is the constraint
+    cmaes_maxiter = maxiter if maxiter is not None else 1000000
+
     opts = {
         'popsize': popsize,
         'bounds': [-search_space_bound, search_space_bound],
-        'maxiter': maxiter,
+        'maxiter': cmaes_maxiter,
         'verbose': -9,  # Suppress output
         'verb_disp': 0,  # No display
         'verb_log': 0    # No logging
@@ -57,9 +60,11 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, si
 
     while not es.stop():
         # Check stopping criteria
+        # Always check time limit
         if time.time() - start_time > maxtime:
             break
-        if maxevaluations and evaluations_done >= maxevaluations:
+        # Only check evaluation limit if specified (overrides time)
+        if maxevaluations is not None and evaluations_done >= maxevaluations:
             break
 
         # ASK: Generate new population of candidate solutions
