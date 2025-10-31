@@ -32,8 +32,8 @@ def get_config(args=None):
 
     # Optimizer selection
     parser.add_argument('--optimizer', type=str, default='de',
-                        choices=['de', 'cmaes'],
-                        help='Optimizer to use: "de" (Differential Evolution) or "cmaes" (CMA-ES)')
+                        choices=['de', 'cmaes', 'portfolio'],
+                        help='Optimizer to use: "de" (Differential Evolution), "cmaes" (CMA-ES), or "portfolio" (Nevergrad Portfolio)')
 
     # Differential Evolution parameters
     parser.add_argument('--de_mutate', default=0.3, type=float,
