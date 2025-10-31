@@ -49,7 +49,7 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None):
     # Select optimizer based on config
     if config.optimizer == 'de':
         from de import minimize
-        result_cost, result_tour, convergence_history, time_history = minimize(
+        result_cost, result_tour, convergence_history, time_history, timing_breakdown = minimize(
             decode,
             (model, config, instance, cost_fn),
             config.search_space_bound,
@@ -65,7 +65,7 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None):
         from cmaes import minimize
         # Use provided sigma0 or fall back to config value
         cmaes_sigma = sigma0 if sigma0 is not None else config.cmaes_sigma0
-        result_cost, result_tour, convergence_history, time_history = minimize(
+        result_cost, result_tour, convergence_history, time_history, timing_breakdown = minimize(
             decode,
             (model, config, instance, cost_fn),
             config.search_space_bound,
@@ -78,7 +78,7 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None):
         )
     elif config.optimizer == 'portfolio':
         from portfolio import minimize
-        result_cost, result_tour, convergence_history, time_history = minimize(
+        result_cost, result_tour, convergence_history, time_history, timing_breakdown = minimize(
             decode,
             (model, config, instance, cost_fn),
             config.search_space_bound,
@@ -92,7 +92,7 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None):
         raise ValueError(f"Unknown optimizer: {config.optimizer}")
 
     solution = decode(np.array([result_tour] * batch_size), model, config, instance, cost_fn)[0][0].tolist()
-    return result_cost, solution, convergence_history, time_history
+    return result_cost, solution, convergence_history, time_history, timing_breakdown
 
 
 def solve_instance_set(model, config, instances, solutions=None, verbose=True):
@@ -121,9 +121,12 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
         logging.info(f"Comparing DE vs CMA-ES (sigma={config.cmaes_sigma0}) vs Portfolio")
 
         # Store results for each optimizer
-        all_results = {'DE': {'gap_values': [], 'cost_values': [], 'runtime_values': []},
-                       'CMA-ES': {'gap_values': [], 'cost_values': [], 'runtime_values': []},
-                       'Portfolio': {'gap_values': [], 'cost_values': [], 'runtime_values': []}}
+        all_results = {'DE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
+                              'ask_times': [], 'eval_times': [], 'tell_times': []},
+                       'CMA-ES': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
+                                  'ask_times': [], 'eval_times': [], 'tell_times': []},
+                       'Portfolio': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
+                                     'ask_times': [], 'eval_times': [], 'tell_times': []}}
 
         # Accumulator for averaging convergence data across instances
         all_instances_data = {'DE': {'convergence': [], 'time': []},
@@ -137,7 +140,8 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
         logging.info(f"Sigma values: {sweep_values}")
 
         # Store results for each sigma value
-        all_results = {sigma: {'gap_values': [], 'cost_values': [], 'runtime_values': []}
+        all_results = {sigma: {'gap_values': [], 'cost_values': [], 'runtime_values': [],
+                               'ask_times': [], 'eval_times': [], 'tell_times': []}
                        for sigma in sweep_values}
 
         # Accumulator for averaging convergence data across instances
@@ -146,7 +150,8 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
     else:
         # Normal mode: loop over batch sizes
         # Store results for each batch size
-        all_results = {bs: {'gap_values': [], 'cost_values': [], 'runtime_values': []}
+        all_results = {bs: {'gap_values': [], 'cost_values': [], 'runtime_values': [],
+                            'ask_times': [], 'eval_times': [], 'tell_times': []}
                        for bs in config.batch_sizes}
 
         # Accumulator for averaging convergence data across instances
@@ -172,7 +177,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 elif optimizer_name == 'Portfolio':
                     config.optimizer = 'portfolio'
 
-                objective_value, solution, convergence_history, time_history = solve_instance(
+                objective_value, solution, convergence_history, time_history, timing_breakdown = solve_instance(
                     model, instance, config, cost_fn, fixed_batch_size)
 
                 # Restore original optimizer
@@ -201,6 +206,15 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 all_results[optimizer_name]['runtime_values'].append(runtime)
                 logging.info(f"    Runtime: {runtime:.2f}s")
 
+                # Store and log timing breakdown
+                all_results[optimizer_name]['ask_times'].append(timing_breakdown['ask_time'])
+                all_results[optimizer_name]['eval_times'].append(timing_breakdown['eval_time'])
+                all_results[optimizer_name]['tell_times'].append(timing_breakdown['tell_time'])
+                logging.info(f"    Timing breakdown:")
+                logging.info(f"      ASK:  {timing_breakdown['ask_time']:.2f}s ({timing_breakdown['ask_time']/runtime*100:.1f}%)")
+                logging.info(f"      EVAL: {timing_breakdown['eval_time']:.2f}s ({timing_breakdown['eval_time']/runtime*100:.1f}%)")
+                logging.info(f"      TELL: {timing_breakdown['tell_time']:.2f}s ({timing_breakdown['tell_time']/runtime*100:.1f}%)")
+
             # Generate per-instance optimizer comparison plots if in per_instance mode
             if config.save_plots and config.plot_mode == 'per_instance':
                 plot_optimizer_comparison_iterations_pct_per_instance(
@@ -217,7 +231,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
             for sigma_value in sweep_values:
                 logging.info(f"  Sigma: {sigma_value}")
                 start_time = time.time()
-                objective_value, solution, convergence_history, time_history = solve_instance(
+                objective_value, solution, convergence_history, time_history, timing_breakdown = solve_instance(
                     model, instance, config, cost_fn, fixed_batch_size, sigma0=sigma_value)
                 runtime = time.time() - start_time
 
@@ -242,12 +256,21 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 all_results[sigma_value]['cost_values'].append(objective_value)
                 all_results[sigma_value]['runtime_values'].append(runtime)
                 logging.info(f"    Runtime: {runtime:.2f}s")
+
+                # Store and log timing breakdown
+                all_results[sigma_value]['ask_times'].append(timing_breakdown['ask_time'])
+                all_results[sigma_value]['eval_times'].append(timing_breakdown['eval_time'])
+                all_results[sigma_value]['tell_times'].append(timing_breakdown['tell_time'])
+                logging.info(f"    Timing breakdown:")
+                logging.info(f"      ASK:  {timing_breakdown['ask_time']:.2f}s ({timing_breakdown['ask_time']/runtime*100:.1f}%)")
+                logging.info(f"      EVAL: {timing_breakdown['eval_time']:.2f}s ({timing_breakdown['eval_time']/runtime*100:.1f}%)")
+                logging.info(f"      TELL: {timing_breakdown['tell_time']:.2f}s ({timing_breakdown['tell_time']/runtime*100:.1f}%)")
         else:
             # Run search for each batch size
             for batch_size in config.batch_sizes:
                 logging.info(f"  Batch size: {batch_size}")
                 start_time = time.time()
-                objective_value, solution, convergence_history, time_history = solve_instance(model, instance, config, cost_fn, batch_size)
+                objective_value, solution, convergence_history, time_history, timing_breakdown = solve_instance(model, instance, config, cost_fn, batch_size)
                 runtime = time.time() - start_time
 
                 # Store convergence history and time history for comparison plots
@@ -271,6 +294,15 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 all_results[batch_size]['cost_values'].append(objective_value)
                 all_results[batch_size]['runtime_values'].append(runtime)
                 logging.info(f"    Runtime: {runtime:.2f}s")
+
+                # Store and log timing breakdown
+                all_results[batch_size]['ask_times'].append(timing_breakdown['ask_time'])
+                all_results[batch_size]['eval_times'].append(timing_breakdown['eval_time'])
+                all_results[batch_size]['tell_times'].append(timing_breakdown['tell_time'])
+                logging.info(f"    Timing breakdown:")
+                logging.info(f"      ASK:  {timing_breakdown['ask_time']:.2f}s ({timing_breakdown['ask_time']/runtime*100:.1f}%)")
+                logging.info(f"      EVAL: {timing_breakdown['eval_time']:.2f}s ({timing_breakdown['eval_time']/runtime*100:.1f}%)")
+                logging.info(f"      TELL: {timing_breakdown['tell_time']:.2f}s ({timing_breakdown['tell_time']/runtime*100:.1f}%)")
 
         # Save convergence comparison plots if enabled (only for per-instance mode)
         if config.save_plots and config.plot_mode == 'per_instance':
@@ -345,6 +377,15 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
             if solutions:
                 logging.info(f"  Mean gap: {np.mean(results['gap_values']):.2f}%")
                 logging.info(f"  Std gap: {np.std(results['gap_values']):.2f}%")
+            # Log timing breakdown
+            mean_runtime = np.mean(results['runtime_values'])
+            mean_ask = np.mean(results['ask_times'])
+            mean_eval = np.mean(results['eval_times'])
+            mean_tell = np.mean(results['tell_times'])
+            logging.info(f"  Mean timing breakdown:")
+            logging.info(f"    ASK:  {mean_ask:.2f}s ({mean_ask/mean_runtime*100:.1f}%)")
+            logging.info(f"    EVAL: {mean_eval:.2f}s ({mean_eval/mean_runtime*100:.1f}%)")
+            logging.info(f"    TELL: {mean_tell:.2f}s ({mean_tell/mean_runtime*100:.1f}%)")
     elif sigma_sweep_mode:
         # Log results for each sigma value
         for sigma_value in sweep_values:
@@ -355,6 +396,15 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
             if solutions:
                 logging.info(f"  Mean gap: {np.mean(results['gap_values']):.2f}%")
                 logging.info(f"  Std gap: {np.std(results['gap_values']):.2f}%")
+            # Log timing breakdown
+            mean_runtime = np.mean(results['runtime_values'])
+            mean_ask = np.mean(results['ask_times'])
+            mean_eval = np.mean(results['eval_times'])
+            mean_tell = np.mean(results['tell_times'])
+            logging.info(f"  Mean timing breakdown:")
+            logging.info(f"    ASK:  {mean_ask:.2f}s ({mean_ask/mean_runtime*100:.1f}%)")
+            logging.info(f"    EVAL: {mean_eval:.2f}s ({mean_eval/mean_runtime*100:.1f}%)")
+            logging.info(f"    TELL: {mean_tell:.2f}s ({mean_tell/mean_runtime*100:.1f}%)")
     else:
         # Log results for each batch size
         for batch_size in config.batch_sizes:
@@ -365,6 +415,15 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
             if solutions:
                 logging.info(f"  Mean gap: {np.mean(results['gap_values']):.2f}%")
                 logging.info(f"  Std gap: {np.std(results['gap_values']):.2f}%")
+            # Log timing breakdown
+            mean_runtime = np.mean(results['runtime_values'])
+            mean_ask = np.mean(results['ask_times'])
+            mean_eval = np.mean(results['eval_times'])
+            mean_tell = np.mean(results['tell_times'])
+            logging.info(f"  Mean timing breakdown:")
+            logging.info(f"    ASK:  {mean_ask:.2f}s ({mean_ask/mean_runtime*100:.1f}%)")
+            logging.info(f"    EVAL: {mean_eval:.2f}s ({mean_eval/mean_runtime*100:.1f}%)")
+            logging.info(f"    TELL: {mean_tell:.2f}s ({mean_tell/mean_runtime*100:.1f}%)")
 
             # Save results to file
             if verbose and not solutions:

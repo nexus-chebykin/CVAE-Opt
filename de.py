@@ -43,6 +43,11 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
     time_history = []
     evaluations_done = 0  # Track total number of evaluations
 
+    # Track timing breakdown
+    ask_time_total = 0.0
+    eval_time_total = 0.0
+    tell_time_total = 0.0
+
     population = np.random.uniform(-search_space_bound, search_space_bound,
                                    (popsize, search_space_size))
 
@@ -63,6 +68,9 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
         # Only check evaluation limit if specified (overrides time)
         if maxevaluations is not None and evaluations_done >= maxevaluations:
             break
+
+        # --- ASK: Generate candidate solutions ----------------+
+        ask_start = time.time()
 
         # cycle through each individual in the population
         for j in range(0, popsize):
@@ -89,9 +97,17 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
         # Ensure bounds
         children = np.clip(children, -search_space_bound, search_space_bound)
 
+        ask_time_total += time.time() - ask_start
+
+        # --- EVALUATE: Objective function evaluation ------+
+        eval_start = time.time()
         _, scores_trial = cost_func(children, *args)
         scores_trial = np.array(scores_trial)
         evaluations_done += popsize  # Increment evaluation counter
+        eval_time_total += time.time() - eval_start
+
+        # --- TELL: Update population with results ---------+
+        tell_start = time.time()
 
         iterations_without_improvement += 1
         if min(population_cost) > min(scores_trial):
@@ -101,10 +117,19 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
         population[improvement] = children[improvement]
         population_cost[improvement] = scores_trial[improvement]
 
+        tell_time_total += time.time() - tell_start
+
         # --- SCORE KEEPING --------------------------------+
         gen_best = min(population_cost)  # fitness of best individual
         convergence_history.append(gen_best)
         time_history.append(time.time() - start_time)
 
-    return gen_best, population[np.argmin(population_cost)], convergence_history, time_history
+    # Return timing breakdown
+    timing_breakdown = {
+        'ask_time': ask_time_total,
+        'eval_time': eval_time_total,
+        'tell_time': tell_time_total
+    }
+
+    return gen_best, population[np.argmin(population_cost)], convergence_history, time_history, timing_breakdown
 

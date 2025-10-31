@@ -38,6 +38,11 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, ma
     time_history = []
     evaluations_done = 0  # Track total number of evaluations
 
+    # Track timing breakdown
+    ask_time_total = 0.0
+    eval_time_total = 0.0
+    tell_time_total = 0.0
+
     # Define the parametrization: continuous bounded variables
     param = ng.p.Array(shape=(search_space_size,))
     param.set_bounds(-search_space_bound, search_space_bound)
@@ -71,6 +76,7 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, ma
             break
 
         # ASK: Generate batch of candidate solutions
+        ask_start = time.time()
         candidates = []
         for _ in range(popsize):
             try:
@@ -79,17 +85,21 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, ma
             except Exception:
                 # Budget exhausted or optimizer stopped
                 break
+        ask_time_total += time.time() - ask_start
 
         if len(candidates) == 0:
             break
 
         # EVALUATE: Batch evaluation of all candidates
+        eval_start = time.time()
         solutions_array = np.array([c.value for c in candidates])
         _, fitness_values = cost_func(solutions_array, *args)
         fitness_values = np.array(fitness_values)
         evaluations_done += len(candidates)
+        eval_time_total += time.time() - eval_start
 
         # TELL: Update optimizer with fitness values
+        tell_start = time.time()
         for candidate, fitness in zip(candidates, fitness_values):
             optimizer.tell(candidate, fitness)
 
@@ -97,6 +107,7 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, ma
             if fitness < best_fitness:
                 best_fitness = fitness
                 best_solution = candidate.value.copy()
+        tell_time_total += time.time() - tell_start
 
         # --- TRACK CONVERGENCE --------------------------------+
         convergence_history.append(best_fitness)
@@ -111,4 +122,11 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, ma
         _, fitness_values = cost_func(best_solution.reshape(1, -1), *args)
         best_fitness = fitness_values[0]
 
-    return best_fitness, best_solution, convergence_history, time_history
+    # Return timing breakdown
+    timing_breakdown = {
+        'ask_time': ask_time_total,
+        'eval_time': eval_time_total,
+        'tell_time': tell_time_total
+    }
+
+    return best_fitness, best_solution, convergence_history, time_history, timing_breakdown

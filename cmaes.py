@@ -37,6 +37,11 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, si
     time_history = []
     evaluations_done = 0  # Track total number of evaluations
 
+    # Track timing breakdown
+    ask_time_total = 0.0
+    eval_time_total = 0.0
+    tell_time_total = 0.0
+
     # Initial mean: start at origin (center of search space)
     x0 = np.zeros(search_space_size)
 
@@ -50,7 +55,12 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, si
         'maxiter': cmaes_maxiter,
         'verbose': -9,  # Suppress output
         'verb_disp': 0,  # No display
-        'verb_log': 0    # No logging
+        'verb_log': 0,   # No logging
+        # Disable internal stopping criteria to respect only time limit
+        'tolx': 1e100,  # Disable stopping based on small x-changes
+        'tolfun': 1e100,  # Disable stopping based on small function value changes
+        'tolstagnation': 1e100,  # Disable stopping based on stagnation
+        'tolfacupx': 1e100  # Disable stopping based on large step-size
     }
 
     # Initialize CMA-ES evolution strategy
@@ -68,16 +78,22 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, si
             break
 
         # ASK: Generate new population of candidate solutions
+        ask_start = time.time()
         solutions = es.ask()
+        ask_time_total += time.time() - ask_start
 
         # EVALUATE: Batch evaluation of all candidates
+        eval_start = time.time()
         solutions_array = np.array(solutions)
         _, fitness_values = cost_func(solutions_array, *args)
         fitness_values = np.array(fitness_values)
         evaluations_done += popsize  # Increment evaluation counter
+        eval_time_total += time.time() - eval_start
 
         # TELL: Update CMA-ES distribution based on fitness values
+        tell_start = time.time()
         es.tell(solutions, fitness_values.tolist())
+        tell_time_total += time.time() - tell_start
 
         # --- TRACK CONVERGENCE --------------------------------+
         gen_best = es.result.fbest  # Best fitness so far
@@ -88,4 +104,11 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, si
     best_solution = es.result.xbest
     best_fitness = es.result.fbest
 
-    return best_fitness, best_solution, convergence_history, time_history
+    # Return timing breakdown
+    timing_breakdown = {
+        'ask_time': ask_time_total,
+        'eval_time': eval_time_total,
+        'tell_time': tell_time_total
+    }
+
+    return best_fitness, best_solution, convergence_history, time_history, timing_breakdown
