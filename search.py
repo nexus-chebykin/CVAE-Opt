@@ -31,6 +31,8 @@ if __name__ == "__main__":
     logging.info("Started Search Run")
     logging.info("Call: {0}".format(''.join(sys.argv)))
     logging.info("Version: {0}".format(train.VERSION))
+    if config.description:
+        logging.info("Description: {0}".format(config.description))
     logging.info("PARAMETERS:")
     for arg in sorted(vars(config)):
         logging.info("{0}: {1}".format(arg, getattr(config, arg)))

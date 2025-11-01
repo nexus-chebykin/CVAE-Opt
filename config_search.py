@@ -29,6 +29,8 @@ def get_config(args=None):
                         choices=['per_instance', 'average'],
                         help='Plotting mode: "per_instance" creates all plots (absolute and percentage) for each instance, '
                              '"average" skips per-instance plots and creates only 3 averaged percentage plots across all instances.')
+    parser.add_argument('--description', type=str, default='',
+                        help='Brief description of this experiment for logging purposes')
 
     # Optimizer selection
     parser.add_argument('--optimizer', type=str, default='de',
