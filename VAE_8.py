@@ -9,7 +9,109 @@ import torch.optim
 import torch.nn.functional as F
 import tsp
 import cvrp
+import math
 
+
+class PositionalEncoding(nn.Module):
+    def __init__(self, d_model: int, max_len: int):
+        super(PositionalEncoding, self).__init__()
+        self.d_model = d_model
+        self.max_len = max_len
+
+        # Create sinusoidal positional encodings
+        pos_enc = torch.zeros(max_len, d_model)
+        position = torch.arange(0, max_len, dtype=torch.float32).unsqueeze(1)
+        div_term = torch.exp(
+            torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model)
+        )
+        pos_enc[:, 0::2] = torch.sin(position * div_term)
+        pos_enc[:, 1::2] = torch.cos(position * div_term)
+        pos_enc = pos_enc.unsqueeze(0)  # (1, max_len, d_model)
+
+        # Register as buffer (not a parameter, but part of state)
+        self.register_buffer('pos_enc', pos_enc)
+
+    def forward(self, embedding: torch.Tensor) -> torch.Tensor:
+        """
+        Args:
+            embedding: [batch_size, seq_len, d_model] or [seq_len, d_model]
+        """
+        return embedding + self.pos_enc[:, :embedding.shape[-2], :]
+
+
+class TransEncoder(nn.Module):
+    def __init__(self, search_space_size, max_len):
+        super(TransEncoder, self).__init__()
+
+        num_layers: int = 3
+        num_heads: int = 8
+        model_size: int = 128
+        expand_factor: int = 4
+
+        self.num_layers = num_layers
+
+        self.pos_enc = PositionalEncoding(d_model=model_size, max_len=max_len)
+
+        # Transformer layers
+        self.layers = nn.ModuleList()
+        for i in range(num_layers):
+            layer = nn.ModuleDict({
+                'mha': nn.MultiheadAttention(
+                    embed_dim=model_size,
+                    num_heads=num_heads,
+                    kdim=model_size,
+                    vdim=model_size,
+                    batch_first=True,
+                ),
+                'norm1': nn.LayerNorm(model_size),
+                'mlp': nn.Sequential(
+                    nn.Linear(model_size, expand_factor * model_size),
+                    nn.ReLU(),
+                    nn.Linear(expand_factor * model_size, model_size),
+                ),
+                'norm2': nn.LayerNorm(model_size),
+            })
+            self.layers.append(layer)
+
+        # VAE projection layers
+        self.fc1 = nn.Linear(model_size, search_space_size)  # For mu
+        self.fc2 = nn.Linear(model_size, search_space_size)  # For log_var
+
+    def _initialize_weights(self):
+        """Initialize weights with scaled initialization."""
+        # Scale attention weights by 1/num_layers
+        scale = 1.0 / self.num_layers
+        for layer in self.layers:
+            # Scale the output projection of multi-head attention
+            nn.init.xavier_uniform_(layer['mha'].out_proj.weight, gain=scale)
+
+    def forward(self, instance_hidden):
+
+
+        x = self.pos_enc(instance_hidden)
+        for layer in self.layers:
+            # Multi-head attention with residual
+            attn_out, _ = layer['mha'](x, x, x)
+            x = layer['norm1'](x + attn_out)
+
+            # Feed-forward network with residual
+            mlp_out = layer['mlp'](x)
+            x = layer['norm2'](x + mlp_out)
+
+        pooled = x.mean(dim=1)  # [batch_size, model_size]
+
+        # Project to VAE parameters
+        mu = self.fc1(pooled)
+        log_var = self.fc2(pooled)
+        z = self.reparameterise(mu, log_var)
+
+        return z, mu, log_var
+
+    @staticmethod
+    def reparameterise(mu, logvar):
+        std = torch.exp(0.5 * logvar)
+        eps = torch.randn_like(std)
+        return mu + eps * std
 
 class Embedding(nn.Module):
     """Encodes the coordinate states using 1D Convolution."""
@@ -223,8 +325,7 @@ class VAE_8(nn.Module):
         encoder_attn = Attention(hidden_size)
         rnn = nn.GRU(hidden_size, hidden_size, 1, batch_first=True, dropout=0)
 
-        self.encoder = Encoder(self.instance_embedding, reference_embedding, encoder_attn, rnn, update_fn,
-                               config.search_space_size, hidden_size)
+        self.encoder = TransEncoder(config.search_space_size, config.problem_size)
         self.decoder = Decoder(self.instance_embedding, reference_embedding, encoder_attn, rnn, hidden_size,
                                config.search_space_size, mask_fn, update_fn)
 
@@ -237,7 +338,7 @@ class VAE_8(nn.Module):
 
     def forward(self, instance, solution_1, solution_2, config):
         instance_hidden = self.instance_embedding(instance)
-        output_e = self.encoder(instance, solution_1, instance_hidden, config)
+        output_e = self.encoder(instance_hidden)
 
         Z, mu, log_var = output_e
 
