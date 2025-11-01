@@ -68,12 +68,18 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, si
 
     # --- OPTIMIZE WITH ASK-TELL PATTERN ----------------+
 
-    while not es.stop():
-        # Check stopping criteria
+    iteration = 0
+    while True:
+        iteration += 1
+
+        # Check stopping criteria (before ask/tell to avoid extra evaluations)
         # Always check time limit
         if time.time() - start_time > maxtime:
             break
-        # Only check evaluation limit if specified (overrides time)
+        # Check iteration limit if specified
+        if maxiter is not None and iteration > maxiter:
+            break
+        # Check evaluation limit if specified
         if maxevaluations is not None and evaluations_done >= maxevaluations:
             break
 
