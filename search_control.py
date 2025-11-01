@@ -315,33 +315,50 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
             # Format optimizer name for display
             optimizer_name = 'CMA-ES' if config.optimizer == 'cmaes' else 'DE'
 
+            # Extract optimal value for gap-based plots
+            if solutions:
+                optimal_value = cost_fn(torch.Tensor(instance).unsqueeze(0),
+                                        torch.Tensor(solutions[i]).long().unsqueeze(0)).item()
+            else:
+                optimal_value = None
+
             # Create absolute value comparison plots (all batch sizes on same graph)
             if len(config.batch_sizes) > 1:
                 plot_convergence_comparison_iterations(i, convergence_data, instances_dir, config.search_iterations, optimizer_name)
                 plot_convergence_comparison(i, convergence_data, instances_dir, config.search_iterations, optimizer_name)
                 plot_convergence_comparison_time(i, convergence_data, instances_dir, config.search_iterations, optimizer_name)
-                # Create percentage-based comparison plots
-                plot_convergence_comparison_iterations_pct(i, convergence_data, instances_dir, config.search_iterations, optimizer_name)
-                plot_convergence_comparison_pct(i, convergence_data, instances_dir, config.search_iterations, optimizer_name)
-                plot_convergence_comparison_time_pct(i, convergence_data, instances_dir, config.search_iterations, optimizer_name)
+                # Create percentage-based comparison plots (requires optimal value)
+                plot_convergence_comparison_iterations_pct(i, convergence_data, instances_dir, config.search_iterations, optimal_value, optimizer_name)
+                plot_convergence_comparison_pct(i, convergence_data, instances_dir, config.search_iterations, optimal_value, optimizer_name)
+                plot_convergence_comparison_time_pct(i, convergence_data, instances_dir, config.search_iterations, optimal_value, optimizer_name)
             else:
                 # If single batch size, still create plots but they'll only have one curve
                 plot_convergence_comparison_iterations(i, convergence_data, instances_dir, config.search_iterations, optimizer_name)
                 plot_convergence_comparison(i, convergence_data, instances_dir, config.search_iterations, optimizer_name)
                 plot_convergence_comparison_time(i, convergence_data, instances_dir, config.search_iterations, optimizer_name)
-                # Create percentage-based plots
-                plot_convergence_comparison_iterations_pct(i, convergence_data, instances_dir, config.search_iterations, optimizer_name)
-                plot_convergence_comparison_pct(i, convergence_data, instances_dir, config.search_iterations, optimizer_name)
-                plot_convergence_comparison_time_pct(i, convergence_data, instances_dir, config.search_iterations, optimizer_name)
+                # Create percentage-based plots (requires optimal value)
+                plot_convergence_comparison_iterations_pct(i, convergence_data, instances_dir, config.search_iterations, optimal_value, optimizer_name)
+                plot_convergence_comparison_pct(i, convergence_data, instances_dir, config.search_iterations, optimal_value, optimizer_name)
+                plot_convergence_comparison_time_pct(i, convergence_data, instances_dir, config.search_iterations, optimal_value, optimizer_name)
 
     # Generate averaged plots
     # For optimizer_comparison_mode and sigma_sweep_mode, always generate averaged plots regardless of plot_mode
     # For normal mode, only generate averaged plots if plot_mode == 'average'
     if config.save_plots:
+        # Extract optimal values for all instances (needed for gap-based plots)
+        if solutions:
+            optimal_values = []
+            for i, instance in enumerate(instances):
+                optimal_value = cost_fn(torch.Tensor(instance).unsqueeze(0),
+                                        torch.Tensor(solutions[i]).long().unsqueeze(0)).item()
+                optimal_values.append(optimal_value)
+        else:
+            optimal_values = None
+
         if optimizer_comparison_mode:
             # Optimizer comparison mode: generate optimizer comparison plots (always, regardless of plot_mode)
             logging.info("Computing averaged convergence data across all instances for optimizer comparison...")
-            averaged_data = compute_averaged_convergence(all_instances_data, ['CMA-ES', 'DE', 'Portfolio'])
+            averaged_data = compute_averaged_convergence(all_instances_data, ['CMA-ES', 'DE', 'Portfolio'], optimal_values)
 
             # Generate optimizer comparison plots
             plot_optimizer_comparison_iterations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size)
@@ -350,7 +367,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
         elif sigma_sweep_mode:
             # Sigma sweep mode: generate sigma comparison plots (always, regardless of plot_mode)
             logging.info("Computing averaged convergence data across all instances for sigma sweep...")
-            averaged_data = compute_averaged_convergence(all_instances_data, sweep_values)
+            averaged_data = compute_averaged_convergence(all_instances_data, sweep_values, optimal_values)
 
             # Generate sigma comparison plots
             plot_sigma_comparison_iterations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size)
@@ -359,7 +376,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
         elif config.plot_mode == 'average' and len(config.batch_sizes) > 1:
             # Normal mode with average plot_mode: generate batch size comparison plots
             logging.info("Computing averaged convergence data across all instances...")
-            averaged_data = compute_averaged_convergence(all_instances_data, config.batch_sizes)
+            averaged_data = compute_averaged_convergence(all_instances_data, config.batch_sizes, optimal_values)
 
             # Format optimizer name for display
             optimizer_name = 'CMA-ES' if config.optimizer == 'cmaes' else 'DE'
