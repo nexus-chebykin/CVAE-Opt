@@ -132,10 +132,19 @@ def read_instance_data(config):
 
 def read_instance_pkl(config):
     with open(config.instances_path, 'rb') as f:
-        instances_data = pickle.load(f)
+        data = pickle.load(f)
+
+    # Check if data contains (instances, solutions) tuple or just instances
+    if isinstance(data, tuple) and len(data) == 2:
+        # New format: (instances, solutions)
+        instances_data, solutions = data
+    else:
+        # Old format: just instances (backward compatibility)
+        instances_data = data
+        solutions = None
 
     if config.problem == "TSP":
-        return instances_data
+        return instances_data, solutions
     elif config.problem == "CVRP":
         instances = []
         for instance in instances_data:
@@ -146,4 +155,4 @@ def read_instance_pkl(config):
             instance_np[1:, 3] = np.array(instance[2]) / instance[3]  # customer demands
             instance_np[0, 3] = 0  # depot demand
             instances.append(instance_np)
-        return instances
+        return instances, solutions

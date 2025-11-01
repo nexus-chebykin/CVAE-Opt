@@ -52,6 +52,6 @@ if __name__ == "__main__":
     model.load_state_dict(model_data['parameters'])
     model.eval()
 
-    instances = read_instance_pkl(config)
+    instances, solutions = read_instance_pkl(config)
 
-    _, avg_runtime, costs = search_control.solve_instance_set(model, config, instances)
+    _, avg_runtime, costs = search_control.solve_instance_set(model, config, instances, solutions)
