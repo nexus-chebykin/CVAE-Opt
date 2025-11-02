@@ -87,7 +87,14 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, ma
                 break
         ask_time_total += time.time() - ask_start
 
-        if len(candidates) == 0:
+        # STRICT: Only accept complete iterations - discard partial batches
+        if len(candidates) < popsize:
+            # Incomplete iteration - break without evaluating
+            break
+
+        # Check time limit again after ASK phase (time may have elapsed during candidate generation)
+        if time.time() - start_time > maxtime:
+            # Time exceeded during ASK - discard this iteration
             break
 
         # EVALUATE: Batch evaluation of all candidates
