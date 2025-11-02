@@ -92,11 +92,6 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, ma
             # Incomplete iteration - break without evaluating
             break
 
-        # Check time limit again after ASK phase (time may have elapsed during candidate generation)
-        if time.time() - start_time > maxtime:
-            # Time exceeded during ASK - discard this iteration
-            break
-
         # EVALUATE: Batch evaluation of all candidates
         eval_start = time.time()
         solutions_array = np.array([c.value for c in candidates])
