@@ -99,11 +99,8 @@ def train(model, config):
     training_data, validation_data = read_instance_data(config)
 
     if config.problem == "TSP":
-        # Reorder the problem based on the solution
-        X = [x[order] for x, order in zip(training_data[0], training_data[1])]
-        reorganized_data = [X, training_data[1]]
 
-        training_dataset = TSPDataset(config.epoch_size, config.problem_size, config, reorganized_data)
+        training_dataset = TSPDataset(config.epoch_size, config.problem_size, config, training_data)
         validation_dataset = TSPDataset(config.network_validation_size, config.problem_size, config, validation_data)
     elif config.problem == "CVRP":
         training_dataset = CVRPDataset(config.epoch_size, config.problem_size, config, training_data)

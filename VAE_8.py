@@ -12,6 +12,68 @@ import cvrp
 import math
 
 
+class Embedding(nn.Module):
+    """Encodes the coordinate states using 1D Convolution."""
+
+    def __init__(self, input_size, hidden_size):
+        super(Embedding, self).__init__()
+        self.embed = nn.Linear(input_size, hidden_size)
+
+    def forward(self, input_data):
+        output_data = self.embed(input_data)
+        return output_data
+
+
+class Encoder(nn.Module):
+    def __init__(self, instance_embedding, reference_embedding, encoder_attn, rnn, update_fn, search_space_size,
+                 hidden_size):
+        super(Encoder, self).__init__()
+        self.instance_embedding = instance_embedding
+        self.reference_embedding = reference_embedding
+        self.encoder_attn = encoder_attn
+        self.gru_decoder = nn.GRU(hidden_size * 2, hidden_size, 1, batch_first=True)
+        self.fc1 = nn.Linear(hidden_size, search_space_size)
+        self.fc2 = nn.Linear(hidden_size, search_space_size)
+        self.rnn = rnn
+        self.update_fn = update_fn
+
+    def forward(self, instance, solution, instance_hidden, config):
+        batch_size, sequence_size, input_size, = instance.size()
+        reference_input = instance[torch.arange(batch_size), solution[:, 0], :].unsqueeze(1).detach()
+
+        last_hh = None
+        last_hh_2 = None
+        reference_hidden = self.reference_embedding(reference_input)
+        for j in range(1, solution.shape[1]):
+
+            rnn_out, last_hh = self.rnn(reference_hidden, last_hh)
+
+            # Given a summary of the output, find an  input context
+            enc_attn = self.encoder_attn(instance_hidden, rnn_out)
+            context = enc_attn.permute(0, 2, 1).bmm(instance_hidden)
+
+            ptr = solution.t()[j].long()
+
+            if self.update_fn is not None:
+                instance = self.update_fn(instance, ptr.data)
+                instance_hidden = self.instance_embedding(instance)
+
+            reference_input = torch.gather(instance, 1, ptr.view(-1, 1, 1).expand(-1, 1, input_size))
+            reference_hidden = self.reference_embedding(reference_input)
+
+            rnn_input = torch.cat((reference_hidden, context), dim=2)
+            rnn_out_2, last_hh_2 = self.gru_decoder(rnn_input, last_hh_2)
+
+        mu = self.fc1(last_hh_2.squeeze(0))
+        log_var = self.fc2(last_hh_2.squeeze(0))
+        return self.reparameterise(mu, log_var), mu, log_var
+
+    @staticmethod
+    def reparameterise(mu, logvar):
+        std = torch.exp(0.5 * logvar)
+        eps = torch.randn_like(std)
+        return mu + eps * std
+
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model: int, max_len: int):
         super(PositionalEncoding, self).__init__()
@@ -85,10 +147,15 @@ class TransEncoder(nn.Module):
             # Scale the output projection of multi-head attention
             nn.init.xavier_uniform_(layer['mha'].out_proj.weight, gain=scale)
 
-    def forward(self, instance_hidden):
+    def forward(self, instance_hidden,solution):
 
+        batch_size = instance_hidden.shape[0]
+        reorganized_instance = torch.gather(
+            instance_hidden, 1,
+            solution.unsqueeze(-1).expand(-1, -1, instance_hidden.shape[-1])
+        )
 
-        x = self.pos_enc(instance_hidden)
+        x = self.pos_enc(reorganized_instance)
         for layer in self.layers:
             # Multi-head attention with residual
             attn_out, _ = layer['mha'](x, x, x)
@@ -112,18 +179,6 @@ class TransEncoder(nn.Module):
         std = torch.exp(0.5 * logvar)
         eps = torch.randn_like(std)
         return mu + eps * std
-
-class Embedding(nn.Module):
-    """Encodes the coordinate states using 1D Convolution."""
-
-    def __init__(self, input_size, hidden_size):
-        super(Embedding, self).__init__()
-        self.embed = nn.Linear(input_size, hidden_size)
-
-    def forward(self, input_data):
-        output_data = self.embed(input_data)
-        return output_data
-
 
 class Attention(nn.Module):
     """Calculates attention over the input nodes given the current state."""
@@ -150,57 +205,6 @@ class Attention(nn.Module):
         attns = F.softmax(attns, dim=1)  # (batch, seq_len)
         return attns
 
-class Encoder(nn.Module):
-    def __init__(self, instance_embedding, reference_embedding, encoder_attn: Attention, rnn, update_fn, search_space_size,
-                 hidden_size):
-        super(Encoder, self).__init__()
-        self.instance_embedding = instance_embedding
-        self.reference_embedding = reference_embedding
-        self.encoder_attn = encoder_attn
-        self.gru_decoder = nn.GRU(hidden_size * 2, hidden_size, 1, batch_first=True)
-        self.fc1 = nn.Linear(hidden_size, search_space_size)
-        self.fc2 = nn.Linear(hidden_size, search_space_size)
-        self.rnn = rnn
-        self.update_fn = update_fn
-
-    def forward(self, instance, solution, instance_hidden, config):
-        batch_size, sequence_size, input_size, = instance.size()
-        reference_input = instance[torch.arange(batch_size), solution[:, 0], :].unsqueeze(1).detach()
-
-        last_hh = None
-        last_hh_2 = None
-        # the loop could be removed
-        reference_hidden = self.reference_embedding(reference_input)
-        for j in range(1, solution.shape[1]):
-
-            rnn_out, last_hh = self.rnn(reference_hidden, last_hh)
-
-            # Given a summary of the output, find an  input context
-            enc_attn = self.encoder_attn(instance_hidden, rnn_out)
-            context = enc_attn.permute(0, 2, 1).bmm(instance_hidden)
-
-            ptr = solution.t()[j].long()
-
-            if self.update_fn is not None:
-                instance = self.update_fn(instance, ptr.data)
-                instance_hidden = self.instance_embedding(instance)
-
-            reference_input = torch.gather(instance, 1, ptr.view(-1, 1, 1).expand(-1, 1, input_size))
-            reference_hidden = self.reference_embedding(reference_input)
-
-            rnn_input = torch.cat((reference_hidden, context), dim=2)
-            rnn_out_2, last_hh_2 = self.gru_decoder(rnn_input, last_hh_2)
-
-        mu = self.fc1(last_hh_2.squeeze(0))
-        log_var = self.fc2(last_hh_2.squeeze(0))
-        return self.reparameterise(mu, log_var), mu, log_var
-
-    @staticmethod
-    def reparameterise(mu, logvar):
-        std = torch.exp(0.5 * logvar)
-        eps = torch.randn_like(std)
-        return mu + eps * std
-
 
 class Pointer(nn.Module):
     """Calculates the next state given the previous state and input embeddings."""
@@ -222,6 +226,7 @@ class Pointer(nn.Module):
 
     def forward(self, instance_hidden, reference_hidden, Z, last_hh):
         rnn_out, last_hh = self.rnn(reference_hidden, last_hh)
+        rnn_out = rnn_out
 
         # Given a summary of the output, find an  input context
         enc_attn = self.encoder_attn(instance_hidden, rnn_out)
@@ -317,30 +322,29 @@ class VAE_8(nn.Module):
             input_size = 4
             mask_fn = cvrp.update_mask
             update_fn = cvrp.update_dynamic
-        else:
-            assert False
 
         hidden_size = 128
-        self.instance_embedding = nn.Linear(input_size, hidden_size)
-        reference_embedding = nn.Linear(input_size, hidden_size)
+        self.instance_embedding = Embedding(input_size, hidden_size)
+        reference_embedding = Embedding(input_size, hidden_size)
         encoder_attn = Attention(hidden_size)
         rnn = nn.GRU(hidden_size, hidden_size, 1, batch_first=True, dropout=0)
 
-        self.encoder = TransEncoder(config.search_space_size, config.problem_size)
+        # self.encoder = Encoder(self.instance_embedding, reference_embedding, encoder_attn, rnn, update_fn,
+        #                        config.search_space_size, hidden_size)
+        self.encoder  = TransEncoder( config.search_space_size, config.problem_size)
         self.decoder = Decoder(self.instance_embedding, reference_embedding, encoder_attn, rnn, hidden_size,
                                config.search_space_size, mask_fn, update_fn)
 
         self.instance_hidden = None
         self.dummy_solution = None
 
-        # Shouldn't be required anymore.
         for p in self.parameters():
             if len(p.shape) > 1:
                 nn.init.xavier_uniform_(p)
 
     def forward(self, instance, solution_1, solution_2, config):
         instance_hidden = self.instance_embedding(instance)
-        output_e = self.encoder(instance_hidden)
+        output_e = self.encoder( instance_hidden,solution_1)
 
         Z, mu, log_var = output_e
 
