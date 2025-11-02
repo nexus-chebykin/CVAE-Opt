@@ -85,18 +85,6 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             maxtime=maxtime,
             maxevaluations=maxevaluations
         )
-    elif config.optimizer == 'portfolio':
-        from portfolio import minimize
-        result_cost, result_tour, convergence_history, time_history, timing_breakdown = minimize(
-            decode,
-            (model, config, instance, cost_fn),
-            config.search_space_bound,
-            config.search_space_size,
-            popsize=batch_size,
-            maxiter=maxiter,
-            maxtime=maxtime,
-            maxevaluations=maxevaluations
-        )
     else:
         raise ValueError(f"Unknown optimizer: {config.optimizer}")
 
@@ -130,23 +118,20 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
     sigma_sweep_mode = config.cmaes_sigma_sweep is not None
 
     if optimizer_comparison_mode:
-        # Optimizer comparison mode: run DE, CMA-ES, and Portfolio with fixed batch size
+        # Optimizer comparison mode: run DE and CMA-ES with fixed batch size
         fixed_batch_size = config.batch_sizes[0]
         logging.info(f"Running optimizer comparison mode with batch size {fixed_batch_size}")
-        logging.info(f"Comparing DE vs CMA-ES (sigma={config.cmaes_sigma0}) vs Portfolio")
+        logging.info(f"Comparing DE vs CMA-ES (sigma={config.cmaes_sigma0})")
 
         # Store results for each optimizer
         all_results = {'DE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
                               'ask_times': [], 'eval_times': [], 'tell_times': []},
                        'CMA-ES': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
-                                  'ask_times': [], 'eval_times': [], 'tell_times': []},
-                       'Portfolio': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
-                                     'ask_times': [], 'eval_times': [], 'tell_times': []}}
+                                  'ask_times': [], 'eval_times': [], 'tell_times': []}}
 
         # Accumulator for averaging convergence data across instances
         all_instances_data = {'DE': {'convergence': [], 'time': []},
-                              'CMA-ES': {'convergence': [], 'time': []},
-                              'Portfolio': {'convergence': [], 'time': []}}
+                              'CMA-ES': {'convergence': [], 'time': []}}
     elif sigma_sweep_mode:
         # Sigma sweep mode: loop over sigma values with fixed batch size
         sweep_values = config.cmaes_sigma_sweep
@@ -178,10 +163,10 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
         convergence_data = {}
 
         if optimizer_comparison_mode:
-            # Run all three optimizers: DE, CMA-ES, and Portfolio
+            # Run both optimizers: DE and CMA-ES
             de_runtime = None  # Will store DE runtime for time-matching mode
 
-            for optimizer_name in ['DE', 'CMA-ES', 'Portfolio']:
+            for optimizer_name in ['DE', 'CMA-ES']:
                 logging.info(f"  Optimizer: {optimizer_name}")
                 start_time = time.time()
 
@@ -191,8 +176,6 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                     config.optimizer = 'de'
                 elif optimizer_name == 'CMA-ES':
                     config.optimizer = 'cmaes'
-                elif optimizer_name == 'Portfolio':
-                    config.optimizer = 'portfolio'
 
                 # Determine stopping criteria based on mode
                 override_maxiter = None
