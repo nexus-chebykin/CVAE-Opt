@@ -166,6 +166,13 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
             # Run both optimizers: DE and CMA-ES
             de_runtime = None  # Will store DE runtime for time-matching mode
 
+            # Calculate optimal value if solutions provided (used for plotting)
+            if solutions:
+                optimal_value = cost_fn(torch.Tensor(instance).unsqueeze(0),
+                                        torch.Tensor(solutions[i]).long().unsqueeze(0)).item()
+            else:
+                optimal_value = None
+
             for optimizer_name in ['DE', 'CMA-ES']:
                 logging.info(f"  Optimizer: {optimizer_name}")
                 start_time = time.time()
@@ -240,13 +247,13 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
             if config.save_plots and config.plot_mode == 'per_instance':
                 plot_optimizer_comparison_iterations_pct_per_instance(
                     convergence_data, search_output_dir, config.search_iterations,
-                    fixed_batch_size, i, config.problem, config.problem_size)
+                    fixed_batch_size, i, optimal_value, config.problem, config.problem_size)
                 plot_optimizer_comparison_evaluations_pct_per_instance(
                     convergence_data, search_output_dir, config.search_iterations,
-                    fixed_batch_size, i, config.problem, config.problem_size)
+                    fixed_batch_size, i, optimal_value, config.problem, config.problem_size)
                 plot_optimizer_comparison_time_pct_per_instance(
                     convergence_data, search_output_dir, config.search_iterations,
-                    fixed_batch_size, i, config.problem, config.problem_size)
+                    fixed_batch_size, i, optimal_value, config.problem, config.problem_size)
         elif sigma_sweep_mode:
             # Run search for each sigma value with fixed batch size
             for sigma_value in sweep_values:
