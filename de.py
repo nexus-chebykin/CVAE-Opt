@@ -59,13 +59,13 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
         iteration += 1
 
         # Check stopping criteria
-        # Always check time limit
-        if time.time() - start_time > maxtime:
+        # Check time limit if specified
+        if maxtime is not None and time.time() - start_time > maxtime:
             break
-        # Only check iteration limit if specified (overrides time)
+        # Check iteration limit if specified
         if maxiter is not None and iteration > maxiter:
             break
-        # Only check evaluation limit if specified (overrides time)
+        # Check evaluation limit if specified
         if maxevaluations is not None and evaluations_done >= maxevaluations:
             break
 

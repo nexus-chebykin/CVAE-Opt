@@ -17,8 +17,8 @@ def get_config(args=None):
     parser.add_argument('--batch_sizes', nargs='+', type=int, default=None,
                         help='List of batch sizes to test (e.g., --batch_sizes 50 100 300 600). If not specified, uses search_batch_size.')
     parser.add_argument('--instances_path', type=str, default="")
-    parser.add_argument('--search_timelimit', default=40, type=int,
-                        help='Maximum wall-clock time in seconds (default: 40)')
+    parser.add_argument('--search_timelimit', default=None, type=int,
+                        help='Maximum wall-clock time in seconds (default: None, no time limit)')
     parser.add_argument('--search_space_size', default=100, type=int)  # Nb. dimensions of search space
     parser.add_argument('--search_iterations', default=300, type=int,
                         help='Maximum number of iterations (default: 300 for DE, overrides time limit if set)')
