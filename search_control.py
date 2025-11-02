@@ -23,7 +23,8 @@ def evaluate(Z, model, config, instance, cost_fn):
     return costs.tolist()
 
 
-def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None):
+def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
+                   override_maxiter=None, override_maxtime=None, override_maxevaluations=None):
     """
     Solve a single instance using the configured optimizer (DE or CMA-ES).
 
@@ -34,6 +35,9 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None):
         cost_fn: Cost function for evaluating tours
         batch_size: Population size for the optimizer
         sigma0: Optional sigma0 for CMA-ES (overrides config.cmaes_sigma0 if provided)
+        override_maxiter: Optional override for maximum iterations (if None, uses config.search_iterations)
+        override_maxtime: Optional override for maximum time (if None, uses config.search_timelimit)
+        override_maxevaluations: Optional override for maximum evaluations (if None, uses config.search_evaluations)
 
     Returns:
         result_cost: Best objective value found
@@ -46,6 +50,11 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None):
     instance = instance.to(config.device)
     model.reset_decoder(batch_size, config)
 
+    # Determine stopping criteria (use overrides if provided, otherwise use config values)
+    maxiter = override_maxiter if override_maxiter is not None else config.search_iterations
+    maxtime = override_maxtime if override_maxtime is not None else config.search_timelimit
+    maxevaluations = override_maxevaluations if override_maxevaluations is not None else config.search_evaluations
+
     # Select optimizer based on config
     if config.optimizer == 'de':
         from de import minimize
@@ -57,9 +66,9 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None):
             popsize=batch_size,
             mutate=config.de_mutate,
             recombination=config.de_recombine,
-            maxiter=config.search_iterations,
-            maxtime=config.search_timelimit,
-            maxevaluations=config.search_evaluations
+            maxiter=maxiter,
+            maxtime=maxtime,
+            maxevaluations=maxevaluations
         )
     elif config.optimizer == 'cmaes':
         from cmaes import minimize
@@ -72,9 +81,9 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None):
             config.search_space_size,
             popsize=batch_size,
             sigma0=cmaes_sigma,
-            maxiter=config.search_iterations,
-            maxtime=config.search_timelimit,
-            maxevaluations=config.search_evaluations
+            maxiter=maxiter,
+            maxtime=maxtime,
+            maxevaluations=maxevaluations
         )
     elif config.optimizer == 'portfolio':
         from portfolio import minimize
@@ -84,9 +93,9 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None):
             config.search_space_bound,
             config.search_space_size,
             popsize=batch_size,
-            maxiter=config.search_iterations,
-            maxtime=config.search_timelimit,
-            maxevaluations=config.search_evaluations
+            maxiter=maxiter,
+            maxtime=maxtime,
+            maxevaluations=maxevaluations
         )
     else:
         raise ValueError(f"Unknown optimizer: {config.optimizer}")
@@ -170,6 +179,8 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
 
         if optimizer_comparison_mode:
             # Run all three optimizers: DE, CMA-ES, and Portfolio
+            de_runtime = None  # Will store DE runtime for time-matching mode
+
             for optimizer_name in ['DE', 'CMA-ES', 'Portfolio']:
                 logging.info(f"  Optimizer: {optimizer_name}")
                 start_time = time.time()
@@ -183,12 +194,33 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 elif optimizer_name == 'Portfolio':
                     config.optimizer = 'portfolio'
 
+                # Determine stopping criteria based on mode
+                override_maxiter = None
+                override_maxtime = None
+
+                if config.stopping_criteria == 'time_of_de':
+                    if optimizer_name == 'DE':
+                        # DE runs for 300 iterations
+                        override_maxiter = 300
+                        override_maxtime = None  # No time limit for DE
+                    else:
+                        # Other optimizers match DE's runtime
+                        override_maxiter = None  # No iteration limit
+                        override_maxtime = de_runtime
+                        logging.info(f"    Using time-matching: maxtime={de_runtime:.2f}s (matching DE runtime)")
+
                 objective_value, solution, convergence_history, time_history, timing_breakdown = solve_instance(
-                    model, instance, config, cost_fn, fixed_batch_size)
+                    model, instance, config, cost_fn, fixed_batch_size,
+                    override_maxiter=override_maxiter, override_maxtime=override_maxtime)
 
                 # Restore original optimizer
                 config.optimizer = original_optimizer
                 runtime = time.time() - start_time
+
+                # Store DE runtime for time-matching mode
+                if config.stopping_criteria == 'time_of_de' and optimizer_name == 'DE':
+                    de_runtime = runtime
+                    logging.info(f"    DE runtime captured: {de_runtime:.2f}s (will be used for other optimizers)")
 
                 # Store convergence history and time history for comparison plots
                 convergence_data[optimizer_name] = (convergence_history, time_history)

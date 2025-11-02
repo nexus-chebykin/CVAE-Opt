@@ -1,4 +1,5 @@
 import argparse
+import sys
 import torch
 
 
@@ -19,10 +20,14 @@ def get_config(args=None):
     parser.add_argument('--search_timelimit', default=40, type=int,
                         help='Maximum wall-clock time in seconds (default: 40)')
     parser.add_argument('--search_space_size', default=100, type=int)  # Nb. dimensions of search space
-    parser.add_argument('--search_iterations', default=None, type=int,
-                        help='Maximum number of iterations (None = no limit, overrides time limit if set)')
+    parser.add_argument('--search_iterations', default=300, type=int,
+                        help='Maximum number of iterations (default: 300 for DE, overrides time limit if set)')
     parser.add_argument('--search_evaluations', default=None, type=int,
                         help='Maximum number of objective function evaluations (None = no limit, overrides time limit if set)')
+    parser.add_argument('--stopping_criteria', type=str, default='default',
+                        choices=['default', 'time_of_de'],
+                        help='Stopping criteria mode: "default" uses specified time/iteration/evaluation limits, '
+                             '"time_of_de" runs DE for 300 iterations then matches that time for other optimizers (requires --compare_optimizers)')
     parser.add_argument('--save_plots', default=False, action='store_true',
                         help='Save convergence plots for each instance')
     parser.add_argument('--plot_mode', type=str, default='per_instance',
@@ -74,5 +79,17 @@ def get_config(args=None):
             parser.error("--compare_optimizers requires exactly one batch size (use --batch_sizes 600)")
         if config.cmaes_sigma_sweep is not None:
             parser.error("--compare_optimizers cannot be used with --cmaes_sigma_sweep")
+
+    # Validate stopping criteria mode
+    if config.stopping_criteria == 'time_of_de':
+        if not config.compare_optimizers:
+            parser.error("--stopping_criteria time_of_de requires --compare_optimizers (it needs multiple optimizers to compare)")
+        # Check if user explicitly set search_iterations or search_timelimit
+        # We check sys.argv to see if they were explicitly provided
+        cmd_args = args if args is not None else sys.argv[1:]
+        if '--search_iterations' in cmd_args:
+            parser.error("--stopping_criteria time_of_de cannot be used with --search_iterations (DE iterations are fixed at 300)")
+        if '--search_timelimit' in cmd_args:
+            parser.error("--stopping_criteria time_of_de cannot be used with --search_timelimit (time is determined by DE runtime)")
 
     return config
