@@ -48,7 +48,7 @@ def plot_convergence_comparison_iterations_pct(instance_idx, convergence_data, o
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
 
-    comparison_path = os.path.join(output_path, 'instances', f'instance_{instance_idx}_convergence_comparison_iterations_pct.png')
+    comparison_path = os.path.join(output_path, f'instance_{instance_idx}_convergence_comparison_iterations_pct.png')
     plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
     plt.close()
 
@@ -92,7 +92,7 @@ def plot_convergence_comparison_pct(instance_idx, convergence_data, output_path,
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
 
-    comparison_path = os.path.join(output_path, 'instances', f'instance_{instance_idx}_convergence_comparison_pct.png')
+    comparison_path = os.path.join(output_path, f'instance_{instance_idx}_convergence_comparison_pct.png')
     plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
     plt.close()
 
@@ -134,7 +134,7 @@ def plot_convergence_comparison_time_pct(instance_idx, convergence_data, output_
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
 
-    comparison_path = os.path.join(output_path, 'instances', f'instance_{instance_idx}_convergence_comparison_time_pct.png')
+    comparison_path = os.path.join(output_path, f'instance_{instance_idx}_convergence_comparison_time_pct.png')
     plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
     plt.close()
 
