@@ -12,117 +12,6 @@ import logging
 import os
 
 
-def plot_convergence_comparison_iterations(instance_idx, convergence_data, output_path, max_iterations, optimizer='DE'):
-    """
-    Plot comparison of convergence histories for different batch sizes vs iterations.
-
-    Args:
-        instance_idx: Index of the instance
-        convergence_data: Dict mapping batch_size -> (convergence_history, time_history)
-        output_path: Directory to save plots
-        max_iterations: Maximum number of iterations
-        optimizer: Optimizer name for plot title (default: 'DE')
-    """
-    plt.figure(figsize=(12, 7))
-
-    # Define colors for different batch sizes
-    colors = ['#E63946', '#F1A208', '#2A9D8F', '#264653']
-
-    # Plot each batch size
-    for idx, (batch_size, (convergence_history, time_history)) in enumerate(sorted(convergence_data.items())):
-        iterations = list(range(1, len(convergence_history) + 1))
-        color = colors[idx % len(colors)]
-        plt.plot(iterations, convergence_history, linewidth=2.5, color=color,
-                 label=f'Batch Size: {batch_size}', marker='o', markevery=max(1, len(iterations)//10), markersize=6)
-
-    plt.xlabel('Iteration', fontsize=13)
-    plt.ylabel('Best Objective Value', fontsize=13)
-    plt.title(f'Convergence Comparison [{optimizer}] - Instance {instance_idx} (Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
-    plt.legend(fontsize=11, loc='best', framealpha=0.9)
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-
-    comparison_path = os.path.join(output_path, f'instance_{instance_idx}_convergence_comparison_iterations.png')
-    plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
-    plt.close()
-
-    logging.info(f"Saved iterations-based comparison plot for instance {instance_idx}")
-
-
-def plot_convergence_comparison(instance_idx, convergence_data, output_path, max_iterations, optimizer='DE'):
-    """
-    Plot comparison of convergence histories for different batch sizes on the same graph.
-
-    Args:
-        instance_idx: Index of the instance
-        convergence_data: Dict mapping batch_size -> (convergence_history, time_history)
-        output_path: Directory to save plots
-        max_iterations: Maximum number of iterations
-        optimizer: Optimizer name for plot title (default: 'DE')
-    """
-    plt.figure(figsize=(12, 7))
-
-    # Define colors for different batch sizes
-    colors = ['#E63946', '#F1A208', '#2A9D8F', '#264653']
-
-    # Plot each batch size
-    for idx, (batch_size, (convergence_history, time_history)) in enumerate(sorted(convergence_data.items())):
-        iterations = list(range(1, len(convergence_history) + 1))
-        evaluations = [iter_num * batch_size for iter_num in iterations]
-        color = colors[idx % len(colors)]
-        plt.plot(evaluations, convergence_history, linewidth=2.5, color=color,
-                 label=f'Batch Size: {batch_size}', marker='o', markevery=max(1, len(evaluations)//10), markersize=6)
-
-    plt.xlabel('Objective Function Evaluations', fontsize=13)
-    plt.ylabel('Best Objective Value', fontsize=13)
-    plt.title(f'Convergence Comparison [{optimizer}] - Instance {instance_idx} (Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
-    plt.legend(fontsize=11, loc='best', framealpha=0.9)
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-
-    comparison_path = os.path.join(output_path, f'instance_{instance_idx}_convergence_comparison.png')
-    plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
-    plt.close()
-
-    logging.info(f"Saved comparison plot for instance {instance_idx}")
-
-
-def plot_convergence_comparison_time(instance_idx, convergence_data, output_path, max_iterations, optimizer='DE'):
-    """
-    Plot comparison of convergence histories for different batch sizes vs wall-clock time.
-
-    Args:
-        instance_idx: Index of the instance
-        convergence_data: Dict mapping batch_size -> (convergence_history, time_history)
-        output_path: Directory to save plots
-        max_iterations: Maximum number of iterations
-        optimizer: Optimizer name for plot title (default: 'DE')
-    """
-    plt.figure(figsize=(12, 7))
-
-    # Define colors for different batch sizes
-    colors = ['#E63946', '#F1A208', '#2A9D8F', '#264653']
-
-    # Plot each batch size
-    for idx, (batch_size, (convergence_history, time_history)) in enumerate(sorted(convergence_data.items())):
-        color = colors[idx % len(colors)]
-        plt.plot(time_history, convergence_history, linewidth=2.5, color=color,
-                 label=f'Batch Size: {batch_size}', marker='o', markevery=max(1, len(time_history)//10), markersize=6)
-
-    plt.xlabel('Wall-Clock Time (seconds)', fontsize=13)
-    plt.ylabel('Best Objective Value', fontsize=13)
-    plt.title(f'Convergence Comparison [{optimizer}] - Instance {instance_idx} (Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
-    plt.legend(fontsize=11, loc='best', framealpha=0.9)
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-
-    comparison_path = os.path.join(output_path, f'instance_{instance_idx}_convergence_comparison_time.png')
-    plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
-    plt.close()
-
-    logging.info(f"Saved time-based comparison plot for instance {instance_idx}")
-
-
 def plot_convergence_comparison_iterations_pct(instance_idx, convergence_data, output_path, max_iterations, optimal_value, optimizer='DE'):
     """
     Plot comparison of convergence histories as optimality gap vs iterations.
@@ -159,7 +48,7 @@ def plot_convergence_comparison_iterations_pct(instance_idx, convergence_data, o
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
 
-    comparison_path = os.path.join(output_path, f'instance_{instance_idx}_convergence_comparison_iterations_pct.png')
+    comparison_path = os.path.join(output_path, 'instances', f'instance_{instance_idx}_convergence_comparison_iterations_pct.png')
     plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
     plt.close()
 
@@ -196,14 +85,14 @@ def plot_convergence_comparison_pct(instance_idx, convergence_data, output_path,
         plt.plot(evaluations, convergence_pct, linewidth=2.5, color=color,
                  label=f'Batch Size: {batch_size}', marker='o', markevery=max(1, len(evaluations)//10), markersize=6)
 
-    plt.xlabel('Objective Function Evaluations', fontsize=13)
+    plt.xlabel('Decoder evaluations', fontsize=13)
     plt.ylabel('Optimality Gap (%)', fontsize=13)
     plt.title(f'Convergence Comparison [{optimizer}] - Instance {instance_idx} (Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
     plt.legend(fontsize=11, loc='best', framealpha=0.9)
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
 
-    comparison_path = os.path.join(output_path, f'instance_{instance_idx}_convergence_comparison_pct.png')
+    comparison_path = os.path.join(output_path, 'instances', f'instance_{instance_idx}_convergence_comparison_pct.png')
     plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
     plt.close()
 
@@ -245,7 +134,7 @@ def plot_convergence_comparison_time_pct(instance_idx, convergence_data, output_
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
 
-    comparison_path = os.path.join(output_path, f'instance_{instance_idx}_convergence_comparison_time_pct.png')
+    comparison_path = os.path.join(output_path, 'instances', f'instance_{instance_idx}_convergence_comparison_time_pct.png')
     plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
     plt.close()
 
@@ -283,7 +172,7 @@ def plot_average_convergence_iterations_pct(averaged_data, output_path, max_iter
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
 
-    comparison_path = os.path.join(output_path, 'average_convergence_iterations_pct.png')
+    comparison_path = os.path.join(output_path, 'average', 'average_convergence_iterations_pct.png')
     plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
     plt.close()
 
@@ -315,14 +204,14 @@ def plot_average_convergence_evaluations_pct(averaged_data, output_path, max_ite
         plt.plot(evaluations, gap_history, linewidth=2.5, color=color,
                  label=f'Batch Size: {batch_size}', marker='o', markevery=max(1, len(evaluations)//10), markersize=6)
 
-    plt.xlabel('Objective Function Evaluations', fontsize=13)
+    plt.xlabel('Decoder evaluations', fontsize=13)
     plt.ylabel('Optimality Gap (%)', fontsize=13)
     plt.title(f'Average Optimality Gap [{optimizer}] (Across {num_instances} Instances, Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
     plt.legend(fontsize=11, loc='best', framealpha=0.9)
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
 
-    comparison_path = os.path.join(output_path, 'average_convergence_evaluations_pct.png')
+    comparison_path = os.path.join(output_path, 'average', 'average_convergence_evaluations_pct.png')
     plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
     plt.close()
 
@@ -359,7 +248,7 @@ def plot_average_convergence_time_pct(averaged_data, output_path, max_iterations
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
 
-    comparison_path = os.path.join(output_path, 'average_convergence_time_pct.png')
+    comparison_path = os.path.join(output_path, 'average', 'average_convergence_time_pct.png')
     plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
     plt.close()
 
@@ -397,7 +286,7 @@ def plot_sigma_comparison_iterations_pct(averaged_data, output_path, max_iterati
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
 
-    comparison_path = os.path.join(output_path, 'sigma_comparison_iterations_pct.png')
+    comparison_path = os.path.join(output_path, 'average', 'sigma_comparison_iterations_pct.png')
     plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
     plt.close()
 
@@ -429,14 +318,14 @@ def plot_sigma_comparison_evaluations_pct(averaged_data, output_path, max_iterat
         plt.plot(evaluations, gap_history, linewidth=2.5, color=color,
                  label=f'Sigma: {sigma_value}', marker='o', markevery=max(1, len(evaluations)//10), markersize=6)
 
-    plt.xlabel('Objective Function Evaluations', fontsize=13)
+    plt.xlabel('Decoder evaluations', fontsize=13)
     plt.ylabel('Optimality Gap (%)', fontsize=13)
     plt.title(f'CMA-ES Sigma Comparison - Average Optimality Gap (Batch Size: {batch_size}, Across {num_instances} Instances, Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
     plt.legend(fontsize=11, loc='best', framealpha=0.9)
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
 
-    comparison_path = os.path.join(output_path, 'sigma_comparison_evaluations_pct.png')
+    comparison_path = os.path.join(output_path, 'average', 'sigma_comparison_evaluations_pct.png')
     plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
     plt.close()
 
@@ -473,7 +362,7 @@ def plot_sigma_comparison_time_pct(averaged_data, output_path, max_iterations, n
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
 
-    comparison_path = os.path.join(output_path, 'sigma_comparison_time_pct.png')
+    comparison_path = os.path.join(output_path, 'average', 'sigma_comparison_time_pct.png')
     plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
     plt.close()
 
@@ -512,7 +401,7 @@ def plot_optimizer_comparison_iterations_pct(optimizer_data, output_path, max_it
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
 
-    comparison_path = os.path.join(output_path, 'optimizer_comparison_iterations_pct.png')
+    comparison_path = os.path.join(output_path, 'average', 'optimizer_comparison_iterations_pct.png')
     plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
     plt.close()
 
@@ -545,14 +434,14 @@ def plot_optimizer_comparison_evaluations_pct(optimizer_data, output_path, max_i
         plt.plot(evaluations, gap_history, linewidth=2.5, color=color,
                  label=optimizer_name, marker='o', markevery=max(1, len(evaluations)//10), markersize=6)
 
-    plt.xlabel('Objective Function Evaluations', fontsize=13)
+    plt.xlabel('Decoder evaluations', fontsize=13)
     plt.ylabel('Optimality Gap (%)', fontsize=13)
     plt.title(f'Optimizer Comparison - Average Optimality Gap (Batch Size: {batch_size}, Across {num_instances} Instances, Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
     plt.legend(fontsize=11, loc='best', framealpha=0.9)
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
 
-    comparison_path = os.path.join(output_path, 'optimizer_comparison_evaluations_pct.png')
+    comparison_path = os.path.join(output_path, 'average', 'optimizer_comparison_evaluations_pct.png')
     plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
     plt.close()
 
@@ -590,7 +479,7 @@ def plot_optimizer_comparison_time_pct(optimizer_data, output_path, max_iteratio
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
 
-    comparison_path = os.path.join(output_path, 'optimizer_comparison_time_pct.png')
+    comparison_path = os.path.join(output_path, 'average', 'optimizer_comparison_time_pct.png')
     plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
     plt.close()
 
@@ -636,7 +525,7 @@ def plot_optimizer_comparison_iterations_pct_per_instance(optimizer_results, out
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
 
-    comparison_path = os.path.join(output_path, f'optimizer_comparison_iterations_pct_inst{instance_idx}.png')
+    comparison_path = os.path.join(output_path, 'instances', f'optimizer_comparison_iterations_pct_inst{instance_idx}.png')
     plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
     plt.close()
 
@@ -674,14 +563,14 @@ def plot_optimizer_comparison_evaluations_pct_per_instance(optimizer_results, ou
         plt.plot(evaluations, convergence_pct, linewidth=2.5, color=color,
                  label=optimizer_name, marker='o', markevery=max(1, len(evaluations)//10), markersize=6)
 
-    plt.xlabel('Number of Evaluations', fontsize=13)
+    plt.xlabel('Decoder evaluations', fontsize=13)
     plt.ylabel('Optimality Gap (%)', fontsize=13)
     plt.title(f'Optimizer Comparison - Instance {instance_idx} ({problem}{problem_size}, Batch Size: {batch_size}, Max Iterations: {max_iterations})', fontsize=15, fontweight='bold')
     plt.legend(fontsize=11, loc='best', framealpha=0.9)
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
 
-    comparison_path = os.path.join(output_path, f'optimizer_comparison_evaluations_pct_inst{instance_idx}.png')
+    comparison_path = os.path.join(output_path, 'instances', f'optimizer_comparison_evaluations_pct_inst{instance_idx}.png')
     plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
     plt.close()
 
@@ -724,7 +613,7 @@ def plot_optimizer_comparison_time_pct_per_instance(optimizer_results, output_pa
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
 
-    comparison_path = os.path.join(output_path, f'optimizer_comparison_time_pct_inst{instance_idx}.png')
+    comparison_path = os.path.join(output_path, 'instances', f'optimizer_comparison_time_pct_inst{instance_idx}.png')
     plt.savefig(comparison_path, dpi=150, bbox_inches='tight')
     plt.close()
 

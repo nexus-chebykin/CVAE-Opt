@@ -344,21 +344,13 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
             else:
                 optimal_value = None
 
-            # Create absolute value comparison plots (all batch sizes on same graph)
+            # Create percentage-based comparison plots (all batch sizes on same graph)
             if len(config.batch_sizes) > 1:
-                plot_convergence_comparison_iterations(i, convergence_data, instances_dir, config.search_iterations, optimizer_name)
-                plot_convergence_comparison(i, convergence_data, instances_dir, config.search_iterations, optimizer_name)
-                plot_convergence_comparison_time(i, convergence_data, instances_dir, config.search_iterations, optimizer_name)
-                # Create percentage-based comparison plots (requires optimal value)
                 plot_convergence_comparison_iterations_pct(i, convergence_data, instances_dir, config.search_iterations, optimal_value, optimizer_name)
                 plot_convergence_comparison_pct(i, convergence_data, instances_dir, config.search_iterations, optimal_value, optimizer_name)
                 plot_convergence_comparison_time_pct(i, convergence_data, instances_dir, config.search_iterations, optimal_value, optimizer_name)
             else:
                 # If single batch size, still create plots but they'll only have one curve
-                plot_convergence_comparison_iterations(i, convergence_data, instances_dir, config.search_iterations, optimizer_name)
-                plot_convergence_comparison(i, convergence_data, instances_dir, config.search_iterations, optimizer_name)
-                plot_convergence_comparison_time(i, convergence_data, instances_dir, config.search_iterations, optimizer_name)
-                # Create percentage-based plots (requires optimal value)
                 plot_convergence_comparison_iterations_pct(i, convergence_data, instances_dir, config.search_iterations, optimal_value, optimizer_name)
                 plot_convergence_comparison_pct(i, convergence_data, instances_dir, config.search_iterations, optimal_value, optimizer_name)
                 plot_convergence_comparison_time_pct(i, convergence_data, instances_dir, config.search_iterations, optimal_value, optimizer_name)
