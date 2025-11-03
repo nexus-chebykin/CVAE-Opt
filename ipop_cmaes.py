@@ -10,7 +10,7 @@ import time
 import cma
 
 
-def minimize(cost_func, args, search_space_bound, search_space_size, popsize, sigma0, maxiter, maxtime, maxevaluations=None, restarts=5, incpopsize=2.0):
+def minimize(cost_func, args, search_space_bound, search_space_size, popsize=None, sigma0=0.5, maxiter=None, maxtime=None, maxevaluations=None, restarts=5, incpopsize=2.0, maxpopsize=None):
     """
     IPOP-CMA-ES optimizer: CMA-ES with increasing population restarts.
 
@@ -19,13 +19,14 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, si
         args: Additional arguments passed to cost_func
         search_space_bound: Box constraints [-bound, +bound] for all dimensions
         search_space_size: Dimensionality of search space
-        popsize: Initial population size (lambda in CMA-ES terminology)
+        popsize: Initial population size (default: None, uses CMA-ES library default)
         sigma0: Initial step size (typically 0.2-0.5 of search range)
         maxiter: Maximum number of iterations
         maxtime: Maximum wall-clock time in seconds
         maxevaluations: Maximum number of function evaluations
         restarts: Number of restarts with increasing population (default: 5)
         incpopsize: Population size multiplier for each restart (default: 2.0)
+        maxpopsize: Maximum population size (default: None, no limit)
 
     Returns:
         gen_best: Best fitness value found
@@ -50,7 +51,7 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, si
     global_best_fitness = np.inf
     global_best_solution = None
 
-    # Initial population size
+    # Initial population size (use library default if not specified)
     current_popsize = popsize
 
     # --- RESTART LOOP ----------------+
@@ -63,7 +64,6 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, si
         cmaes_maxiter = maxiter if maxiter is not None else 1000000
 
         opts = {
-            'popsize': current_popsize,
             'bounds': [-search_space_bound, search_space_bound],
             'maxiter': cmaes_maxiter,
             'verbose': -9,  # Suppress output
@@ -74,7 +74,18 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, si
             'tolfun': 1e-11,  # Allow convergence based on small function value changes
         }
 
+        # Only set popsize if specified by user (otherwise let CMA-ES decide)
+        if current_popsize is not None:
+            opts['popsize'] = current_popsize
+
+        # Set maximum population size if specified
+        if maxpopsize is not None:
+            opts['maxpopsize'] = maxpopsize
+
         es = cma.CMAEvolutionStrategy(x0, sigma0, opts)
+
+        # Get actual population size from CMA-ES (needed if popsize was None)
+        actual_popsize = es.popsize
 
         # --- OPTIMIZE WITH ASK-TELL PATTERN ----------------+
         restart_iteration = 0
@@ -103,7 +114,7 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, si
             solutions_array = np.array(solutions)
             _, fitness_values = cost_func(solutions_array, *args)
             fitness_values = np.array(fitness_values)
-            evaluations_done += current_popsize
+            evaluations_done += actual_popsize
             eval_time_total += time.time() - eval_start
 
             # TELL: Update CMA-ES distribution based on fitness values
@@ -132,7 +143,8 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, si
                 break
 
             # Increase population size for next restart
-            current_popsize = int(current_popsize * incpopsize)
+            # Use actual_popsize (from CMA-ES) in case popsize was None initially
+            current_popsize = int(actual_popsize * incpopsize)
 
     # --- RETURN RESULTS ----------------+
     # Use global best from all restarts

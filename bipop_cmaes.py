@@ -10,7 +10,7 @@ import time
 import cma
 
 
-def minimize(cost_func, args, search_space_bound, search_space_size, popsize, sigma0, maxiter, maxtime, maxevaluations=None, restarts=9, incpopsize=2.0):
+def minimize(cost_func, args, search_space_bound, search_space_size, popsize=None, sigma0=0.5, maxiter=None, maxtime=None, maxevaluations=None, restarts=5, incpopsize=2.0, maxpopsize=None):
     """
     BIPOP-CMA-ES optimizer: CMA-ES with bi-population restart strategy.
 
@@ -22,13 +22,14 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, si
         args: Additional arguments passed to cost_func
         search_space_bound: Box constraints [-bound, +bound] for all dimensions
         search_space_size: Dimensionality of search space
-        popsize: Initial population size (lambda in CMA-ES terminology)
+        popsize: Initial population size (default: None, uses CMA-ES library default)
         sigma0: Initial step size (typically 0.2-0.5 of search range)
         maxiter: Maximum number of iterations
         maxtime: Maximum wall-clock time in seconds
         maxevaluations: Maximum number of function evaluations
-        restarts: Number of restarts (default: 9, recommended <= 9)
+        restarts: Number of restarts (default: 5)
         incpopsize: Population size multiplier for large population restarts (default: 2.0)
+        maxpopsize: Maximum population size (default: None, no limit)
 
     Returns:
         gen_best: Best fitness value found
@@ -56,11 +57,15 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, si
     # --- BIPOP PARAMETERS ----------------+
     budget_small = 0  # Total evaluations used by small population runs
     budget_large = 0  # Total evaluations used by large population runs
-    popsize_large = popsize  # Current large population size
-    popsize_small = int(popsize / 2)  # Initial small population size
+
+    # If popsize not specified, CMA-ES will determine it on first run
+    # We'll initialize popsize_large and popsize_small after first CMA-ES creation
+    popsize_large = popsize  # Current large population size (can be None initially)
+    popsize_small = int(popsize / 2) if popsize is not None else None  # Initial small population size
 
     restart_idx = 0
     use_large_population = True  # Start with large population
+    first_run = True  # Track first run to initialize population sizes
 
     # --- RESTART LOOP ----------------+
     while restart_idx <= restarts:
@@ -83,7 +88,6 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, si
         cmaes_maxiter = maxiter if maxiter is not None else 1000000
 
         opts = {
-            'popsize': current_popsize,
             'bounds': [-search_space_bound, search_space_bound],
             'maxiter': cmaes_maxiter,
             'verbose': -9,  # Suppress output
@@ -94,7 +98,24 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, si
             'tolfun': 1e-11,  # Allow convergence based on small function value changes
         }
 
+        # Only set popsize if specified (otherwise let CMA-ES decide)
+        if current_popsize is not None:
+            opts['popsize'] = current_popsize
+
+        # Set maximum population size if specified
+        if maxpopsize is not None:
+            opts['maxpopsize'] = maxpopsize
+
         es = cma.CMAEvolutionStrategy(x0, current_sigma, opts)
+
+        # Get actual population size from CMA-ES (needed if popsize was None)
+        actual_popsize = es.popsize
+
+        # Initialize popsize_large and popsize_small on first run if they were None
+        if first_run and popsize is None:
+            popsize_large = actual_popsize
+            popsize_small = int(actual_popsize / 2)
+            first_run = False
 
         # Track evaluations used in this restart
         restart_evals = 0
@@ -124,8 +145,8 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, si
             solutions_array = np.array(solutions)
             _, fitness_values = cost_func(solutions_array, *args)
             fitness_values = np.array(fitness_values)
-            evaluations_done += current_popsize
-            restart_evals += current_popsize
+            evaluations_done += actual_popsize
+            restart_evals += actual_popsize
             eval_time_total += time.time() - eval_start
 
             # TELL: Update CMA-ES distribution based on fitness values
@@ -166,7 +187,8 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, si
                 # Use small population
                 use_large_population = False
                 # Randomly vary small population size (exploration)
-                popsize_small = int(popsize * (0.5 + 0.5 * np.random.rand()))
+                # Use the initial popsize_large (determined from first run) as base
+                popsize_small = int(popsize_large * (0.5 + 0.5 * np.random.rand()))
                 # Ensure minimum population size
                 if popsize_small < 4:
                     popsize_small = 4

@@ -9,17 +9,23 @@ from plotting import *
 
 def decode(Z, model, config, instance, cost_fn):
     Z = torch.Tensor(Z).to(config.device)
+    # Slice instance to match Z's batch size (for variable population sizes in IPOP/BIPOP)
+    batch_size = Z.shape[0]
+    instance_batch = instance[:batch_size]
     with torch.no_grad():
-        tour_probs, tour_idx, tour_logp = model.decode(instance, Z, config)
-    costs = cost_fn(instance, tour_idx)
+        tour_probs, tour_idx, tour_logp = model.decode(instance_batch, Z, config)
+    costs = cost_fn(instance_batch, tour_idx)
     return tour_idx, costs.tolist()
 
 
 def evaluate(Z, model, config, instance, cost_fn):
     Z = torch.Tensor(Z).to(config.device)
+    # Slice instance to match Z's batch size (for variable population sizes in IPOP/BIPOP)
+    batch_size = Z.shape[0]
+    instance_batch = instance[:batch_size]
     with torch.no_grad():
-        tour_probs, tour_idx, tour_logp = model.decode(instance, Z, config)
-    costs = cost_fn(instance, tour_idx)
+        tour_probs, tour_idx, tour_logp = model.decode(instance_batch, Z, config)
+    costs = cost_fn(instance_batch, tour_idx)
     return costs.tolist()
 
 
@@ -45,22 +51,11 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
         convergence_history: History of best fitness per iteration
         time_history: History of elapsed time per iteration
     """
-    # Calculate the actual batch size needed for instance expansion and decoder
-    # For IPOP and BIPOP, we need to account for population growth during restarts
-    actual_batch_size = batch_size
-    if config.optimizer == 'ipop_cmaes':
-        # IPOP grows population by incpopsize^restarts, so max = initial * incpopsize^restarts
-        max_popsize = int(config.ipop_initial_popsize * (config.ipop_incpopsize ** config.ipop_restarts))
-        actual_batch_size = max(batch_size, max_popsize)
-    elif config.optimizer == 'bipop_cmaes':
-        # BIPOP also grows large population by incpopsize^restarts (approximately)
-        max_popsize = int(config.bipop_initial_popsize * (config.bipop_incpopsize ** config.bipop_restarts))
-        actual_batch_size = max(batch_size, max_popsize)
-
+    # Pre-expand instance to batch_size (maxpopsize constraint in IPOP/BIPOP ensures they don't exceed this)
     instance = torch.Tensor(instance)
-    instance = instance.unsqueeze(0).expand(actual_batch_size, -1, -1)
+    instance = instance.unsqueeze(0).expand(batch_size, -1, -1)
     instance = instance.to(config.device)
-    model.reset_decoder(actual_batch_size, config)
+    model.reset_decoder(batch_size, config)
 
     # Determine stopping criteria (use overrides if provided, otherwise use config values)
     maxiter = override_maxiter if override_maxiter is not None else config.search_iterations
@@ -106,13 +101,14 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             (model, config, instance, cost_fn),
             config.search_space_bound,
             config.search_space_size,
-            popsize=config.ipop_initial_popsize,
+            popsize=config.ipop_initial_popsize,  # Can be None (uses CMA-ES default)
             sigma0=cmaes_sigma,
             maxiter=maxiter,
             maxtime=maxtime,
             maxevaluations=maxevaluations,
             restarts=config.ipop_restarts,
-            incpopsize=config.ipop_incpopsize
+            incpopsize=config.ipop_incpopsize,
+            maxpopsize=batch_size  # Constrain population to not exceed batch_size
         )
     elif config.optimizer == 'bipop_cmaes':
         from bipop_cmaes import minimize
@@ -123,18 +119,19 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             (model, config, instance, cost_fn),
             config.search_space_bound,
             config.search_space_size,
-            popsize=config.bipop_initial_popsize,
+            popsize=config.bipop_initial_popsize,  # Can be None (uses CMA-ES default)
             sigma0=cmaes_sigma,
             maxiter=maxiter,
             maxtime=maxtime,
             maxevaluations=maxevaluations,
             restarts=config.bipop_restarts,
-            incpopsize=config.bipop_incpopsize
+            incpopsize=config.bipop_incpopsize,
+            maxpopsize=batch_size  # Constrain population to not exceed batch_size
         )
     else:
         raise ValueError(f"Unknown optimizer: {config.optimizer}")
 
-    solution = decode(np.array([result_tour] * actual_batch_size), model, config, instance, cost_fn)[0][0].tolist()
+    solution = decode(np.array([result_tour] * batch_size), model, config, instance, cost_fn)[0][0].tolist()
     return result_cost, solution, convergence_history, time_history, timing_breakdown
 
 
