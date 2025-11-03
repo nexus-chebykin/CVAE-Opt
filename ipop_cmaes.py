@@ -79,13 +79,13 @@ def minimize(
 
         opts = {
             "bounds": [-search_space_bound, search_space_bound],
-            #"maxiter": cmaes_maxiter,
+            "maxiter": cmaes_maxiter,
             "verbose": -9,  # Suppress output
             "verb_disp": 0,
             "verb_log": 0,
-            # Disable some internal stopping criteria to respect only our limits
-            # "tolx": 1e-11,  # Allow convergence based on small x-changes
-            # "tolfun": 1e-11,  # Allow convergence based on small function value changes
+            # Set reasonable convergence tolerances to allow restarts
+            "tolx": 1e-11,  # Allow convergence based on small x-changes
+            "tolfun": 1e-11,  # Allow convergence based on small function value changes
         }
 
         # Only set popsize if specified by user (otherwise let CMA-ES decide)
