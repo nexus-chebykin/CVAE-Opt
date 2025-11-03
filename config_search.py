@@ -36,6 +36,8 @@ def get_config(args=None):
                              '"average" skips per-instance plots and creates only 3 averaged percentage plots across all instances.')
     parser.add_argument('--description', type=str, default='',
                         help='Brief description of this experiment for logging purposes')
+    parser.add_argument('--seed', type=int, default=1234,
+                        help='Random seed for reproducibility (default: 1234)')
 
     # Optimizer selection
     parser.add_argument('--optimizer', type=str, default='de',

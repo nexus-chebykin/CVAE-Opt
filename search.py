@@ -2,6 +2,7 @@ from config_search import get_config
 
 import torch
 import numpy as np
+import random
 import datetime
 import os
 import logging
@@ -17,6 +18,13 @@ if __name__ == "__main__":
 
     config = get_config()
 
+    # Set random seeds for reproducibility
+    random.seed(config.seed)
+    np.random.seed(config.seed)
+    torch.manual_seed(config.seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(config.seed)
+
     if config.output_path == "":
         config.output_path = os.getcwd()
     config.output_path = os.path.join(config.output_path, "runs", "run_" + str(now.day) + "." + str(now.month) +
@@ -31,6 +39,7 @@ if __name__ == "__main__":
     logging.info("Started Search Run")
     logging.info("Call: {0}".format(''.join(sys.argv)))
     logging.info("Version: {0}".format(train.VERSION))
+    logging.info("Random seed: {0}".format(config.seed))
     if config.description:
         logging.info("Description: {0}".format(config.description))
     logging.info("PARAMETERS:")
