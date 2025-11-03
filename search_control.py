@@ -6,25 +6,31 @@ import logging
 import os
 from plotting import *
 
+# Track last batch size to avoid unnecessary decoder resets
+_last_batch_size = None
+
 
 def decode(Z, model, config, instance, cost_fn):
+    global _last_batch_size
     Z = torch.Tensor(Z).to(config.device)
     batch_size = Z.shape[0]
 
     # Check if population size exceeds pre-expanded instance size
     if batch_size > instance.shape[0]:
-        import logging
         logging.warning(f"Population size ({batch_size}) exceeds pre-allocated instance size ({instance.shape[0]}). Re-expanding instance tensor.")
         # Get original instance (first element of the batch)
         original_instance = instance[0]
         # Re-expand to new batch size
         instance = original_instance.unsqueeze(0).expand(batch_size, -1, -1)
-        # Reset decoder with new batch size
-        model.reset_decoder(batch_size, config)
         instance_batch = instance
     else:
         # Slice instance to match Z's batch size (for variable population sizes)
         instance_batch = instance[:batch_size]
+
+    # Reset decoder only when batch size changes (typically once per restart, not per iteration)
+    if batch_size != _last_batch_size:
+        model.reset_decoder(batch_size, config)
+        _last_batch_size = batch_size
 
     with torch.no_grad():
         tour_probs, tour_idx, tour_logp = model.decode(instance_batch, Z, config)
@@ -33,23 +39,26 @@ def decode(Z, model, config, instance, cost_fn):
 
 
 def evaluate(Z, model, config, instance, cost_fn):
+    global _last_batch_size
     Z = torch.Tensor(Z).to(config.device)
     batch_size = Z.shape[0]
 
     # Check if population size exceeds pre-expanded instance size
     if batch_size > instance.shape[0]:
-        import logging
         logging.warning(f"Population size ({batch_size}) exceeds pre-allocated instance size ({instance.shape[0]}). Re-expanding instance tensor.")
         # Get original instance (first element of the batch)
         original_instance = instance[0]
         # Re-expand to new batch size
         instance = original_instance.unsqueeze(0).expand(batch_size, -1, -1)
-        # Reset decoder with new batch size
-        model.reset_decoder(batch_size, config)
         instance_batch = instance
     else:
         # Slice instance to match Z's batch size (for variable population sizes)
         instance_batch = instance[:batch_size]
+
+    # Reset decoder only when batch size changes (typically once per restart, not per iteration)
+    if batch_size != _last_batch_size:
+        model.reset_decoder(batch_size, config)
+        _last_batch_size = batch_size
 
     with torch.no_grad():
         tour_probs, tour_idx, tour_logp = model.decode(instance_batch, Z, config)
@@ -79,11 +88,19 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
         convergence_history: History of best fitness per iteration
         time_history: History of elapsed time per iteration
     """
-    # Pre-expand instance to batch_size (maxpopsize constraint in IPOP/BIPOP ensures they don't exceed this)
+    global _last_batch_size
+
+    # Reset batch size tracking for this instance
+    _last_batch_size = None
+
+    # Pre-expand instance to batch_size (will be sliced dynamically for IPOP/BIPOP)
     instance = torch.Tensor(instance)
     instance = instance.unsqueeze(0).expand(batch_size, -1, -1)
     instance = instance.to(config.device)
     model.reset_decoder(batch_size, config)
+
+    # Update tracking (decoder was just reset to batch_size)
+    _last_batch_size = batch_size
 
     # Determine stopping criteria (use overrides if provided, otherwise use config values)
     maxiter = override_maxiter if override_maxiter is not None else config.search_iterations
@@ -162,7 +179,11 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
 
 
 def solve_instance_set(model, config, instances, solutions=None, verbose=True):
+    global _last_batch_size
     model.eval()
+
+    # Reset batch size tracking for clean state
+    _last_batch_size = None
 
     if config.problem == "TSP":
         cost_fn = tsp.tours_length
