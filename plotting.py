@@ -582,8 +582,8 @@ def plot_optimizer_comparison_iterations_pct(
     """
     plt.figure(figsize=(12, 7))
 
-    # Define colors for optimizers (supports 3 optimizers now)
-    colors = {"DE": "#E63946", "CMA-ES": "#2A9D8F", "Portfolio": "#F1A208"}
+    # Define colors for optimizers (supports 4 optimizers now)
+    colors = {"DE": "#E63946", "CMA-ES": "#2A9D8F", "IPOP-CMA-ES": "#F1A208", "BIPOP-CMA-ES": "#6A4C93"}
 
     # Plot each optimizer (data already contains gap percentages)
     for optimizer_name, (gap_history, time_history) in sorted(optimizer_data.items()):
@@ -637,8 +637,8 @@ def plot_optimizer_comparison_evaluations_pct(
     """
     plt.figure(figsize=(12, 7))
 
-    # Define colors for optimizers (supports 3 optimizers now)
-    colors = {"DE": "#E63946", "CMA-ES": "#2A9D8F", "Portfolio": "#F1A208"}
+    # Define colors for optimizers (supports 4 optimizers now)
+    colors = {"DE": "#E63946", "CMA-ES": "#2A9D8F", "IPOP-CMA-ES": "#F1A208", "BIPOP-CMA-ES": "#6A4C93"}
 
     # Plot each optimizer (data already contains gap percentages)
     for optimizer_name, (gap_history, time_history) in sorted(optimizer_data.items()):
@@ -693,8 +693,8 @@ def plot_optimizer_comparison_time_pct(
     """
     plt.figure(figsize=(12, 7))
 
-    # Define colors for optimizers (supports 3 optimizers now)
-    colors = {"DE": "#E63946", "CMA-ES": "#2A9D8F", "Portfolio": "#F1A208"}
+    # Define colors for optimizers (supports 4 optimizers now)
+    colors = {"DE": "#E63946", "CMA-ES": "#2A9D8F", "IPOP-CMA-ES": "#F1A208", "BIPOP-CMA-ES": "#6A4C93"}
 
     # Plot each optimizer (data already contains gap percentages)
     for optimizer_name, (gap_history, time_history) in sorted(optimizer_data.items()):
@@ -761,8 +761,8 @@ def plot_optimizer_comparison_iterations_pct_per_instance(
 
     plt.figure(figsize=(12, 7))
 
-    # Define colors for optimizers (supports 3 optimizers now)
-    colors = {"DE": "#E63946", "CMA-ES": "#2A9D8F", "Portfolio": "#F1A208"}
+    # Define colors for optimizers (supports 4 optimizers now)
+    colors = {"DE": "#E63946", "CMA-ES": "#2A9D8F", "IPOP-CMA-ES": "#F1A208", "BIPOP-CMA-ES": "#6A4C93"}
 
     # Plot each optimizer
     for optimizer_name, (convergence_history, time_history) in sorted(
@@ -836,8 +836,8 @@ def plot_optimizer_comparison_evaluations_pct_per_instance(
 
     plt.figure(figsize=(12, 7))
 
-    # Define colors for optimizers (supports 3 optimizers now)
-    colors = {"DE": "#E63946", "CMA-ES": "#2A9D8F", "Portfolio": "#F1A208"}
+    # Define colors for optimizers (supports 4 optimizers now)
+    colors = {"DE": "#E63946", "CMA-ES": "#2A9D8F", "IPOP-CMA-ES": "#F1A208", "BIPOP-CMA-ES": "#6A4C93"}
 
     # Plot each optimizer
     for optimizer_name, (convergence_history, time_history) in sorted(
@@ -912,8 +912,8 @@ def plot_optimizer_comparison_time_pct_per_instance(
 
     plt.figure(figsize=(12, 7))
 
-    # Define colors for optimizers (supports 3 optimizers now)
-    colors = {"DE": "#E63946", "CMA-ES": "#2A9D8F", "Portfolio": "#F1A208"}
+    # Define colors for optimizers (supports 4 optimizers now)
+    colors = {"DE": "#E63946", "CMA-ES": "#2A9D8F", "IPOP-CMA-ES": "#F1A208", "BIPOP-CMA-ES": "#6A4C93"}
 
     # Plot each optimizer
     for optimizer_name, (convergence_history, time_history) in sorted(

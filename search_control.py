@@ -26,7 +26,7 @@ def evaluate(Z, model, config, instance, cost_fn):
 def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
                    override_maxiter=None, override_maxtime=None, override_maxevaluations=None):
     """
-    Solve a single instance using the configured optimizer (DE or CMA-ES).
+    Solve a single instance using the configured optimizer (DE, CMA-ES, IPOP-CMA-ES, or BIPOP-CMA-ES).
 
     Args:
         model: Neural network model
@@ -85,6 +85,39 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             maxtime=maxtime,
             maxevaluations=maxevaluations
         )
+    elif config.optimizer == 'ipop_cmaes':
+        from ipop_cmaes import minimize
+        # Use provided sigma0 or fall back to config value
+        cmaes_sigma = sigma0 if sigma0 is not None else config.cmaes_sigma0
+        result_cost, result_tour, convergence_history, time_history, timing_breakdown = minimize(
+            decode,
+            (model, config, instance, cost_fn),
+            config.search_space_bound,
+            config.search_space_size,
+            popsize=batch_size,
+            sigma0=cmaes_sigma,
+            maxiter=maxiter,
+            maxtime=maxtime,
+            maxevaluations=maxevaluations,
+            restarts=config.ipop_restarts,
+            incpopsize=config.ipop_incpopsize
+        )
+    elif config.optimizer == 'bipop_cmaes':
+        from bipop_cmaes import minimize
+        # Use provided sigma0 or fall back to config value
+        cmaes_sigma = sigma0 if sigma0 is not None else config.cmaes_sigma0
+        result_cost, result_tour, convergence_history, time_history, timing_breakdown = minimize(
+            decode,
+            (model, config, instance, cost_fn),
+            config.search_space_bound,
+            config.search_space_size,
+            popsize=batch_size,
+            sigma0=cmaes_sigma,
+            maxiter=maxiter,
+            maxtime=maxtime,
+            maxevaluations=maxevaluations,
+            restarts=config.bipop_restarts
+        )
     else:
         raise ValueError(f"Unknown optimizer: {config.optimizer}")
 
@@ -118,20 +151,26 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
     sigma_sweep_mode = config.cmaes_sigma_sweep is not None
 
     if optimizer_comparison_mode:
-        # Optimizer comparison mode: run DE and CMA-ES with fixed batch size
+        # Optimizer comparison mode: run all optimizers with fixed batch size
         fixed_batch_size = config.batch_sizes[0]
         logging.info(f"Running optimizer comparison mode with batch size {fixed_batch_size}")
-        logging.info(f"Comparing DE vs CMA-ES (sigma={config.cmaes_sigma0})")
+        logging.info(f"Comparing: DE, CMA-ES, IPOP-CMA-ES, BIPOP-CMA-ES (sigma={config.cmaes_sigma0})")
 
         # Store results for each optimizer
         all_results = {'DE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
                               'ask_times': [], 'eval_times': [], 'tell_times': []},
                        'CMA-ES': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
-                                  'ask_times': [], 'eval_times': [], 'tell_times': []}}
+                                  'ask_times': [], 'eval_times': [], 'tell_times': []},
+                       'IPOP-CMA-ES': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
+                                       'ask_times': [], 'eval_times': [], 'tell_times': []},
+                       'BIPOP-CMA-ES': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
+                                        'ask_times': [], 'eval_times': [], 'tell_times': []}}
 
         # Accumulator for averaging convergence data across instances
         all_instances_data = {'DE': {'convergence': [], 'time': []},
-                              'CMA-ES': {'convergence': [], 'time': []}}
+                              'CMA-ES': {'convergence': [], 'time': []},
+                              'IPOP-CMA-ES': {'convergence': [], 'time': []},
+                              'BIPOP-CMA-ES': {'convergence': [], 'time': []}}
     elif sigma_sweep_mode:
         # Sigma sweep mode: loop over sigma values with fixed batch size
         sweep_values = config.cmaes_sigma_sweep
@@ -173,7 +212,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
             else:
                 optimal_value = None
 
-            for optimizer_name in ['DE', 'CMA-ES']:
+            for optimizer_name in ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES']:
                 logging.info(f"  Optimizer: {optimizer_name}")
                 start_time = time.time()
 
@@ -183,6 +222,10 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                     config.optimizer = 'de'
                 elif optimizer_name == 'CMA-ES':
                     config.optimizer = 'cmaes'
+                elif optimizer_name == 'IPOP-CMA-ES':
+                    config.optimizer = 'ipop_cmaes'
+                elif optimizer_name == 'BIPOP-CMA-ES':
+                    config.optimizer = 'bipop_cmaes'
 
                 # Determine stopping criteria based on mode
                 override_maxiter = None
@@ -335,7 +378,13 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
         # Save convergence comparison plots if enabled (only for per-instance mode)
         if config.save_plots and config.plot_mode == 'per_instance' and not optimizer_comparison_mode:
             # Format optimizer name for display
-            optimizer_name = 'CMA-ES' if config.optimizer == 'cmaes' else 'DE'
+            optimizer_name_map = {
+                'de': 'DE',
+                'cmaes': 'CMA-ES',
+                'ipop_cmaes': 'IPOP-CMA-ES',
+                'bipop_cmaes': 'BIPOP-CMA-ES'
+            }
+            optimizer_name = optimizer_name_map.get(config.optimizer, config.optimizer.upper())
 
             # Extract optimal value for gap-based plots
             if solutions:
@@ -372,7 +421,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
         if optimizer_comparison_mode:
             # Optimizer comparison mode: generate optimizer comparison plots (always, regardless of plot_mode)
             logging.info("Computing averaged convergence data across all instances for optimizer comparison...")
-            averaged_data = compute_averaged_convergence(all_instances_data, ['DE', 'CMA-ES'], optimal_values)
+            averaged_data = compute_averaged_convergence(all_instances_data, ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES'], optimal_values)
 
             # Generate optimizer comparison plots
             plot_optimizer_comparison_iterations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size)
@@ -393,7 +442,13 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
             averaged_data = compute_averaged_convergence(all_instances_data, config.batch_sizes, optimal_values)
 
             # Format optimizer name for display
-            optimizer_name = 'CMA-ES' if config.optimizer == 'cmaes' else 'DE'
+            optimizer_name_map = {
+                'de': 'DE',
+                'cmaes': 'CMA-ES',
+                'ipop_cmaes': 'IPOP-CMA-ES',
+                'bipop_cmaes': 'BIPOP-CMA-ES'
+            }
+            optimizer_name = optimizer_name_map.get(config.optimizer, config.optimizer.upper())
 
             # Generate averaged percentage plots
             plot_average_convergence_iterations_pct(averaged_data, average_dir, config.search_iterations, len(instances), optimizer_name)
@@ -406,7 +461,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
 
     if optimizer_comparison_mode:
         # Log results for each optimizer
-        for optimizer_name in ['DE', 'CMA-ES']:
+        for optimizer_name in ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES']:
             results = all_results[optimizer_name]
             logging.info(f"\n{optimizer_name}:")
             logging.info(f"  Mean cost: {np.mean(results['cost_values']):.4f}")

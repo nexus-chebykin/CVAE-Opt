@@ -10,7 +10,17 @@ import time
 import cma
 
 
-def minimize(cost_func, args, search_space_bound, search_space_size, popsize, sigma0, maxiter, maxtime, maxevaluations=None):
+def minimize(
+    cost_func,
+    args,
+    search_space_bound,
+    search_space_size,
+    popsize,
+    sigma0,
+    maxiter,
+    maxtime,
+    maxevaluations=None,
+):
     """
     CMA-ES optimizer matching DE interface.
 
@@ -50,17 +60,17 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, si
     cmaes_maxiter = maxiter if maxiter is not None else 1000000
 
     opts = {
-        'popsize': popsize,
-        'bounds': [-search_space_bound, search_space_bound],
-        'maxiter': cmaes_maxiter,
-        'verbose': -9,  # Suppress output
-        'verb_disp': 0,  # No display
-        'verb_log': 0,   # No logging
+        "popsize": popsize,
+        "bounds": [-search_space_bound, search_space_bound],
+        "maxiter": cmaes_maxiter,
+        "verbose": -9,  # Suppress output
+        "verb_disp": 0,  # No display
+        "verb_log": 0,  # No logging
         # Disable internal stopping criteria to respect only time limit
-        'tolx': 1e100,  # Disable stopping based on small x-changes
-        'tolfun': 1e100,  # Disable stopping based on small function value changes
-        'tolstagnation': 1e100,  # Disable stopping based on stagnation
-        'tolfacupx': 1e100  # Disable stopping based on large step-size
+        #'tolx': 1e100,  # Disable stopping based on small x-changes
+        #'tolfun': 1e100,  # Disable stopping based on small function value changes
+        #'tolstagnation': 1e100,  # Disable stopping based on stagnation
+        #'tolfacupx': 1e100  # Disable stopping based on large step-size
     }
 
     # Initialize CMA-ES evolution strategy
@@ -112,9 +122,15 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, si
 
     # Return timing breakdown
     timing_breakdown = {
-        'ask_time': ask_time_total,
-        'eval_time': eval_time_total,
-        'tell_time': tell_time_total
+        "ask_time": ask_time_total,
+        "eval_time": eval_time_total,
+        "tell_time": tell_time_total,
     }
 
-    return best_fitness, best_solution, convergence_history, time_history, timing_breakdown
+    return (
+        best_fitness,
+        best_solution,
+        convergence_history,
+        time_history,
+        timing_breakdown,
+    )

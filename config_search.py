@@ -41,8 +41,9 @@ def get_config(args=None):
 
     # Optimizer selection
     parser.add_argument('--optimizer', type=str, default='de',
-                        choices=['de', 'cmaes'],
-                        help='Optimizer to use: "de" (Differential Evolution) or "cmaes" (CMA-ES)')
+                        choices=['de', 'cmaes', 'ipop_cmaes', 'bipop_cmaes'],
+                        help='Optimizer to use: "de" (Differential Evolution), "cmaes" (CMA-ES), '
+                             '"ipop_cmaes" (IPOP-CMA-ES), or "bipop_cmaes" (BIPOP-CMA-ES)')
 
     # Differential Evolution parameters
     parser.add_argument('--de_mutate', default=0.3, type=float,
@@ -57,9 +58,20 @@ def get_config(args=None):
                         help='List of sigma values to test for CMA-ES comparison (e.g., --cmaes_sigma_sweep 0.3 0.5 1.0 1.5). '
                              'When provided, runs CMA-ES with each sigma value using a single fixed batch size.')
 
+    # IPOP-CMA-ES parameters
+    parser.add_argument('--ipop_restarts', default=5, type=int,
+                        help='Number of restarts for IPOP-CMA-ES (default: 5)')
+    parser.add_argument('--ipop_incpopsize', default=2.0, type=float,
+                        help='Population size multiplier for IPOP-CMA-ES restarts (default: 2.0)')
+
+    # BIPOP-CMA-ES parameters
+    parser.add_argument('--bipop_restarts', default=9, type=int,
+                        help='Number of restarts for BIPOP-CMA-ES (default: 9, recommended <= 9)')
+
     # Optimizer comparison
     parser.add_argument('--compare_optimizers', default=False, action='store_true',
-                        help='Compare DE vs CMA-ES with the same batch size. Requires --plot_mode average and exactly one batch size.')
+                        help='Compare all optimizers (DE, CMA-ES, IPOP-CMA-ES, BIPOP-CMA-ES) with the same batch size. '
+                             'Requires exactly one batch size.')
 
     config = parser.parse_args()
     config.device = torch.device(config.device)
