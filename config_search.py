@@ -63,10 +63,16 @@ def get_config(args=None):
                         help='Number of restarts for IPOP-CMA-ES (default: 5)')
     parser.add_argument('--ipop_incpopsize', default=2.0, type=float,
                         help='Population size multiplier for IPOP-CMA-ES restarts (default: 2.0)')
+    parser.add_argument('--ipop_initial_popsize', default=None, type=int,
+                        help='Initial population size for IPOP-CMA-ES (default: calculated as 600 / (incpopsize^restarts))')
 
     # BIPOP-CMA-ES parameters
     parser.add_argument('--bipop_restarts', default=9, type=int,
                         help='Number of restarts for BIPOP-CMA-ES (default: 9, recommended <= 9)')
+    parser.add_argument('--bipop_incpopsize', default=2.0, type=float,
+                        help='Population size multiplier for BIPOP-CMA-ES restarts (default: 2.0)')
+    parser.add_argument('--bipop_initial_popsize', default=19, type=int,
+                        help='Initial population size for BIPOP-CMA-ES (default: 19)')
 
     # Optimizer comparison
     parser.add_argument('--compare_optimizers', default=False, action='store_true',
@@ -79,6 +85,10 @@ def get_config(args=None):
     # If batch_sizes not specified, use search_batch_size as default
     if config.batch_sizes is None:
         config.batch_sizes = [config.search_batch_size]
+
+    # Calculate default IPOP initial popsize if not specified
+    if config.ipop_initial_popsize is None:
+        config.ipop_initial_popsize = int(600 / (config.ipop_incpopsize ** config.ipop_restarts))
 
     # Validate sigma sweep mode
     if config.cmaes_sigma_sweep is not None:

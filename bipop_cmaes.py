@@ -10,7 +10,7 @@ import time
 import cma
 
 
-def minimize(cost_func, args, search_space_bound, search_space_size, popsize, sigma0, maxiter, maxtime, maxevaluations=None, restarts=9):
+def minimize(cost_func, args, search_space_bound, search_space_size, popsize, sigma0, maxiter, maxtime, maxevaluations=None, restarts=9, incpopsize=2.0):
     """
     BIPOP-CMA-ES optimizer: CMA-ES with bi-population restart strategy.
 
@@ -28,6 +28,7 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, si
         maxtime: Maximum wall-clock time in seconds
         maxevaluations: Maximum number of function evaluations
         restarts: Number of restarts (default: 9, recommended <= 9)
+        incpopsize: Population size multiplier for large population restarts (default: 2.0)
 
     Returns:
         gen_best: Best fitness value found
@@ -172,7 +173,7 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, si
             else:
                 # Use large population and increase its size (IPOP-style)
                 use_large_population = True
-                popsize_large = int(popsize_large * 2)
+                popsize_large = int(popsize_large * incpopsize)
 
         restart_idx += 1
 

@@ -45,10 +45,22 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
         convergence_history: History of best fitness per iteration
         time_history: History of elapsed time per iteration
     """
+    # Calculate the actual batch size needed for instance expansion and decoder
+    # For IPOP and BIPOP, we need to account for population growth during restarts
+    actual_batch_size = batch_size
+    if config.optimizer == 'ipop_cmaes':
+        # IPOP grows population by incpopsize^restarts, so max = initial * incpopsize^restarts
+        max_popsize = int(config.ipop_initial_popsize * (config.ipop_incpopsize ** config.ipop_restarts))
+        actual_batch_size = max(batch_size, max_popsize)
+    elif config.optimizer == 'bipop_cmaes':
+        # BIPOP also grows large population by incpopsize^restarts (approximately)
+        max_popsize = int(config.bipop_initial_popsize * (config.bipop_incpopsize ** config.bipop_restarts))
+        actual_batch_size = max(batch_size, max_popsize)
+
     instance = torch.Tensor(instance)
-    instance = instance.unsqueeze(0).expand(batch_size, -1, -1)
+    instance = instance.unsqueeze(0).expand(actual_batch_size, -1, -1)
     instance = instance.to(config.device)
-    model.reset_decoder(batch_size, config)
+    model.reset_decoder(actual_batch_size, config)
 
     # Determine stopping criteria (use overrides if provided, otherwise use config values)
     maxiter = override_maxiter if override_maxiter is not None else config.search_iterations
@@ -94,7 +106,7 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             (model, config, instance, cost_fn),
             config.search_space_bound,
             config.search_space_size,
-            popsize=batch_size,
+            popsize=config.ipop_initial_popsize,
             sigma0=cmaes_sigma,
             maxiter=maxiter,
             maxtime=maxtime,
@@ -111,17 +123,18 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             (model, config, instance, cost_fn),
             config.search_space_bound,
             config.search_space_size,
-            popsize=batch_size,
+            popsize=config.bipop_initial_popsize,
             sigma0=cmaes_sigma,
             maxiter=maxiter,
             maxtime=maxtime,
             maxevaluations=maxevaluations,
-            restarts=config.bipop_restarts
+            restarts=config.bipop_restarts,
+            incpopsize=config.bipop_incpopsize
         )
     else:
         raise ValueError(f"Unknown optimizer: {config.optimizer}")
 
-    solution = decode(np.array([result_tour] * batch_size), model, config, instance, cost_fn)[0][0].tolist()
+    solution = decode(np.array([result_tour] * actual_batch_size), model, config, instance, cost_fn)[0][0].tolist()
     return result_cost, solution, convergence_history, time_history, timing_breakdown
 
 
