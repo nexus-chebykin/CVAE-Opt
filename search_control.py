@@ -333,6 +333,10 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 all_results[optimizer_name]['cost_values'].append(objective_value)
                 all_results[optimizer_name]['runtime_values'].append(runtime)
                 logging.info(f"    Runtime: {runtime:.2f}s")
+                logging.info(f"    Iterations: {timing_breakdown['iterations']}")
+                # Log restarts for IPOP and BIPOP
+                if optimizer_name in ['IPOP-CMA-ES', 'BIPOP-CMA-ES']:
+                    logging.info(f"    Restarts: {timing_breakdown['restarts']}")
 
                 # Store and log timing breakdown
                 all_results[optimizer_name]['ask_times'].append(timing_breakdown['ask_time'])
@@ -384,6 +388,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 all_results[sigma_value]['cost_values'].append(objective_value)
                 all_results[sigma_value]['runtime_values'].append(runtime)
                 logging.info(f"    Runtime: {runtime:.2f}s")
+                logging.info(f"    Iterations: {timing_breakdown['iterations']}")
 
                 # Store and log timing breakdown
                 all_results[sigma_value]['ask_times'].append(timing_breakdown['ask_time'])
@@ -422,6 +427,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 all_results[batch_size]['cost_values'].append(objective_value)
                 all_results[batch_size]['runtime_values'].append(runtime)
                 logging.info(f"    Runtime: {runtime:.2f}s")
+                logging.info(f"    Iterations: {timing_breakdown['iterations']}")
 
                 # Store and log timing breakdown
                 all_results[batch_size]['ask_times'].append(timing_breakdown['ask_time'])

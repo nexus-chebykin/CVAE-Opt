@@ -55,6 +55,7 @@ def minimize(
     convergence_history = []
     time_history = []
     evaluations_done = 0
+    total_iterations = 0  # Track total iterations across all restarts
 
     # Track timing breakdown
     ask_time_total = 0.0
@@ -79,9 +80,11 @@ def minimize(
     restart_idx = 0
     use_large_population = True  # Start with large population
     first_run = True  # Track first run to initialize population sizes
+    restarts_completed = 0  # Track number of restarts actually completed
 
     # --- RESTART LOOP ----------------+
     while restart_idx <= restarts:
+        restarts_completed = restart_idx
 
         # --- DETERMINE POPULATION SIZE FOR THIS RESTART ----------------+
         if use_large_population:
@@ -104,13 +107,13 @@ def minimize(
 
         opts = {
             "bounds": [-search_space_bound, search_space_bound],
-            "maxiter": cmaes_maxiter,
+            #"maxiter": cmaes_maxiter,
             "verbose": -9,  # Suppress output
             "verb_disp": 0,
             "verb_log": 0,
             # Disable some internal stopping criteria to respect only our limits
-            "tolx": 1e-11,  # Allow convergence based on small x-changes
-            "tolfun": 1e-11,  # Allow convergence based on small function value changes
+            # "tolx": 1e-11,  # Allow convergence based on small x-changes
+            # "tolfun": 1e-11,  # Allow convergence based on small function value changes
         }
 
         # Only set popsize if specified (otherwise let CMA-ES decide)
@@ -133,14 +136,15 @@ def minimize(
 
         # --- OPTIMIZE WITH ASK-TELL PATTERN ----------------+
         while True:
+            total_iterations += 1
 
             # Check stopping criteria before ask/tell to avoid extra evaluations
             if maxtime is not None and time.time() - start_time > maxtime:
                 break
-            if maxiter is not None and len(convergence_history) >= maxiter:
-                break
-            if maxevaluations is not None and evaluations_done >= maxevaluations:
-                break
+            #if maxiter is not None and len(convergence_history) >= maxiter:
+            #    break
+            #if maxevaluations is not None and evaluations_done >= maxevaluations:
+            #    break
 
             # ASK: Generate new population of candidate solutions
             ask_start = time.time()
@@ -220,6 +224,8 @@ def minimize(
         "ask_time": ask_time_total,
         "eval_time": eval_time_total,
         "tell_time": tell_time_total,
+        "iterations": total_iterations,
+        "restarts": restarts_completed,
     }
 
     return (

@@ -125,6 +125,7 @@ def minimize(
         "ask_time": ask_time_total,
         "eval_time": eval_time_total,
         "tell_time": tell_time_total,
+        "iterations": iteration,
     }
 
     return (

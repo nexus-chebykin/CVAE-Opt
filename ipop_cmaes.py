@@ -52,6 +52,7 @@ def minimize(
     convergence_history = []
     time_history = []
     evaluations_done = 0
+    total_iterations = 0  # Track total iterations across all restarts
 
     # Track timing breakdown
     ask_time_total = 0.0
@@ -64,9 +65,11 @@ def minimize(
 
     # Initial population size (use library default if not specified)
     current_popsize = popsize
+    restarts_completed = 0  # Track number of restarts actually completed
 
     # --- RESTART LOOP ----------------+
     for restart_idx in range(restarts + 1):  # +1 for initial run
+        restarts_completed = restart_idx
 
         # Initialize CMA-ES for this restart
         x0 = np.zeros(search_space_size)  # Start at origin (center of search space)
@@ -76,13 +79,13 @@ def minimize(
 
         opts = {
             "bounds": [-search_space_bound, search_space_bound],
-            "maxiter": cmaes_maxiter,
+            #"maxiter": cmaes_maxiter,
             "verbose": -9,  # Suppress output
             "verb_disp": 0,
             "verb_log": 0,
             # Disable some internal stopping criteria to respect only our limits
-            "tolx": 1e-11,  # Allow convergence based on small x-changes
-            "tolfun": 1e-11,  # Allow convergence based on small function value changes
+            # "tolx": 1e-11,  # Allow convergence based on small x-changes
+            # "tolfun": 1e-11,  # Allow convergence based on small function value changes
         }
 
         # Only set popsize if specified by user (otherwise let CMA-ES decide)
@@ -98,6 +101,7 @@ def minimize(
         restart_iteration = 0
         while True:
             restart_iteration += 1
+            total_iterations += 1
 
             # Check stopping criteria before ask/tell to avoid extra evaluations
             if maxtime is not None and time.time() - start_time > maxtime:
@@ -140,10 +144,10 @@ def minimize(
             # Check stopping criteria before restarting
             if maxtime is not None and time.time() - start_time > maxtime:
                 break
-            if maxiter is not None and len(convergence_history) >= maxiter:
-                break
-            if maxevaluations is not None and evaluations_done >= maxevaluations:
-                break
+            #if maxiter is not None and len(convergence_history) >= maxiter:
+            #    break
+            #if maxevaluations is not None and evaluations_done >= maxevaluations:
+            #    break
 
             # Increase population size for next restart
             # Use actual_popsize (from CMA-ES) in case popsize was None initially
@@ -163,6 +167,8 @@ def minimize(
         "ask_time": ask_time_total,
         "eval_time": eval_time_total,
         "tell_time": tell_time_total,
+        "iterations": total_iterations,
+        "restarts": restarts_completed,
     }
 
     return (

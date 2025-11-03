@@ -128,7 +128,8 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
     timing_breakdown = {
         'ask_time': ask_time_total,
         'eval_time': eval_time_total,
-        'tell_time': tell_time_total
+        'tell_time': tell_time_total,
+        'iterations': iteration
     }
 
     return gen_best, population[np.argmin(population_cost)], convergence_history, time_history, timing_breakdown
