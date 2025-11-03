@@ -9,9 +9,23 @@ from plotting import *
 
 def decode(Z, model, config, instance, cost_fn):
     Z = torch.Tensor(Z).to(config.device)
-    # Slice instance to match Z's batch size (for variable population sizes in IPOP/BIPOP)
     batch_size = Z.shape[0]
-    instance_batch = instance[:batch_size]
+
+    # Check if population size exceeds pre-expanded instance size
+    if batch_size > instance.shape[0]:
+        import logging
+        logging.warning(f"Population size ({batch_size}) exceeds pre-allocated instance size ({instance.shape[0]}). Re-expanding instance tensor.")
+        # Get original instance (first element of the batch)
+        original_instance = instance[0]
+        # Re-expand to new batch size
+        instance = original_instance.unsqueeze(0).expand(batch_size, -1, -1)
+        # Reset decoder with new batch size
+        model.reset_decoder(batch_size, config)
+        instance_batch = instance
+    else:
+        # Slice instance to match Z's batch size (for variable population sizes)
+        instance_batch = instance[:batch_size]
+
     with torch.no_grad():
         tour_probs, tour_idx, tour_logp = model.decode(instance_batch, Z, config)
     costs = cost_fn(instance_batch, tour_idx)
@@ -20,9 +34,23 @@ def decode(Z, model, config, instance, cost_fn):
 
 def evaluate(Z, model, config, instance, cost_fn):
     Z = torch.Tensor(Z).to(config.device)
-    # Slice instance to match Z's batch size (for variable population sizes in IPOP/BIPOP)
     batch_size = Z.shape[0]
-    instance_batch = instance[:batch_size]
+
+    # Check if population size exceeds pre-expanded instance size
+    if batch_size > instance.shape[0]:
+        import logging
+        logging.warning(f"Population size ({batch_size}) exceeds pre-allocated instance size ({instance.shape[0]}). Re-expanding instance tensor.")
+        # Get original instance (first element of the batch)
+        original_instance = instance[0]
+        # Re-expand to new batch size
+        instance = original_instance.unsqueeze(0).expand(batch_size, -1, -1)
+        # Reset decoder with new batch size
+        model.reset_decoder(batch_size, config)
+        instance_batch = instance
+    else:
+        # Slice instance to match Z's batch size (for variable population sizes)
+        instance_batch = instance[:batch_size]
+
     with torch.no_grad():
         tour_probs, tour_idx, tour_logp = model.decode(instance_batch, Z, config)
     costs = cost_fn(instance_batch, tour_idx)
@@ -107,8 +135,7 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             maxtime=maxtime,
             maxevaluations=maxevaluations,
             restarts=config.ipop_restarts,
-            incpopsize=config.ipop_incpopsize,
-            maxpopsize=batch_size  # Constrain population to not exceed batch_size
+            incpopsize=config.ipop_incpopsize
         )
     elif config.optimizer == 'bipop_cmaes':
         from bipop_cmaes import minimize
@@ -125,8 +152,7 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             maxtime=maxtime,
             maxevaluations=maxevaluations,
             restarts=config.bipop_restarts,
-            incpopsize=config.bipop_incpopsize,
-            maxpopsize=batch_size  # Constrain population to not exceed batch_size
+            incpopsize=config.bipop_incpopsize
         )
     else:
         raise ValueError(f"Unknown optimizer: {config.optimizer}")

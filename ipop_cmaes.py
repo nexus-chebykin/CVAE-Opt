@@ -10,7 +10,7 @@ import time
 import cma
 
 
-def minimize(cost_func, args, search_space_bound, search_space_size, popsize=None, sigma0=0.5, maxiter=None, maxtime=None, maxevaluations=None, restarts=5, incpopsize=2.0, maxpopsize=None):
+def minimize(cost_func, args, search_space_bound, search_space_size, popsize=None, sigma0=0.5, maxiter=None, maxtime=None, maxevaluations=None, restarts=5, incpopsize=2.0):
     """
     IPOP-CMA-ES optimizer: CMA-ES with increasing population restarts.
 
@@ -26,7 +26,6 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize=Non
         maxevaluations: Maximum number of function evaluations
         restarts: Number of restarts with increasing population (default: 5)
         incpopsize: Population size multiplier for each restart (default: 2.0)
-        maxpopsize: Maximum population size (default: None, no limit)
 
     Returns:
         gen_best: Best fitness value found
@@ -77,10 +76,6 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize=Non
         # Only set popsize if specified by user (otherwise let CMA-ES decide)
         if current_popsize is not None:
             opts['popsize'] = current_popsize
-
-        # Set maximum population size if specified
-        if maxpopsize is not None:
-            opts['maxpopsize'] = maxpopsize
 
         es = cma.CMAEvolutionStrategy(x0, sigma0, opts)
 
