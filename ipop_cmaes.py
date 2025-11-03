@@ -84,8 +84,8 @@ def minimize(
             "verb_disp": 0,
             "verb_log": 0,
             # Set reasonable convergence tolerances to allow restarts
-            "tolx": 1e-5,  # Allow convergence based on small x-changes
-            "tolfun": 1e-5,  # Allow convergence based on small function value changes
+            "tolx": 1e-4,  # Allow convergence based on small x-changes
+            "tolfun": 1e-4,  # Allow convergence based on small function value changes
         }
 
         # Only set popsize if specified by user (otherwise let CMA-ES decide)
