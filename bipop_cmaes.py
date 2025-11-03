@@ -10,7 +10,19 @@ import time
 import cma
 
 
-def minimize(cost_func, args, search_space_bound, search_space_size, popsize=None, sigma0=0.5, maxiter=None, maxtime=None, maxevaluations=None, restarts=5, incpopsize=2.0):
+def minimize(
+    cost_func,
+    args,
+    search_space_bound,
+    search_space_size,
+    popsize=None,
+    sigma0=0.5,
+    maxiter=None,
+    maxtime=None,
+    maxevaluations=None,
+    restarts=5,
+    incpopsize=2.0,
+):
     """
     BIPOP-CMA-ES optimizer: CMA-ES with bi-population restart strategy.
 
@@ -60,7 +72,9 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize=Non
     # If popsize not specified, CMA-ES will determine it on first run
     # We'll initialize popsize_large and popsize_small after first CMA-ES creation
     popsize_large = popsize  # Current large population size (can be None initially)
-    popsize_small = int(popsize / 2) if popsize is not None else None  # Initial small population size
+    popsize_small = (
+        int(popsize / 2) if popsize is not None else None
+    )  # Initial small population size
 
     restart_idx = 0
     use_large_population = True  # Start with large population
@@ -80,26 +94,28 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize=Non
             # Vary sigma for small populations (exploration)
             current_sigma = sigma0 * (0.5 + np.random.rand())
             # Random initial point for small populations
-            x0 = np.random.uniform(-search_space_bound, search_space_bound, search_space_size)
+            x0 = np.random.uniform(
+                -search_space_bound, search_space_bound, search_space_size
+            )
 
         # --- INITIALIZE CMA-ES FOR THIS RESTART ----------------+
         # If maxiter is None, use a very large number so time limit is the constraint
         cmaes_maxiter = maxiter if maxiter is not None else 1000000
 
         opts = {
-            'bounds': [-search_space_bound, search_space_bound],
-            'maxiter': cmaes_maxiter,
-            'verbose': -9,  # Suppress output
-            'verb_disp': 0,
-            'verb_log': 0,
+            "bounds": [-search_space_bound, search_space_bound],
+            "maxiter": cmaes_maxiter,
+            "verbose": -9,  # Suppress output
+            "verb_disp": 0,
+            "verb_log": 0,
             # Disable some internal stopping criteria to respect only our limits
-            'tolx': 1e-11,  # Allow convergence based on small x-changes
-            'tolfun': 1e-11,  # Allow convergence based on small function value changes
+            "tolx": 1e-11,  # Allow convergence based on small x-changes
+            "tolfun": 1e-11,  # Allow convergence based on small function value changes
         }
 
         # Only set popsize if specified (otherwise let CMA-ES decide)
         if current_popsize is not None:
-            opts['popsize'] = current_popsize
+            opts["popsize"] = current_popsize
 
         es = cma.CMAEvolutionStrategy(x0, current_sigma, opts)
 
@@ -166,10 +182,10 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize=Non
             # Check stopping criteria before restarting
             if maxtime is not None and time.time() - start_time > maxtime:
                 break
-            if maxiter is not None and len(convergence_history) >= maxiter:
-                break
-            if maxevaluations is not None and evaluations_done >= maxevaluations:
-                break
+            # if maxiter is not None and len(convergence_history) >= maxiter:
+            #    break
+            # if maxevaluations is not None and evaluations_done >= maxevaluations:
+            #    break
 
             # --- DECIDE NEXT RESTART STRATEGY (BIPOP LOGIC) ----------------+
             # Run small populations until budget_small >= budget_large
@@ -192,14 +208,24 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize=Non
 
     # --- RETURN RESULTS ----------------+
     # Use global best from all restarts
-    best_solution = global_best_solution if global_best_solution is not None else es.result.xbest
-    best_fitness = global_best_fitness if global_best_fitness != np.inf else es.result.fbest
+    best_solution = (
+        global_best_solution if global_best_solution is not None else es.result.xbest
+    )
+    best_fitness = (
+        global_best_fitness if global_best_fitness != np.inf else es.result.fbest
+    )
 
     # Return timing breakdown
     timing_breakdown = {
-        'ask_time': ask_time_total,
-        'eval_time': eval_time_total,
-        'tell_time': tell_time_total
+        "ask_time": ask_time_total,
+        "eval_time": eval_time_total,
+        "tell_time": tell_time_total,
     }
 
-    return best_fitness, best_solution, convergence_history, time_history, timing_breakdown
+    return (
+        best_fitness,
+        best_solution,
+        convergence_history,
+        time_history,
+        timing_breakdown,
+    )
