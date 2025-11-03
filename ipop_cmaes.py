@@ -95,10 +95,6 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize=Non
             if maxevaluations is not None and evaluations_done >= maxevaluations:
                 break
 
-            # Check CMA-ES internal stopping criteria (convergence)
-            if es.stop():
-                break
-
             # ASK: Generate new population of candidate solutions
             ask_start = time.time()
             solutions = es.ask()
