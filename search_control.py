@@ -333,7 +333,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 logging.info(f"      TELL: {timing_breakdown['tell_time']:.2f}s ({timing_breakdown['tell_time']/runtime*100:.1f}%)")
 
         # Save convergence comparison plots if enabled (only for per-instance mode)
-        if config.save_plots and config.plot_mode == 'per_instance':
+        if config.save_plots and config.plot_mode == 'per_instance' and not optimizer_comparison_mode:
             # Format optimizer name for display
             optimizer_name = 'CMA-ES' if config.optimizer == 'cmaes' else 'DE'
 
