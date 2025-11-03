@@ -111,6 +111,8 @@ def minimize(
             # if maxevaluations is not None and evaluations_done >= maxevaluations:
             #   break
 
+            if es.stop():
+                break
             # ASK: Generate new population of candidate solutions
             ask_start = time.time()
             solutions = es.ask()
@@ -144,9 +146,9 @@ def minimize(
             # Check stopping criteria before restarting
             if maxtime is not None and time.time() - start_time > maxtime:
                 break
-            #if maxiter is not None and len(convergence_history) >= maxiter:
+            # if maxiter is not None and len(convergence_history) >= maxiter:
             #    break
-            #if maxevaluations is not None and evaluations_done >= maxevaluations:
+            # if maxevaluations is not None and evaluations_done >= maxevaluations:
             #    break
 
             # Increase population size for next restart
