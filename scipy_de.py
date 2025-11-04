@@ -1,11 +1,12 @@
 # ------------------------------------------------------------------------------+
 # SciPy Differential Evolution wrapper for CVAE-Opt
 #
-# Implements adaptive Differential Evolution using scipy.optimize.differential_evolution
-# with adaptive=True (JADE-like self-adaptation of F and CR parameters)
+# Implements Differential Evolution using scipy.optimize.differential_evolution
+# with adaptive mutation dithering for automatic F/CR tuning
 #
 # Key features:
-# - Adaptive mutation and crossover rates (ignores manual F/CR parameters)
+# - Adaptive mutation via dithering (F varies between 0.5-1.0 automatically)
+# - Adaptive crossover rate (CR varies between 0.7-1.0 automatically)
 # - Vectorized batch evaluation for GPU efficiency
 # - Strategy: 'best1bin' (most common and robust)
 # - Compatible with CVAE-Opt's ask-evaluate-tell timing structure
@@ -19,7 +20,7 @@ import time
 def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
              mutate, recombination, maxiter, maxtime, maxevaluations=None):
     """
-    Minimize using SciPy's adaptive Differential Evolution.
+    Minimize using SciPy's Differential Evolution with adaptive dithering.
 
     Args:
         cost_func: Objective function that takes (Z_batch, *args) and returns (tours, costs)
@@ -27,8 +28,8 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
         search_space_bound: Symmetric bounds for search space [-bound, +bound]
         search_space_size: Dimensionality of search space
         popsize: Absolute population size (will be converted to SciPy multiplier)
-        mutate: Mutation factor F (IGNORED - adaptive=True auto-tunes this)
-        recombination: Crossover rate CR (IGNORED - adaptive=True auto-tunes this)
+        mutate: Mutation factor F (IGNORED - using adaptive dithering instead)
+        recombination: Crossover rate CR (IGNORED - using adaptive dithering instead)
         maxiter: Maximum number of iterations (None = no limit)
         maxtime: Maximum wall-clock time in seconds (None = no limit)
         maxevaluations: Maximum number of function evaluations (None = no limit)
@@ -126,7 +127,8 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
     # Run SciPy's differential evolution
     # Key parameters:
     # - strategy='best1bin': Most common DE strategy (DE/best/1/bin)
-    # - adaptive=True: JADE-like self-adaptation of F and CR (ignores mutation/recombination args)
+    # - mutation=(0.5, 1.0): Adaptive dithering - F varies randomly between 0.5 and 1.0 each generation
+    # - recombination=(0.7, 1.0): Adaptive dithering - CR varies randomly between 0.7 and 1.0
     # - vectorized=True: Batch evaluation for GPU efficiency
     # - workers=1: Sequential evaluation (parallelization handled by GPU in cost_func)
     optimization_start = time.time()
@@ -136,7 +138,8 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
             func=vectorized_objective,
             bounds=bounds,
             strategy='best1bin',
-            adaptive=True,
+            mutation=(0.5, 1.0),  # Adaptive dithering for mutation factor F
+            recombination=(0.7, 1.0),  # Adaptive dithering for crossover rate CR
             vectorized=True,
             popsize=scipy_popsize,
             maxiter=maxiter if maxiter is not None else 1000,  # SciPy requires a value

@@ -44,7 +44,7 @@ def get_config(args=None):
                         choices=['de', 'cmaes', 'ipop_cmaes', 'bipop_cmaes', 'pygmo_de', 'scipy_de'],
                         help='Optimizer to use: "de" (Differential Evolution), "cmaes" (CMA-ES), '
                              '"ipop_cmaes" (IPOP-CMA-ES), "bipop_cmaes" (BIPOP-CMA-ES), "pygmo_de" (Pygmo DE), '
-                             'or "scipy_de" (SciPy adaptive DE)')
+                             'or "scipy_de" (SciPy DE with adaptive dithering)')
 
     # Differential Evolution parameters
     parser.add_argument('--de_mutate', default=0.3, type=float,
