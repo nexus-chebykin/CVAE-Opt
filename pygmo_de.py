@@ -119,7 +119,6 @@ def minimize(
     """
 
     # --- INITIALIZE -------------------------------------+
-    start_time = time.time()
     convergence_history = []
     time_history = []
     evaluations_done = 0
@@ -147,10 +146,28 @@ def minimize(
     # pygmo creates a random initial population and evaluates it
     pop = pg.population(prob=prob, size=popsize)
 
+    # FIX: Flatten GRU parameters after population creation
+    # Pygmo's internal serialization (during population initialization) can cause
+    # GRU weights to lose their contiguous memory layout, triggering a PyTorch warning
+    # and degrading performance. We restore the contiguous layout here.
+    # The model is passed as args[0] in the cost_func arguments tuple.
+    if len(args) > 0:
+        model = args[0]
+        # Check if model has a modules() method (it's a PyTorch model)
+        if hasattr(model, 'modules'):
+            import torch.nn as nn
+            for module in model.modules():
+                if isinstance(module, nn.GRU):
+                    module.flatten_parameters()
+
+    # Start timing AFTER initial population evaluation (matching de.py and cmaes.py behavior)
+    # This ensures the initial evaluation doesn't count against maxtime
+    start_time = time.time()
+
     # Track the initial best fitness (from initial population evaluation)
     gen_best = pop.champion_f[0]
     convergence_history.append(gen_best)
-    time_history.append(time.time() - start_time)
+    time_history.append(0.0)  # Initial evaluation happens at t=0
     evaluations_done += popsize
 
     # --- EVOLUTION LOOP (replaces ask-tell) -------------+
