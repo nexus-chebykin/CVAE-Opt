@@ -200,6 +200,11 @@ def minimize(
         convergence_history.append(gen_best)
         time_history.append(time.time() - start_time)
 
+        # Check if we've exceeded maxtime after completing this iteration
+        # This prevents starting another expensive iteration when already over budget
+        if maxtime is not None and time.time() - start_time > maxtime:
+            break
+
     # --- RETURN RESULTS ---------------------------------+
     best_fitness = pop.champion_f[0]
     best_solution = pop.champion_x
