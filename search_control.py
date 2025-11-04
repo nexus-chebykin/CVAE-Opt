@@ -185,6 +185,20 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             maxtime=maxtime,
             maxevaluations=maxevaluations
         )
+    elif config.optimizer == 'scipy_de':
+        from scipy_de import minimize
+        result_cost, result_tour, convergence_history, time_history, timing_breakdown = minimize(
+            decode,
+            (model, config, instance, cost_fn),
+            config.search_space_bound,
+            config.search_space_size,
+            popsize=batch_size,
+            mutate=config.de_mutate,
+            recombination=config.de_recombine,
+            maxiter=maxiter,
+            maxtime=maxtime,
+            maxevaluations=maxevaluations
+        )
     else:
         raise ValueError(f"Unknown optimizer: {config.optimizer}")
 
@@ -225,7 +239,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
         # Optimizer comparison mode: run all optimizers with fixed batch size
         fixed_batch_size = config.batch_sizes[0]
         logging.info(f"Running optimizer comparison mode with batch size {fixed_batch_size}")
-        logging.info(f"Comparing: DE, CMA-ES, IPOP-CMA-ES, BIPOP-CMA-ES, Pygmo-DE (sigma={config.cmaes_sigma0})")
+        logging.info(f"Comparing: DE, CMA-ES, IPOP-CMA-ES, BIPOP-CMA-ES, Pygmo-DE, Scipy-DE (sigma={config.cmaes_sigma0})")
 
         # Store results for each optimizer
         all_results = {'DE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
@@ -237,6 +251,8 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                        'BIPOP-CMA-ES': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
                                         'ask_times': [], 'eval_times': [], 'tell_times': []},
                        'Pygmo-DE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
+                                    'ask_times': [], 'eval_times': [], 'tell_times': []},
+                       'Scipy-DE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
                                     'ask_times': [], 'eval_times': [], 'tell_times': []}}
 
         # Accumulator for averaging convergence data across instances
@@ -244,7 +260,8 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                               'CMA-ES': {'convergence': [], 'time': []},
                               'IPOP-CMA-ES': {'convergence': [], 'time': []},
                               'BIPOP-CMA-ES': {'convergence': [], 'time': []},
-                              'Pygmo-DE': {'convergence': [], 'time': []}}
+                              'Pygmo-DE': {'convergence': [], 'time': []},
+                              'Scipy-DE': {'convergence': [], 'time': []}}
     elif sigma_sweep_mode:
         # Sigma sweep mode: loop over sigma values with fixed batch size
         sweep_values = config.cmaes_sigma_sweep
@@ -286,7 +303,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
             else:
                 optimal_value = None
 
-            for optimizer_name in ['DE', 'Pygmo-DE']:
+            for optimizer_name in ['DE', 'Pygmo-DE', 'Scipy-DE']:
                 logging.info(f"  Optimizer: {optimizer_name}")
                 start_time = time.time()
 
@@ -302,6 +319,8 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                     config.optimizer = 'bipop_cmaes'
                 elif optimizer_name == 'Pygmo-DE':
                     config.optimizer = 'pygmo_de'
+                elif optimizer_name == 'Scipy-DE':
+                    config.optimizer = 'scipy_de'
 
                 # Determine stopping criteria based on mode
                 override_maxiter = None
@@ -465,7 +484,8 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 'cmaes': 'CMA-ES',
                 'ipop_cmaes': 'IPOP-CMA-ES',
                 'bipop_cmaes': 'BIPOP-CMA-ES',
-                'pygmo_de': 'Pygmo-DE'
+                'pygmo_de': 'Pygmo-DE',
+                'scipy_de': 'Scipy-DE'
             }
             optimizer_name = optimizer_name_map.get(config.optimizer, config.optimizer.upper())
 
@@ -504,7 +524,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
         if optimizer_comparison_mode:
             # Optimizer comparison mode: generate optimizer comparison plots (always, regardless of plot_mode)
             logging.info("Computing averaged convergence data across all instances for optimizer comparison...")
-            averaged_data = compute_averaged_convergence(all_instances_data, ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES', 'Pygmo-DE'], optimal_values)
+            averaged_data = compute_averaged_convergence(all_instances_data, ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES', 'Pygmo-DE', 'Scipy-DE'], optimal_values)
 
             # Generate optimizer comparison plots
             plot_optimizer_comparison_iterations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size)
@@ -530,7 +550,8 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 'cmaes': 'CMA-ES',
                 'ipop_cmaes': 'IPOP-CMA-ES',
                 'bipop_cmaes': 'BIPOP-CMA-ES',
-                'pygmo_de': 'Pygmo-DE'
+                'pygmo_de': 'Pygmo-DE',
+                'scipy_de': 'Scipy-DE'
             }
             optimizer_name = optimizer_name_map.get(config.optimizer, config.optimizer.upper())
 
@@ -545,7 +566,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
 
     if optimizer_comparison_mode:
         # Log results for each optimizer
-        for optimizer_name in ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES', 'Pygmo-DE']:
+        for optimizer_name in ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES', 'Pygmo-DE', 'Scipy-DE']:
             results = all_results[optimizer_name]
             logging.info(f"\n{optimizer_name}:")
             logging.info(f"  Mean cost: {np.mean(results['cost_values']):.4f}")
