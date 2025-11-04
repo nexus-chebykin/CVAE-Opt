@@ -2,11 +2,11 @@
 # SciPy Differential Evolution wrapper for CVAE-Opt
 #
 # Implements Differential Evolution using scipy.optimize.differential_evolution
-# with adaptive mutation dithering for automatic F/CR tuning
+# with adaptive mutation dithering for automatic F tuning
 #
 # Key features:
 # - Adaptive mutation via dithering (F varies between 0.5-1.0 automatically)
-# - Adaptive crossover rate (CR varies between 0.7-1.0 automatically)
+# - Fixed high crossover rate (CR = 0.9, recommended value)
 # - Vectorized batch evaluation for GPU efficiency
 # - Strategy: 'best1bin' (most common and robust)
 # - Compatible with CVAE-Opt's ask-evaluate-tell timing structure
@@ -140,7 +140,7 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
     # Key parameters:
     # - strategy='best1bin': Most common DE strategy (DE/best/1/bin)
     # - mutation=(0.5, 1.0): Adaptive dithering - F varies randomly between 0.5 and 1.0 each generation
-    # - recombination=(0.7, 1.0): Adaptive dithering - CR varies randomly between 0.7 and 1.0
+    # - recombination=0.9: Fixed high crossover rate (tuple form not supported by SciPy)
     # - vectorized=True: Batch evaluation for GPU efficiency
     # - workers=1: Sequential evaluation (parallelization handled by GPU in cost_func)
     optimization_start = time.time()
@@ -151,7 +151,7 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
             bounds=bounds,
             strategy='best1bin',
             mutation=(0.5, 1.0),  # Adaptive dithering for mutation factor F
-            recombination=(0.7, 1.0),  # Adaptive dithering for crossover rate CR
+            recombination=0.9,  # Fixed high crossover rate (tuple form not supported)
             vectorized=True,
             popsize=scipy_popsize,
             maxiter=maxiter if maxiter is not None else 1000,  # SciPy requires a value
