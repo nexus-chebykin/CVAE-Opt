@@ -49,6 +49,21 @@ class PygmoProblem:
         """
         return True
 
+    def fitness(self, x):
+        """
+        Evaluates a single solution (mandatory for pygmo).
+        Wraps the single solution in a batch and calls batch_fitness.
+
+        Args:
+            x: Single solution vector
+
+        Returns:
+            list: Single-element list containing the fitness value
+        """
+        # Call batch_fitness with a single solution
+        batch_result = self.batch_fitness(np.array([x]))
+        return [batch_result[0]]
+
     def batch_fitness(self, solutions_batch):
         """
         Evaluates a batch of solutions.
