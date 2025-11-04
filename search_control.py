@@ -225,7 +225,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
         # Optimizer comparison mode: run all optimizers with fixed batch size
         fixed_batch_size = config.batch_sizes[0]
         logging.info(f"Running optimizer comparison mode with batch size {fixed_batch_size}")
-        logging.info(f"Comparing: DE, CMA-ES, IPOP-CMA-ES, BIPOP-CMA-ES (sigma={config.cmaes_sigma0})")
+        logging.info(f"Comparing: DE, CMA-ES, IPOP-CMA-ES, BIPOP-CMA-ES, Pygmo-DE (sigma={config.cmaes_sigma0})")
 
         # Store results for each optimizer
         all_results = {'DE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
@@ -235,13 +235,16 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                        'IPOP-CMA-ES': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
                                        'ask_times': [], 'eval_times': [], 'tell_times': []},
                        'BIPOP-CMA-ES': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
-                                        'ask_times': [], 'eval_times': [], 'tell_times': []}}
+                                        'ask_times': [], 'eval_times': [], 'tell_times': []},
+                       'Pygmo-DE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
+                                    'ask_times': [], 'eval_times': [], 'tell_times': []}}
 
         # Accumulator for averaging convergence data across instances
         all_instances_data = {'DE': {'convergence': [], 'time': []},
                               'CMA-ES': {'convergence': [], 'time': []},
                               'IPOP-CMA-ES': {'convergence': [], 'time': []},
-                              'BIPOP-CMA-ES': {'convergence': [], 'time': []}}
+                              'BIPOP-CMA-ES': {'convergence': [], 'time': []},
+                              'Pygmo-DE': {'convergence': [], 'time': []}}
     elif sigma_sweep_mode:
         # Sigma sweep mode: loop over sigma values with fixed batch size
         sweep_values = config.cmaes_sigma_sweep
@@ -283,7 +286,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
             else:
                 optimal_value = None
 
-            for optimizer_name in ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES']:
+            for optimizer_name in ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES', 'Pygmo-DE']:
                 logging.info(f"  Optimizer: {optimizer_name}")
                 start_time = time.time()
 
@@ -297,6 +300,8 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                     config.optimizer = 'ipop_cmaes'
                 elif optimizer_name == 'BIPOP-CMA-ES':
                     config.optimizer = 'bipop_cmaes'
+                elif optimizer_name == 'Pygmo-DE':
+                    config.optimizer = 'pygmo_de'
 
                 # Determine stopping criteria based on mode
                 override_maxiter = None
@@ -459,7 +464,8 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 'de': 'DE',
                 'cmaes': 'CMA-ES',
                 'ipop_cmaes': 'IPOP-CMA-ES',
-                'bipop_cmaes': 'BIPOP-CMA-ES'
+                'bipop_cmaes': 'BIPOP-CMA-ES',
+                'pygmo_de': 'Pygmo-DE'
             }
             optimizer_name = optimizer_name_map.get(config.optimizer, config.optimizer.upper())
 
@@ -498,7 +504,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
         if optimizer_comparison_mode:
             # Optimizer comparison mode: generate optimizer comparison plots (always, regardless of plot_mode)
             logging.info("Computing averaged convergence data across all instances for optimizer comparison...")
-            averaged_data = compute_averaged_convergence(all_instances_data, ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES'], optimal_values)
+            averaged_data = compute_averaged_convergence(all_instances_data, ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES', 'Pygmo-DE'], optimal_values)
 
             # Generate optimizer comparison plots
             plot_optimizer_comparison_iterations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size)
@@ -523,7 +529,8 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 'de': 'DE',
                 'cmaes': 'CMA-ES',
                 'ipop_cmaes': 'IPOP-CMA-ES',
-                'bipop_cmaes': 'BIPOP-CMA-ES'
+                'bipop_cmaes': 'BIPOP-CMA-ES',
+                'pygmo_de': 'Pygmo-DE'
             }
             optimizer_name = optimizer_name_map.get(config.optimizer, config.optimizer.upper())
 
@@ -538,7 +545,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
 
     if optimizer_comparison_mode:
         # Log results for each optimizer
-        for optimizer_name in ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES']:
+        for optimizer_name in ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES', 'Pygmo-DE']:
             results = all_results[optimizer_name]
             logging.info(f"\n{optimizer_name}:")
             logging.info(f"  Mean cost: {np.mean(results['cost_values']):.4f}")

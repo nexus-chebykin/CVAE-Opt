@@ -76,7 +76,7 @@ def get_config(args=None):
 
     # Optimizer comparison
     parser.add_argument('--compare_optimizers', default=False, action='store_true',
-                        help='Compare all optimizers (DE, CMA-ES, IPOP-CMA-ES, BIPOP-CMA-ES) with the same batch size. '
+                        help='Compare all optimizers (DE, CMA-ES, IPOP-CMA-ES, BIPOP-CMA-ES, Pygmo-DE) with the same batch size. '
                              'Requires exactly one batch size.')
 
     config = parser.parse_args()
