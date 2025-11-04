@@ -102,18 +102,30 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
         return False  # Continue optimization
 
     # Wrapper for vectorized cost function
-    # SciPy's vectorized mode expects a function that takes a 2D array (N_pop, N_dims)
-    # and returns a 1D array of costs (N_pop,)
+    # SciPy's vectorized mode may pass arrays in different orientations depending on version
     def vectorized_objective(Z_batch):
         """
         Vectorized objective function for SciPy's differential_evolution.
 
         Args:
-            Z_batch: 2D array of shape (N_population, N_dimensions)
+            Z_batch: 2D array, either (N_population, N_dimensions) or (N_dimensions, N_population)
 
         Returns:
             costs: 1D array of shape (N_population,)
         """
+        # SciPy's vectorized mode may pass Z_batch as (N_dims, N_pop) in some cases
+        # Ensure it's (N_pop, N_dims) by checking which dimension matches search_space_size
+        if Z_batch.ndim == 2:
+            if Z_batch.shape[1] == search_space_size:
+                # Already correct shape: (N_pop, N_dims)
+                pass
+            elif Z_batch.shape[0] == search_space_size:
+                # Transposed: (N_dims, N_pop) -> transpose to (N_pop, N_dims)
+                Z_batch = Z_batch.T
+            else:
+                # Neither dimension matches - this shouldn't happen but use as-is
+                pass
+
         # Update evaluation counter
         evaluations_done[0] += Z_batch.shape[0]
 
