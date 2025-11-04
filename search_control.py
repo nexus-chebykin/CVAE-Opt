@@ -286,7 +286,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
             else:
                 optimal_value = None
 
-            for optimizer_name in ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES', 'Pygmo-DE']:
+            for optimizer_name in ['DE', 'Pygmo-DE']:
                 logging.info(f"  Optimizer: {optimizer_name}")
                 start_time = time.time()
 

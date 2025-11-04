@@ -65,6 +65,7 @@ class PygmoProblem:
         return [batch_result[0]]
 
     def batch_fitness(self, solutions_batch):
+        print(f"[DEBUG] Received batch of size: {len(solutions_batch)}")
         """
         Evaluates a batch of solutions.
 
