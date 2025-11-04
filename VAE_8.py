@@ -74,31 +74,146 @@ class Encoder(nn.Module):
         eps = torch.randn_like(std)
         return mu + eps * std
 
+# --- Cyclical RoPE + MultiHeadAttention with Cyclical RoPE ---
+class CyclicalRoPE(nn.Module):
+    """
+    Cyclical RoPE: This produces wrap-around (pos 0 ~ pos N) and multi-scale frequency channels.
+    """
+    def __init__(self, head_dim: int):
+        super().__init__()
+        if head_dim % 2 != 0:
+            raise ValueError("head_dim must be even for rotary (pairs).")
+        self.head_dim = head_dim
+        # inv_freq shape: head_dim/2
+        inv_freq = 1.0 / (10000 ** (torch.arange(0, head_dim, 2).float() / head_dim))
+        self.register_buffer("inv_freq", inv_freq)  # shape (head_dim/2,)
+
+    def get_sin_cos(self, seq_len: int, device):
+        """
+        Return sin, cos tensors shaped for broadcasting with [B, seq_len, heads, head_dim/2]
+        sin, cos shape -> (1, seq_len, 1, head_dim/2)
+        """
+        positions = torch.arange(seq_len, dtype=torch.float32, device=device)  # (seq_len,)
+        # base circular angle per position (wraps at seq_len)
+        theta = 2.0 * math.pi * positions / float(seq_len+1)  # (seq_len,)
+        # freqs: outer(theta, inv_freq) -> (seq_len, head_dim/2)
+        freqs = torch.einsum("p,d->pd", theta, self.inv_freq.to(device))
+        sin = freqs.sin().unsqueeze(0).unsqueeze(2)  # (1, seq_len, 1, head_dim/2)
+        cos = freqs.cos().unsqueeze(0).unsqueeze(2)
+        return sin, cos
+
+    @staticmethod
+    def apply_rotary(x, sin, cos):
+        """
+        Returns x with rotary applied.
+        """
+        # split even / odd
+        x_even = x[..., ::2]  # (..., head_dim/2)
+        x_odd = x[..., 1::2]  # (..., head_dim/2)
+        x_rot_even = x_even * cos - x_odd * sin
+        x_rot_odd = x_even * sin + x_odd * cos
+        # interleave back to (..., head_dim)
+        x_rot = torch.stack((x_rot_even, x_rot_odd), dim=-1).flatten(-2)
+        return x_rot
+
+
+class MultiHeadAttentionCyclicRoPE(nn.Module):
+    """
+    Multi-head attention that applies cyclical RoPE
+    """
+    def __init__(self, embed_dim, num_heads, dropout=0.0):
+        super().__init__()
+        assert embed_dim % num_heads == 0, "embed_dim must be divisible by num_heads"
+        self.embed_dim = embed_dim
+        self.num_heads = num_heads
+        self.head_dim = embed_dim // num_heads
+        self.dropout = dropout
+
+        # q/k/v projections
+        self.q_proj = nn.Linear(embed_dim, embed_dim, bias=True)
+        self.k_proj = nn.Linear(embed_dim, embed_dim, bias=True)
+        self.v_proj = nn.Linear(embed_dim, embed_dim, bias=True)
+        self.out_proj = nn.Linear(embed_dim, embed_dim, bias=True)
+
+        # RoPE per head
+        # We'll use same head_dim for all heads; CyclicalRoPE expects head_dim
+        self.rope = CyclicalRoPE(self.head_dim)
+
+    def forward(self, query, key, value):
+        """
+        Returns:
+            attn_output: (B, seq_len, embed_dim)
+            attn_weights: (B, seq_len, seq_len) e
+        """
+        B, L, E = query.shape
+        device = query.device
+        assert E == self.embed_dim
+
+        # Linear projections
+        q = self.q_proj(query)  # (B, L, E)
+        k = self.k_proj(key)
+        v = self.v_proj(value)
+
+        # Reshape to (B, L, heads, head_dim)
+        q = q.view(B, L, self.num_heads, self.head_dim)
+        k = k.view(B, L, self.num_heads, self.head_dim)
+        v = v.view(B, L, self.num_heads, self.head_dim)
+
+        # Get sin/cos for this seq length
+        sin, cos = self.rope.get_sin_cos(L, device)  # (1, L, 1, head_dim/2)
+
+        # Apply RoPE to q and k: operate on last head_dim by pairs
+        # Convert q/k to shape compatible with even/odd split
+        q = self.rope.apply_rotary(q, sin, cos)  # (B, L, heads, head_dim)
+        k = self.rope.apply_rotary(k, sin, cos)
+
+        # Transpose to (B, heads, L, head_dim) for attention
+        q = q.permute(0, 2, 1, 3)
+        k = k.permute(0, 2, 1, 3)
+        v = v.permute(0, 2, 1, 3)
+
+        # Scaled dot-product attention
+        scale = 1.0 / math.sqrt(self.head_dim)
+        attn_scores = torch.matmul(q, k.transpose(-2, -1)) * scale  # (B, heads, L, L)
+        attn_probs = torch.softmax(attn_scores, dim=-1)
+        if self.training and self.dropout > 0.0:
+            attn_probs = F.dropout(attn_probs, p=self.dropout)
+
+        attn_out = torch.matmul(attn_probs, v)  # (B, heads, L, head_dim)
+        # Merge heads: (B, L, E)
+        attn_out = attn_out.permute(0, 2, 1, 3).contiguous().view(B, L, E)
+        out = self.out_proj(attn_out)
+
+
+        return out, attn_probs.mean(dim=1)
+
+
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model: int, max_len: int):
         super(PositionalEncoding, self).__init__()
         self.d_model = d_model
         self.max_len = max_len
 
-        # Create sinusoidal positional encodings
+        # Create circular (sin, cos) positional encodings
         pos_enc = torch.zeros(max_len, d_model)
         position = torch.arange(0, max_len, dtype=torch.float32).unsqueeze(1)
+
         div_term = torch.exp(
             torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model)
         )
-        pos_enc[:, 0::2] = torch.sin(position * div_term)
-        pos_enc[:, 1::2] = torch.cos(position * div_term)
-        pos_enc = pos_enc.unsqueeze(0)  # (1, max_len, d_model)
 
-        # Register as buffer (not a parameter, but part of state)
+        # Map positions to angles along a circle [0, 2π)
+        theta = 2 * math.pi * position / max_len
+
+        pos_enc[:, 0::2] = torch.sin(theta * div_term)
+        pos_enc[:, 1::2] = torch.cos(theta * div_term)
+
+        pos_enc = pos_enc.unsqueeze(0)  # (1, max_len, d_model)
         self.register_buffer('pos_enc', pos_enc)
 
     def forward(self, embedding: torch.Tensor) -> torch.Tensor:
-        """
-        Args:
-            embedding: [batch_size, seq_len, d_model] or [seq_len, d_model]
-        """
-        return embedding + self.pos_enc[:, :embedding.shape[-2], :]
+        seq_len = embedding.size(1)
+        return embedding + self.pos_enc[:, :seq_len, :]
 
 
 class TransEncoder(nn.Module):
@@ -112,19 +227,11 @@ class TransEncoder(nn.Module):
 
         self.num_layers = num_layers
 
-        self.pos_enc = PositionalEncoding(d_model=model_size, max_len=max_len)
-
         # Transformer layers
         self.layers = nn.ModuleList()
         for i in range(num_layers):
             layer = nn.ModuleDict({
-                'mha': nn.MultiheadAttention(
-                    embed_dim=model_size,
-                    num_heads=num_heads,
-                    kdim=model_size,
-                    vdim=model_size,
-                    batch_first=True,
-                ),
+                'mha': MultiHeadAttentionCyclicRoPE(embed_dim=model_size, num_heads=num_heads, dropout=0.0),
                 'norm1': nn.LayerNorm(model_size),
                 'mlp': nn.Sequential(
                     nn.Linear(model_size, expand_factor * model_size),
@@ -147,15 +254,14 @@ class TransEncoder(nn.Module):
             # Scale the output projection of multi-head attention
             nn.init.xavier_uniform_(layer['mha'].out_proj.weight, gain=scale)
 
-    def forward(self, instance_hidden,solution):
+    def forward(self, instance_hidden, solution):
 
         batch_size = instance_hidden.shape[0]
-        reorganized_instance = torch.gather(
+        x = torch.gather(
             instance_hidden, 1,
             solution.unsqueeze(-1).expand(-1, -1, instance_hidden.shape[-1])
         )
 
-        x = self.pos_enc(reorganized_instance)
         for layer in self.layers:
             # Multi-head attention with residual
             attn_out, _ = layer['mha'](x, x, x)
