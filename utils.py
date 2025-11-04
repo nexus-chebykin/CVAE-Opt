@@ -117,8 +117,7 @@ def read_instance_data(config):
     offset = max(config.network_validation_size, config.search_validation_size)
 
     if config.problem == "TSP":
-        training_data = read_instance_data_tsp(config.problem_size, config.epoch_size, config.instances_path,
-                                           config.solutions_path, offset)
+        training_data = read_instance_data_tsp(config.problem_size, config.epoch_size, config.instances_path, config.solutions_path, offset)
         validation_data = read_instance_data_tsp(config.problem_size, offset, config.instances_path,
                                              config.solutions_path)
     elif config.problem == "CVRP":

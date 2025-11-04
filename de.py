@@ -81,10 +81,10 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
 
         iterations_without_improvement += 1
         new_best = np.min(scores_trial)
-        if new_best + 0.001 < np.min(population_cost):
-            iterations_without_improvement = 0
-        if iterations_without_improvement >= 25:
-            break
+        # if new_best + 0.001 < np.min(population_cost):
+        #     iterations_without_improvement = 0
+        # if iterations_without_improvement >= 25:
+        #     break
 
         best_over_time.append(new_best)
 

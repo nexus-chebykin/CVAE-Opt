@@ -23,8 +23,33 @@ class Embedding(nn.Module):
         return output_data
 
 
+class Attention(nn.Module):
+    """Calculates attention over the input nodes given the current state."""
+
+    def __init__(self, hidden_size):
+        super(Attention, self).__init__()
+
+        # W processes features from static decoder elements
+        self.v = nn.Parameter(torch.zeros((1, hidden_size, 1), requires_grad=True))
+        self.W = nn.Parameter(torch.zeros((1, 2 * hidden_size, 1 * hidden_size), requires_grad=True))
+
+    def forward(self, instance_hidden, rnn_out):
+        batch_size, _, hidden_size = instance_hidden.size()
+
+        hidden = rnn_out.expand_as(instance_hidden)
+        hidden = torch.cat((instance_hidden, hidden), 2)
+
+        # Broadcast some dimensions so we can do batch-matrix-multiply
+        v = self.v.expand(batch_size, -1, -1)
+        W = self.W.expand(batch_size, -1, -1)
+
+        ret = torch.bmm(hidden, W)
+        attns = torch.bmm(torch.relu(ret), v)
+        attns = F.softmax(attns, dim=1)  # (batch, seq_len)
+        return attns
+
 class Encoder(nn.Module):
-    def __init__(self, instance_embedding, reference_embedding, encoder_attn, rnn, update_fn, search_space_size,
+    def __init__(self, instance_embedding, reference_embedding, encoder_attn: Attention, rnn, update_fn, search_space_size,
                  hidden_size):
         super(Encoder, self).__init__()
         self.instance_embedding = instance_embedding
@@ -42,6 +67,7 @@ class Encoder(nn.Module):
 
         last_hh = None
         last_hh_2 = None
+        # the loop could be removed
         reference_hidden = self.reference_embedding(reference_input)
         for j in range(1, solution.shape[1]):
 
@@ -74,32 +100,6 @@ class Encoder(nn.Module):
         return mu + eps * std
 
 
-class Attention(nn.Module):
-    """Calculates attention over the input nodes given the current state."""
-
-    def __init__(self, hidden_size):
-        super(Attention, self).__init__()
-
-        # W processes features from static decoder elements
-        self.v = nn.Parameter(torch.zeros((1, hidden_size, 1), requires_grad=True))
-        self.W = nn.Parameter(torch.zeros((1, 2 * hidden_size, 1 * hidden_size), requires_grad=True))
-
-    def forward(self, instance_hidden, rnn_out):
-        batch_size, _, hidden_size = instance_hidden.size()
-
-        hidden = rnn_out.expand_as(instance_hidden)
-        hidden = torch.cat((instance_hidden, hidden), 2)
-
-        # Broadcast some dimensions so we can do batch-matrix-multiply
-        v = self.v.expand(batch_size, -1, -1)
-        W = self.W.expand(batch_size, -1, -1)
-
-        ret = torch.bmm(hidden, W)
-        attns = torch.bmm(torch.relu(ret), v)
-        attns = F.softmax(attns, dim=1)  # (batch, seq_len)
-        return attns
-
-
 class Pointer(nn.Module):
     """Calculates the next state given the previous state and input embeddings."""
 
@@ -120,7 +120,6 @@ class Pointer(nn.Module):
 
     def forward(self, instance_hidden, reference_hidden, Z, last_hh):
         rnn_out, last_hh = self.rnn(reference_hidden, last_hh)
-        rnn_out = rnn_out
 
         # Given a summary of the output, find an  input context
         enc_attn = self.encoder_attn(instance_hidden, rnn_out)
@@ -216,10 +215,12 @@ class VAE_8(nn.Module):
             input_size = 4
             mask_fn = cvrp.update_mask
             update_fn = cvrp.update_dynamic
+        else:
+            assert False
 
-        hidden_size = 64
-        self.instance_embedding = Embedding(input_size, hidden_size)
-        reference_embedding = Embedding(input_size, hidden_size)
+        hidden_size = 128
+        self.instance_embedding = nn.Linear(input_size, hidden_size)
+        reference_embedding = nn.Linear(input_size, hidden_size)
         encoder_attn = Attention(hidden_size)
         rnn = nn.GRU(hidden_size, hidden_size, 1, batch_first=True, dropout=0)
 
@@ -231,6 +232,7 @@ class VAE_8(nn.Module):
         self.instance_hidden = None
         self.dummy_solution = None
 
+        # Shouldn't be required anymore.
         for p in self.parameters():
             if len(p.shape) > 1:
                 nn.init.xavier_uniform_(p)
