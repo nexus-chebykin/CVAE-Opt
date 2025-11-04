@@ -74,6 +74,19 @@ class PygmoProblem:
         Returns:
             list: Fitness values for each solution in the batch
         """
+        # FIX: Flatten GRU parameters before every evaluation
+        # Pygmo's internal serialization can cause GRU weights to lose contiguous memory layout.
+        # We restore it here before each batch evaluation to prevent PyTorch warnings.
+        # The model is passed as args[0] in the cost_func arguments tuple.
+        if len(self.args) > 0:
+            model = self.args[0]
+            # Check if model has modules() method (it's a PyTorch model)
+            if hasattr(model, 'modules'):
+                import torch.nn as nn
+                for module in model.modules():
+                    if isinstance(module, nn.GRU):
+                        module.flatten_parameters()
+
         # cost_func returns (tours, costs) - we only need costs
         _, costs = self.cost_func(solutions_batch, *self.args)
         return costs
@@ -119,6 +132,9 @@ def minimize(
     """
 
     # --- INITIALIZE -------------------------------------+
+    # Start timing from the beginning (including initial population evaluation)
+    # This ensures maxtime limits total wall-clock runtime, matching user expectations
+    start_time = time.time()
     convergence_history = []
     time_history = []
     evaluations_done = 0
@@ -144,30 +160,13 @@ def minimize(
 
     # 3. Create the initial population
     # pygmo creates a random initial population and evaluates it
+    # Note: flatten_parameters() is called inside batch_fitness() to fix GRU contiguity
     pop = pg.population(prob=prob, size=popsize)
-
-    # FIX: Flatten GRU parameters after population creation
-    # Pygmo's internal serialization (during population initialization) can cause
-    # GRU weights to lose their contiguous memory layout, triggering a PyTorch warning
-    # and degrading performance. We restore the contiguous layout here.
-    # The model is passed as args[0] in the cost_func arguments tuple.
-    if len(args) > 0:
-        model = args[0]
-        # Check if model has a modules() method (it's a PyTorch model)
-        if hasattr(model, 'modules'):
-            import torch.nn as nn
-            for module in model.modules():
-                if isinstance(module, nn.GRU):
-                    module.flatten_parameters()
-
-    # Start timing AFTER initial population evaluation (matching de.py and cmaes.py behavior)
-    # This ensures the initial evaluation doesn't count against maxtime
-    start_time = time.time()
 
     # Track the initial best fitness (from initial population evaluation)
     gen_best = pop.champion_f[0]
     convergence_history.append(gen_best)
-    time_history.append(0.0)  # Initial evaluation happens at t=0
+    time_history.append(time.time() - start_time)
     evaluations_done += popsize
 
     # --- EVOLUTION LOOP (replaces ask-tell) -------------+
