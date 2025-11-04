@@ -171,6 +171,20 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             restarts=config.bipop_restarts,
             incpopsize=config.bipop_incpopsize
         )
+    elif config.optimizer == 'pygmo_de':
+        from pygmo_de import minimize
+        result_cost, result_tour, convergence_history, time_history, timing_breakdown = minimize(
+            decode,
+            (model, config, instance, cost_fn),
+            config.search_space_bound,
+            config.search_space_size,
+            popsize=batch_size,
+            mutate=config.de_mutate,
+            recombination=config.de_recombine,
+            maxiter=maxiter,
+            maxtime=maxtime,
+            maxevaluations=maxevaluations
+        )
     else:
         raise ValueError(f"Unknown optimizer: {config.optimizer}")
 

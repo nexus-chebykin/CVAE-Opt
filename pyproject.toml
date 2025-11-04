@@ -3,12 +3,13 @@ name = "cvae-opt"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11, <3.12"
 dependencies = [
     "cma>=4.4.0",
     "matplotlib>=3.10.7",
     "nevergrad>=1.0.12",
     "numpy>=2.3.3",
+    "pygmo~=2.19.5",
     "scipy>=1.16.2",
     "torch>=2.8.0",
     "tqdm>=4.67.1",

@@ -41,9 +41,9 @@ def get_config(args=None):
 
     # Optimizer selection
     parser.add_argument('--optimizer', type=str, default='de',
-                        choices=['de', 'cmaes', 'ipop_cmaes', 'bipop_cmaes'],
+                        choices=['de', 'cmaes', 'ipop_cmaes', 'bipop_cmaes', 'pygmo_de'],
                         help='Optimizer to use: "de" (Differential Evolution), "cmaes" (CMA-ES), '
-                             '"ipop_cmaes" (IPOP-CMA-ES), or "bipop_cmaes" (BIPOP-CMA-ES)')
+                             '"ipop_cmaes" (IPOP-CMA-ES), "bipop_cmaes" (BIPOP-CMA-ES), or "pygmo_de" (Pygmo DE)')
 
     # Differential Evolution parameters
     parser.add_argument('--de_mutate', default=0.3, type=float,
