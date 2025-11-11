@@ -84,6 +84,9 @@ def minimize(
 
     # --- RESTART LOOP ----------------+
     while restart_idx <= restarts:
+        # Check time limit before starting a new restart
+        if maxtime is not None and time.time() - start_time > maxtime:
+            break
         restarts_completed = restart_idx
 
         # --- DETERMINE POPULATION SIZE FOR THIS RESTART ----------------+

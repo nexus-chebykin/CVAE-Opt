@@ -91,6 +91,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "cma" },
+    { name = "evox" },
     { name = "matplotlib" },
     { name = "nevergrad" },
     { name = "numpy" },
@@ -108,6 +109,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "cma", specifier = ">=4.4.0" },
+    { name = "evox", specifier = ">=0.8.0" },
     { name = "matplotlib", specifier = ">=3.10.7" },
     { name = "nevergrad", specifier = ">=1.0.12" },
     { name = "numpy", specifier = ">=2.3.3" },
@@ -138,6 +140,19 @@ dependencies = [
     { name = "scipy" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/42/b0/876bc174ff34a0b2e3b75f10d7c3c9a267a1f56dbac59e943b6f682f6aa8/directsearch-1.0.tar.gz", hash = "sha256:8093ecc401a3d5eff28f053d4ef1b726f5a9c577bd33d6a8b2413a5ba753c734", size = 13605, upload-time = "2022-04-01T03:06:11.488Z" }
+
+[[package]]
+name = "evox"
+version = "1.2.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+    { name = "torch" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/2b/be/f35125ed619429ce26b15b11526b1ada4598851492dba3eb7e681e28e20c/evox-1.2.2.tar.gz", hash = "sha256:44673bb2f37a301c05506aba4981b7754541f834af6ef6d6cb34752c925f8f21", size = 292316, upload-time = "2025-06-03T05:19:48.408Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/33/4b/b03bae1a9b348f1880a21535ce7a250439e6cc4a2e2a3cee977ea415fac6/evox-1.2.2-py3-none-any.whl", hash = "sha256:1f86b1316bf79985190d4acd1f2e69785446ec53f04446acf8028b2d8c1888c2", size = 352751, upload-time = "2025-06-03T05:19:46.614Z" },
+]
 
 [[package]]
 name = "filelock"

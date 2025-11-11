@@ -199,11 +199,177 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             maxtime=maxtime,
             maxevaluations=maxevaluations
         )
+    elif config.optimizer == 'evox_jade':
+        from evox_jade import minimize
+        result_cost, result_tour, convergence_history, time_history, timing_breakdown = minimize(
+            decode,
+            (model, config, instance, cost_fn),
+            config.search_space_bound,
+            config.search_space_size,
+            popsize=batch_size,
+            mutate=config.de_mutate,
+            recombination=config.de_recombine,
+            maxiter=maxiter,
+            maxtime=maxtime,
+            maxevaluations=maxevaluations
+        )
+    elif config.optimizer == 'pygmo_pso_gen':
+        from pygmo_pso_gen import minimize
+        result_cost, result_tour, convergence_history, time_history, timing_breakdown = minimize(
+            decode,
+            (model, config, instance, cost_fn),
+            config.search_space_bound,
+            config.search_space_size,
+            popsize=batch_size,
+            mutate=config.de_mutate,
+            recombination=config.de_recombine,
+            maxiter=maxiter,
+            maxtime=maxtime,
+            maxevaluations=maxevaluations
+        )
+    elif config.optimizer == 'evox_shade':
+        from evox_shade import minimize
+        result_cost, result_tour, convergence_history, time_history, timing_breakdown = minimize(
+            decode,
+            (model, config, instance, cost_fn),
+            config.search_space_bound,
+            config.search_space_size,
+            popsize=batch_size,
+            mutate=config.de_mutate,
+            recombination=config.de_recombine,
+            maxiter=maxiter,
+            maxtime=maxtime,
+            maxevaluations=maxevaluations
+        )
+    elif config.optimizer == 'evox_sade':
+        from evox_sade import minimize
+        result_cost, result_tour, convergence_history, time_history, timing_breakdown = minimize(
+            decode,
+            (model, config, instance, cost_fn),
+            config.search_space_bound,
+            config.search_space_size,
+            popsize=batch_size,
+            mutate=config.de_mutate,
+            recombination=config.de_recombine,
+            maxiter=maxiter,
+            maxtime=maxtime,
+            maxevaluations=maxevaluations
+        )
+    elif config.optimizer == 'evox_code':
+        from evox_code import minimize
+        result_cost, result_tour, convergence_history, time_history, timing_breakdown = minimize(
+            decode,
+            (model, config, instance, cost_fn),
+            config.search_space_bound,
+            config.search_space_size,
+            popsize=batch_size,
+            mutate=config.de_mutate,
+            recombination=config.de_recombine,
+            maxiter=maxiter,
+            maxtime=maxtime,
+            maxevaluations=maxevaluations
+        )
+    elif config.optimizer == 'evox_ode':
+        from evox_ode import minimize
+        result_cost, result_tour, convergence_history, time_history, timing_breakdown = minimize(
+            decode,
+            (model, config, instance, cost_fn),
+            config.search_space_bound,
+            config.search_space_size,
+            popsize=batch_size,
+            mutate=config.de_mutate,
+            recombination=config.de_recombine,
+            maxiter=maxiter,
+            maxtime=maxtime,
+            maxevaluations=maxevaluations
+        )
+    elif config.optimizer == 'ngopt':
+        from ngopt import minimize
+        result_cost, result_tour, convergence_history, time_history, timing_breakdown = minimize(
+            decode,
+            (model, config, instance, cost_fn),
+            config.search_space_bound,
+            config.search_space_size,
+            popsize=batch_size,
+            mutate=config.de_mutate,
+            recombination=config.de_recombine,
+            maxiter=maxiter,
+            maxtime=maxtime,
+            maxevaluations=maxevaluations
+        )
     else:
         raise ValueError(f"Unknown optimizer: {config.optimizer}")
 
     solution = decode(np.array([result_tour] * batch_size), model, config, instance, cost_fn)[0][0].tolist()
     return result_cost, solution, convergence_history, time_history, timing_breakdown
+
+
+def write_results_csv(all_results, output_file, has_solutions):
+    """
+    Write per-instance results and summary statistics to a CSV file.
+
+    Args:
+        all_results: Dictionary containing results for each optimizer/parameter
+        output_file: Path to the output CSV file
+        has_solutions: Boolean indicating if optimal solutions were provided
+    """
+    import csv
+
+    with open(output_file, 'w', newline='') as f:
+        writer = csv.writer(f)
+
+        # Section 1: Per-instance results
+        if has_solutions:
+            writer.writerow(['optimizer', 'instance_id', 'runtime', 'gap', 'cost', 'optimal_cost'])
+        else:
+            writer.writerow(['optimizer', 'instance_id', 'runtime', 'cost'])
+
+        # Get list of optimizers/parameters
+        optimizer_names = list(all_results.keys())
+
+        # Determine number of instances from first optimizer
+        num_instances = len(all_results[optimizer_names[0]]['runtime_values'])
+
+        # Write per-instance rows
+        for i in range(num_instances):
+            for optimizer_name in optimizer_names:
+                results = all_results[optimizer_name]
+                runtime = results['runtime_values'][i]
+                cost = results['cost_values'][i]
+                instance_id = results['instance_ids'][i]
+
+                if has_solutions:
+                    gap = results['gap_values'][i]
+                    optimal_cost = results['optimal_values'][i]
+                    writer.writerow([optimizer_name, instance_id, f"{runtime:.2f}", f"{gap:.2f}", f"{cost:.4f}", f"{optimal_cost:.4f}"])
+                else:
+                    writer.writerow([optimizer_name, instance_id, f"{runtime:.2f}", f"{cost:.4f}"])
+
+        # Blank line separator
+        writer.writerow([])
+
+        # Section 2: Summary statistics
+        if has_solutions:
+            writer.writerow(['optimizer', 'mean_runtime', 'std_runtime', 'mean_gap', 'std_gap', 'num_instances'])
+        else:
+            writer.writerow(['optimizer', 'mean_runtime', 'std_runtime', 'mean_cost', 'std_cost', 'num_instances'])
+
+        for optimizer_name in optimizer_names:
+            results = all_results[optimizer_name]
+            mean_runtime = np.mean(results['runtime_values'])
+            std_runtime = np.std(results['runtime_values'])
+            num_inst = len(results['runtime_values'])
+
+            if has_solutions:
+                mean_gap = np.mean(results['gap_values'])
+                std_gap = np.std(results['gap_values'])
+                writer.writerow([optimizer_name, f"{mean_runtime:.2f}", f"{std_runtime:.2f}",
+                               f"{mean_gap:.2f}", f"{std_gap:.2f}", num_inst])
+            else:
+                mean_cost = np.mean(results['cost_values'])
+                std_cost = np.std(results['cost_values'])
+                writer.writerow([optimizer_name, f"{mean_runtime:.2f}", f"{std_runtime:.2f}",
+                               f"{mean_cost:.4f}", f"{std_cost:.4f}", num_inst])
 
 
 def solve_instance_set(model, config, instances, solutions=None, verbose=True):
@@ -239,29 +405,59 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
         # Optimizer comparison mode: run all optimizers with fixed batch size
         fixed_batch_size = config.batch_sizes[0]
         logging.info(f"Running optimizer comparison mode with batch size {fixed_batch_size}")
-        logging.info(f"Comparing: DE, CMA-ES, IPOP-CMA-ES, BIPOP-CMA-ES, Pygmo-DE, Scipy-DE (sigma={config.cmaes_sigma0})")
+        logging.info(f"Comparing: DE, CMA-ES, IPOP-CMA-ES, BIPOP-CMA-ES, Scipy-DE, EvoX-JADE, Pygmo-PSO-Gen, EvoX-SHADE, EvoX-SaDE, EvoX-CoDE, EvoX-ODE, NGOpt (sigma={config.cmaes_sigma0})")
 
         # Store results for each optimizer
         all_results = {'DE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
-                              'ask_times': [], 'eval_times': [], 'tell_times': []},
+                              'ask_times': [], 'eval_times': [], 'tell_times': [],
+                              'instance_ids': [], 'optimal_values': []},
                        'CMA-ES': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
-                                  'ask_times': [], 'eval_times': [], 'tell_times': []},
+                                  'ask_times': [], 'eval_times': [], 'tell_times': [],
+                                  'instance_ids': [], 'optimal_values': []},
                        'IPOP-CMA-ES': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
-                                       'ask_times': [], 'eval_times': [], 'tell_times': []},
+                                       'ask_times': [], 'eval_times': [], 'tell_times': [],
+                                       'instance_ids': [], 'optimal_values': []},
                        'BIPOP-CMA-ES': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
-                                        'ask_times': [], 'eval_times': [], 'tell_times': []},
-                       'Pygmo-DE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
-                                    'ask_times': [], 'eval_times': [], 'tell_times': []},
+                                        'ask_times': [], 'eval_times': [], 'tell_times': [],
+                                        'instance_ids': [], 'optimal_values': []},
                        'Scipy-DE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
-                                    'ask_times': [], 'eval_times': [], 'tell_times': []}}
+                                    'ask_times': [], 'eval_times': [], 'tell_times': [],
+                                    'instance_ids': [], 'optimal_values': []},
+                       'EvoX-JADE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
+                                     'ask_times': [], 'eval_times': [], 'tell_times': [],
+                                     'instance_ids': [], 'optimal_values': []},
+                       'Pygmo-PSO-Gen': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
+                                         'ask_times': [], 'eval_times': [], 'tell_times': [],
+                                         'instance_ids': [], 'optimal_values': []},
+                       'EvoX-SHADE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
+                                      'ask_times': [], 'eval_times': [], 'tell_times': [],
+                                      'instance_ids': [], 'optimal_values': []},
+                       'EvoX-SaDE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
+                                     'ask_times': [], 'eval_times': [], 'tell_times': [],
+                                     'instance_ids': [], 'optimal_values': []},
+                       'EvoX-CoDE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
+                                     'ask_times': [], 'eval_times': [], 'tell_times': [],
+                                     'instance_ids': [], 'optimal_values': []},
+                       'EvoX-ODE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
+                                    'ask_times': [], 'eval_times': [], 'tell_times': [],
+                                    'instance_ids': [], 'optimal_values': []},
+                       'NGOpt': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
+                                 'ask_times': [], 'eval_times': [], 'tell_times': [],
+                                 'instance_ids': [], 'optimal_values': []}}
 
         # Accumulator for averaging convergence data across instances
         all_instances_data = {'DE': {'convergence': [], 'time': []},
                               'CMA-ES': {'convergence': [], 'time': []},
                               'IPOP-CMA-ES': {'convergence': [], 'time': []},
                               'BIPOP-CMA-ES': {'convergence': [], 'time': []},
-                              'Pygmo-DE': {'convergence': [], 'time': []},
-                              'Scipy-DE': {'convergence': [], 'time': []}}
+                              'Scipy-DE': {'convergence': [], 'time': []},
+                              'EvoX-JADE': {'convergence': [], 'time': []},
+                              'Pygmo-PSO-Gen': {'convergence': [], 'time': []},
+                              'EvoX-SHADE': {'convergence': [], 'time': []},
+                              'EvoX-SaDE': {'convergence': [], 'time': []},
+                              'EvoX-CoDE': {'convergence': [], 'time': []},
+                              'EvoX-ODE': {'convergence': [], 'time': []},
+                              'NGOpt': {'convergence': [], 'time': []}}
     elif sigma_sweep_mode:
         # Sigma sweep mode: loop over sigma values with fixed batch size
         sweep_values = config.cmaes_sigma_sweep
@@ -303,7 +499,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
             else:
                 optimal_value = None
 
-            for optimizer_name in ['DE', 'Pygmo-DE', 'Scipy-DE']:
+            for optimizer_name in ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES', 'Scipy-DE', 'EvoX-JADE', 'Pygmo-PSO-Gen', 'EvoX-SHADE', 'EvoX-SaDE', 'EvoX-CoDE', 'EvoX-ODE', 'NGOpt']:
                 logging.info(f"  Optimizer: {optimizer_name}")
                 start_time = time.time()
 
@@ -321,6 +517,20 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                     config.optimizer = 'pygmo_de'
                 elif optimizer_name == 'Scipy-DE':
                     config.optimizer = 'scipy_de'
+                elif optimizer_name == 'EvoX-JADE':
+                    config.optimizer = 'evox_jade'
+                elif optimizer_name == 'Pygmo-PSO-Gen':
+                    config.optimizer = 'pygmo_pso_gen'
+                elif optimizer_name == 'EvoX-SHADE':
+                    config.optimizer = 'evox_shade'
+                elif optimizer_name == 'EvoX-SaDE':
+                    config.optimizer = 'evox_sade'
+                elif optimizer_name == 'EvoX-CoDE':
+                    config.optimizer = 'evox_code'
+                elif optimizer_name == 'EvoX-ODE':
+                    config.optimizer = 'evox_ode'
+                elif optimizer_name == 'NGOpt':
+                    config.optimizer = 'ngopt'
 
                 # Determine stopping criteria based on mode
                 override_maxiter = None
@@ -333,7 +543,18 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                         override_maxtime = None  # No time limit for DE
                     else:
                         # Other optimizers match DE's runtime
-                        override_maxiter = None  # No iteration limit
+                        override_maxiter = 999999  # Effectively no iteration limit (much larger than time allows)
+                        override_maxtime = de_runtime
+                        logging.info(f"    Using time-matching: maxtime={de_runtime:.2f}s (matching DE runtime)")
+                else:
+                    # Default mode: DE runs with config iterations, others match DE's runtime
+                    if optimizer_name == 'DE':
+                        # DE runs with the specified iterations from config
+                        override_maxiter = None  # Use config.search_iterations
+                        override_maxtime = None  # No time limit for DE
+                    else:
+                        # Other optimizers match DE's runtime (time-based stopping)
+                        override_maxiter = 999999  # Effectively no iteration limit (much larger than time allows)
                         override_maxtime = de_runtime
                         logging.info(f"    Using time-matching: maxtime={de_runtime:.2f}s (matching DE runtime)")
 
@@ -345,8 +566,8 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 config.optimizer = original_optimizer
                 runtime = time.time() - start_time
 
-                # Store DE runtime for time-matching mode
-                if config.stopping_criteria == 'time_of_de' and optimizer_name == 'DE':
+                # Store DE runtime for time-matching (both time_of_de and default modes)
+                if optimizer_name == 'DE':
                     de_runtime = runtime
                     logging.info(f"    DE runtime captured: {de_runtime:.2f}s (will be used for other optimizers)")
 
@@ -363,13 +584,16 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                                             torch.Tensor(solutions[i]).long().unsqueeze(0)).item()
                     gap = (objective_value / optimal_value - 1) * 100
                     all_results[optimizer_name]['gap_values'].append(gap)
+                    all_results[optimizer_name]['optimal_values'].append(optimal_value)
                     logging.info(f"    Objective: {objective_value:.4f}, Optimal: {optimal_value:.4f}, Gap: {gap:.2f}%")
                 else:
                     all_results[optimizer_name]['gap_values'].append(0)
+                    all_results[optimizer_name]['optimal_values'].append(0)
                     logging.info(f"    Objective: {objective_value:.4f}")
 
                 all_results[optimizer_name]['cost_values'].append(objective_value)
                 all_results[optimizer_name]['runtime_values'].append(runtime)
+                all_results[optimizer_name]['instance_ids'].append(i)
                 logging.info(f"    Runtime: {runtime:.2f}s")
                 logging.info(f"    Iterations: {timing_breakdown['iterations']}")
                 # Log restarts for IPOP and BIPOP
@@ -485,7 +709,14 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 'ipop_cmaes': 'IPOP-CMA-ES',
                 'bipop_cmaes': 'BIPOP-CMA-ES',
                 'pygmo_de': 'Pygmo-DE',
-                'scipy_de': 'Scipy-DE'
+                'scipy_de': 'Scipy-DE',
+                'evox_jade': 'EvoX-JADE',
+                'pygmo_pso_gen': 'Pygmo-PSO-Gen',
+                'evox_shade': 'EvoX-SHADE',
+                'evox_sade': 'EvoX-SaDE',
+                'evox_code': 'EvoX-CoDE',
+                'evox_ode': 'EvoX-ODE',
+                'ngopt': 'NGOpt'
             }
             optimizer_name = optimizer_name_map.get(config.optimizer, config.optimizer.upper())
 
@@ -524,7 +755,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
         if optimizer_comparison_mode:
             # Optimizer comparison mode: generate optimizer comparison plots (always, regardless of plot_mode)
             logging.info("Computing averaged convergence data across all instances for optimizer comparison...")
-            averaged_data = compute_averaged_convergence(all_instances_data, ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES', 'Pygmo-DE', 'Scipy-DE'], optimal_values)
+            averaged_data = compute_averaged_convergence(all_instances_data, ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES', 'Scipy-DE', 'EvoX-JADE', 'Pygmo-PSO-Gen', 'EvoX-SHADE', 'EvoX-SaDE', 'EvoX-CoDE', 'EvoX-ODE', 'NGOpt'], optimal_values)
 
             # Generate optimizer comparison plots
             plot_optimizer_comparison_iterations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size)
@@ -551,7 +782,14 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 'ipop_cmaes': 'IPOP-CMA-ES',
                 'bipop_cmaes': 'BIPOP-CMA-ES',
                 'pygmo_de': 'Pygmo-DE',
-                'scipy_de': 'Scipy-DE'
+                'scipy_de': 'Scipy-DE',
+                'evox_jade': 'EvoX-JADE',
+                'pygmo_pso_gen': 'Pygmo-PSO-Gen',
+                'evox_shade': 'EvoX-SHADE',
+                'evox_sade': 'EvoX-SaDE',
+                'evox_code': 'EvoX-CoDE',
+                'evox_ode': 'EvoX-ODE',
+                'ngopt': 'NGOpt'
             }
             optimizer_name = optimizer_name_map.get(config.optimizer, config.optimizer.upper())
 
@@ -566,7 +804,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
 
     if optimizer_comparison_mode:
         # Log results for each optimizer
-        for optimizer_name in ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES', 'Pygmo-DE', 'Scipy-DE']:
+        for optimizer_name in ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES', 'Scipy-DE', 'EvoX-JADE', 'Pygmo-PSO-Gen', 'EvoX-SHADE', 'EvoX-SaDE', 'EvoX-CoDE', 'EvoX-ODE', 'NGOpt']:
             results = all_results[optimizer_name]
             logging.info(f"\n{optimizer_name}:")
             logging.info(f"  Mean cost: {np.mean(results['cost_values']):.4f}")
@@ -583,6 +821,11 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
             logging.info(f"    ASK:  {mean_ask:.2f}s ({mean_ask/mean_runtime*100:.1f}%)")
             logging.info(f"    EVAL: {mean_eval:.2f}s ({mean_eval/mean_runtime*100:.1f}%)")
             logging.info(f"    TELL: {mean_tell:.2f}s ({mean_tell/mean_runtime*100:.1f}%)")
+
+        # Write results to CSV file
+        csv_output_file = os.path.join(config.output_path, "search", "optimizer_comparison_results.csv")
+        write_results_csv(all_results, csv_output_file, solutions is not None)
+        logging.info(f"\nResults saved to: {csv_output_file}")
     elif sigma_sweep_mode:
         # Log results for each sigma value
         for sigma_value in sweep_values:

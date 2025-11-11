@@ -41,10 +41,13 @@ def get_config(args=None):
 
     # Optimizer selection
     parser.add_argument('--optimizer', type=str, default='de',
-                        choices=['de', 'cmaes', 'ipop_cmaes', 'bipop_cmaes', 'pygmo_de', 'scipy_de'],
+                        choices=['de', 'cmaes', 'ipop_cmaes', 'bipop_cmaes', 'pygmo_de', 'scipy_de', 'evox_jade', 'pygmo_pso_gen', 'evox_shade', 'evox_sade', 'evox_code', 'evox_ode', 'ngopt'],
                         help='Optimizer to use: "de" (Differential Evolution), "cmaes" (CMA-ES), '
                              '"ipop_cmaes" (IPOP-CMA-ES), "bipop_cmaes" (BIPOP-CMA-ES), "pygmo_de" (Pygmo DE), '
-                             'or "scipy_de" (SciPy DE with adaptive dithering)')
+                             '"scipy_de" (SciPy DE with adaptive dithering), "evox_jade" (EvoX JADE), '
+                             '"pygmo_pso_gen" (Pygmo PSO Generational), "evox_shade" (EvoX SHADE), '
+                             '"evox_sade" (EvoX SaDE), "evox_code" (EvoX CoDE), "evox_ode" (EvoX ODE), '
+                             'or "ngopt" (Nevergrad NGOpt)')
 
     # Differential Evolution parameters
     parser.add_argument('--de_mutate', default=0.3, type=float,

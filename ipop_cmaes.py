@@ -69,6 +69,9 @@ def minimize(
 
     # --- RESTART LOOP ----------------+
     for restart_idx in range(restarts + 1):  # +1 for initial run
+        # Check time limit before starting a new restart
+        if maxtime is not None and time.time() - start_time > maxtime:
+            break
         restarts_completed = restart_idx
 
         # Initialize CMA-ES for this restart

@@ -1,0 +1,50 @@
+Traceback (most recent call last):
+  File "/home/superior/vini/ml_project/CVAE-Opt/search.py", line 66, in <module>
+    _, avg_runtime, costs = search_control.solve_instance_set(model, config, instances, solutions)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/search_control.py", line 555, in solve_instance_set
+    averaged_data = compute_averaged_convergence(all_instances_data, ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES', 'Scipy-DE', 'EvoX-JADE'], optimal_values)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/plotting.py", line 973, in compute_averaged_convergence
+    raise ValueError(
+ValueError: Optimal values required for gap-based plots. Provide instances with corresponding optimal solutions.
+/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
+  warnings.warn(
+/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
+  warnings.warn(
+/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
+  warnings.warn(
+/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
+  warnings.warn(
+/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
+  warnings.warn(
+/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
+  warnings.warn(
+/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
+  warnings.warn(
+/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
+  warnings.warn(
+/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
+  warnings.warn(
+/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
+  warnings.warn(
+/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
+  warnings.warn(
+/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
+  warnings.warn(
+/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
+  warnings.warn(
+/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
+  warnings.warn(
+/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
+  warnings.warn(
+/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
+  warnings.warn(
+/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
+  warnings.warn(
+/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
+  warnings.warn(
+/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
+  warnings.warn(
+/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
+  warnings.warn(
