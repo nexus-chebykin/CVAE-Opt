@@ -22,6 +22,8 @@ def minimize(
     maxtime,
     maxevaluations=None,
     use_lhs=True,
+    CMA_rankmu=1.0,
+    CMA_rankone=1.0,
     seed=None,
 ):
     """
@@ -38,6 +40,8 @@ def minimize(
         maxtime: Maximum wall-clock time in seconds
         maxevaluations: Maximum number of function evaluations (None = no limit)
         use_lhs: If True, initialize with Latin Hypercube Sampling using "prime the pump" approach
+        CMA_rankmu: Rank-mu update learning rate multiplier (default: 1.0)
+        CMA_rankone: Rank-one update learning rate multiplier (default: 1.0)
         seed: Random seed for reproducibility (used for LHS initialization)
 
     Returns:
@@ -73,6 +77,8 @@ def minimize(
         "verbose": -9,  # Suppress output
         "verb_disp": 0,  # No display
         "verb_log": 0,  # No logging
+        "CMA_rankmu": CMA_rankmu,  # Rank-mu update learning rate multiplier
+        "CMA_rankone": CMA_rankone  # Rank-one update learning rate multiplier
         # Disable internal stopping criteria to respect only time limit
         #'tolx': 1e100,  # Disable stopping based on small x-changes
         #'tolfun': 1e100,  # Disable stopping based on small function value changes

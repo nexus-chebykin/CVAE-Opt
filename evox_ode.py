@@ -54,7 +54,9 @@ class CVAEOptProblem(torch.nn.Module):
 
 
 def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
-             mutate, recombination, maxiter, maxtime, maxevaluations=None, seed=1234):
+             mutate, recombination, maxiter, maxtime, maxevaluations=None,
+             base_vector='rand', num_difference_vectors=1,
+             differential_weight=0.5, cross_probability=0.9, seed=1234):
     """
     Minimize objective function using EvoX ODE algorithm.
 
@@ -68,11 +70,15 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
         search_space_bound: Symmetric search space bounds [-bound, +bound]
         search_space_size: Dimensionality of the search space
         popsize: Population size
-        mutate: Mutation factor (ODE uses default F=0.5)
-        recombination: Crossover rate (ODE uses default CR=0.3)
+        mutate: Mutation factor (not used by ODE - use differential_weight instead)
+        recombination: Crossover rate (not used by ODE - use cross_probability instead)
         maxiter: Maximum number of iterations (None = no limit)
         maxtime: Maximum wall-clock time in seconds (None = no limit)
         maxevaluations: Maximum number of function evaluations (None = no limit)
+        base_vector: Mutation base vector strategy ('best' or 'rand', default: 'rand')
+        num_difference_vectors: Number of difference vectors (1 or 2, default: 1)
+        differential_weight: Mutation scaling factor F (default: 0.5)
+        cross_probability: Crossover probability CR (default: 0.9)
 
     Returns:
         best_fitness: Best objective value found
@@ -113,11 +119,27 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
     lb = torch.full((search_space_size,), -search_space_bound, device=device)
     ub = torch.full((search_space_size,), search_space_bound, device=device)
 
+    # EvoX ODE requires:
+    #   - float if num_difference_vectors == 1
+    #   - tensor of shape [num_difference_vectors] otherwise
+    if num_difference_vectors == 1:
+        # Keep as float
+        if isinstance(differential_weight, torch.Tensor):
+            differential_weight = differential_weight.item()
+    else:
+        # Convert to tensor of shape [num_difference_vectors]
+        if not isinstance(differential_weight, torch.Tensor):
+            differential_weight = torch.full((num_difference_vectors,), differential_weight, device=device)
+
     algorithm = ODE(
         pop_size=popsize,
         lb=lb,
         ub=ub,
-        device=device
+        device=device,
+        base_vector=base_vector,
+        num_difference_vectors=num_difference_vectors,
+        differential_weight=differential_weight,
+        cross_probability=cross_probability
     )
 
     # Create workflow

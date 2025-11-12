@@ -18,9 +18,11 @@ import time
 
 
 def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
-             mutate, recombination, maxiter, maxtime, maxevaluations=None, seed=None):
+             mutate, recombination, maxiter, maxtime, maxevaluations=None,
+             strategy='best1bin', mutation=(0.5, 1.0), recombination_scipy=0.9,
+             updating='deferred', seed=None):
     """
-    Minimize using SciPy's Differential Evolution with adaptive dithering.
+    Minimize using SciPy's Differential Evolution with tunable parameters.
 
     Args:
         cost_func: Objective function that takes (Z_batch, *args) and returns (tours, costs)
@@ -28,11 +30,15 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
         search_space_bound: Symmetric bounds for search space [-bound, +bound]
         search_space_size: Dimensionality of search space
         popsize: Absolute population size (will be converted to SciPy multiplier)
-        mutate: Mutation factor F (IGNORED - using adaptive dithering instead)
-        recombination: Crossover rate CR (IGNORED - using adaptive dithering instead)
+        mutate: Mutation factor F (IGNORED - use mutation parameter instead)
+        recombination: Crossover rate CR (IGNORED - use recombination_scipy parameter instead)
         maxiter: Maximum number of iterations (None = no limit)
         maxtime: Maximum wall-clock time in seconds (None = no limit)
         maxevaluations: Maximum number of function evaluations (None = no limit)
+        strategy: DE mutation strategy (e.g., 'best1bin', 'rand1bin', default: 'best1bin')
+        mutation: Mutation factor (float) or dithering range (tuple), default: (0.5, 1.0)
+        recombination_scipy: Crossover probability (default: 0.9)
+        updating: Population update strategy ('deferred' or 'immediate', default: 'deferred')
 
     Returns:
         best_cost: Best objective value found
@@ -162,9 +168,9 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
         result = differential_evolution(
             func=vectorized_objective,
             bounds=bounds,
-            strategy='best1bin',
-            mutation=(0.5, 1.0),  # Adaptive dithering for mutation factor F
-            recombination=0.9,  # Fixed high crossover rate (tuple form not supported)
+            strategy=strategy,  # Tunable mutation strategy
+            mutation=mutation,  # Tunable mutation factor (float or tuple for dithering)
+            recombination=recombination_scipy,  # Tunable crossover rate
             vectorized=True,
             popsize=scipy_popsize,
             maxiter=maxiter if maxiter is not None else 1000,  # SciPy requires a value
@@ -173,7 +179,8 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
             polish=False,  # Disable final polish step (not useful for discrete problems)
             atol=0,  # Disable absolute tolerance stopping
             tol=0.0,  # Disable relative tolerance stopping
-            updating='deferred',  # Classic DE (evaluate all candidates before updating)
+            updating=updating,  # Tunable update strategy ('deferred' or 'immediate')
+            init='latinhypercube',  # FIXED: Use Latin Hypercube Sampling for initialization
             seed=seed  # Use provided seed (passed from config.seed)
         )
     except StopIteration:

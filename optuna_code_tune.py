@@ -1,15 +1,15 @@
 # ------------------------------------------------------------------------------+
-# Optuna-based Hyperparameter Tuning for EvoX JADE Optimizer
+# Optuna-based Hyperparameter Tuning for EvoX CoDE Optimizer
 #
-# This script performs automated hyperparameter search for the JADE algorithm
+# This script performs automated hyperparameter search for the CoDE algorithm
 # using the Optuna optimization framework.
 #
 # Usage:
-#   uv run python optuna_jade_tune.py \
+#   uv run python optuna_code_tune.py \
 #     --model_path models/tsp_100_model.pt \
 #     --instances_path instances/tsp/test/tsp100_10inst_w_optimal.pkl \
-#     --n_trials 100 \
-#     --tune_n_instances 5
+#     --n_trials 50 \
+#     --tune_n_instances 3
 # ------------------------------------------------------------------------------+
 
 import argparse
@@ -39,33 +39,22 @@ from VAE_8 import VAE_8
 
 
 def setup_logging(output_dir: str) -> Tuple[str, logging.Logger]:
-    """
-    Setup logging for the tuning process.
-
-    Args:
-        output_dir: Directory to save log files
-
-    Returns:
-        Tuple of (log_filename, logger)
-    """
+    """Setup logging for the tuning process."""
     now = datetime.datetime.now()
     timestamp = f"{now.year:04d}{now.month:02d}{now.day:02d}_{now.hour:02d}{now.minute:02d}{now.second:02d}"
     log_filename = f"optuna_tuning_{timestamp}.log"
     log_path = os.path.join(output_dir, log_filename)
 
-    # Create logger
-    logger = logging.getLogger('optuna_jade_tuning')
+    logger = logging.getLogger('optuna_code_tuning')
     logger.setLevel(logging.INFO)
     logger.handlers.clear()
 
-    # File handler (for log file)
     file_handler = logging.FileHandler(log_path, mode='w')
     file_handler.setLevel(logging.INFO)
     file_formatter = logging.Formatter('[%(asctime)s][%(levelname)s] %(message)s', datefmt='%H:%M:%S')
     file_handler.setFormatter(file_formatter)
     logger.addHandler(file_handler)
 
-    # Console handler (for terminal output)
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(logging.INFO)
     console_formatter = logging.Formatter('[%(levelname)s] %(message)s')
@@ -75,19 +64,8 @@ def setup_logging(output_dir: str) -> Tuple[str, logging.Logger]:
     return log_filename, logger
 
 
-def create_config_for_trial(base_config, jade_c: float, jade_num_diff_vectors: int):
-    """
-    Create a configuration object for a trial with specific JADE parameters.
-
-    Args:
-        base_config: Base configuration with model path, device, etc.
-        jade_c: JADE learning rate parameter
-        jade_num_diff_vectors: Number of difference vectors
-
-    Returns:
-        Config object with JADE parameters set
-    """
-    # Create a simple config object (namespace)
+def create_config_for_trial(base_config, diff_padding_num: int, replace: bool):
+    """Create a configuration object for a trial with specific CoDE parameters."""
     class Config:
         pass
 
@@ -100,48 +78,33 @@ def create_config_for_trial(base_config, jade_c: float, jade_num_diff_vectors: i
     config.search_iterations = base_config.search_iterations
     config.search_timelimit = base_config.search_timelimit
     config.search_evaluations = base_config.search_evaluations
-    config.optimizer = 'evox_jade'
+    config.seed = base_config.seed
+    config.optimizer = 'evox_code'
     config.problem = base_config.problem
     config.problem_size = base_config.problem_size
 
-    # Set JADE-specific parameters (these are what we're tuning)
-    config.jade_c = jade_c
-    config.jade_num_diff_vectors = jade_num_diff_vectors
-    config.jade_mean = None  # Keep uniform initialization
-    config.jade_stdev = None  # Keep uniform initialization
-
-    # Other optimizer parameters (not used by JADE but required by interface)
-    config.de_mutate = 0.3
-    config.de_recombine = 0.95
+    # Set CoDE-specific parameters (these are what we're tuning)
+    config.code_diff_padding_num = diff_padding_num
+    config.code_replace = replace
 
     return config
 
 
 def objective(trial: optuna.Trial, args) -> float:
-    """
-    Optuna objective function to minimize.
-
-    Args:
-        trial: Optuna trial object
-        args: Tuple containing (model, base_config, instances, solutions, cost_fn,
-                                batch_size, tune_n_instances, logger)
-
-    Returns:
-        Mean optimality gap (%) across tuning instances
-    """
+    """Optuna objective function to minimize."""
     model, base_config, instances, solutions, cost_fn, batch_size, tune_n_instances, logger = args
 
     # Suggest hyperparameters
-    jade_c = trial.suggest_float('jade_c', 0.01, 0.5, log=True)
-    jade_num_diff_vectors = trial.suggest_categorical('jade_num_diff_vectors', [1, 2])
+    diff_padding_num = trial.suggest_int('diff_padding_num', 3, 10)
+    replace = trial.suggest_categorical('replace', [True, False])
 
     # Log trial start
     logger.info(f"=" * 80)
     logger.info(f"Trial {trial.number + 1} started")
-    logger.info(f"  Parameters: jade_c={jade_c:.6f}, jade_num_diff_vectors={jade_num_diff_vectors}")
+    logger.info(f"  Parameters: diff_padding_num={diff_padding_num}, replace={replace}")
 
     # Create config for this trial
-    config = create_config_for_trial(base_config, jade_c, jade_num_diff_vectors)
+    config = create_config_for_trial(base_config, diff_padding_num, replace)
 
     # Determine which instances to use for tuning
     if tune_n_instances is not None and tune_n_instances < len(instances):
@@ -178,7 +141,6 @@ def objective(trial: optuna.Trial, args) -> float:
             logger.info(f"  Instance {i}: gap={gap:.2f}%, cost={objective_value:.4f}, "
                        f"optimal={optimal_value:.4f}, time={instance_time:.1f}s")
         else:
-            # If no optimal solution, use raw cost (to be minimized)
             gaps.append(objective_value)
             instance_time = time.time() - instance_start
             logger.info(f"  Instance {i}: cost={objective_value:.4f}, time={instance_time:.1f}s")
@@ -199,52 +161,52 @@ def objective(trial: optuna.Trial, args) -> float:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Optuna-based hyperparameter tuning for EvoX JADE optimizer"
+        description="Optuna-based hyperparameter tuning for EvoX CoDE optimizer"
     )
 
     # Required parameters
     parser.add_argument('--model_path', type=str, required=True,
                        help='Path to trained model checkpoint')
     parser.add_argument('--instances_path', type=str, required=True,
-                       help='Path to instances pickle file (with optimal solutions if available)')
+                       help='Path to instances pickle file')
 
     # Tuning parameters
-    parser.add_argument('--n_trials', type=int, default=100,
-                       help='Number of Optuna trials to run (default: 100)')
-    parser.add_argument('--tune_n_instances', type=int, default=None,
-                       help='Number of instances to use for tuning (default: None, uses all)')
+    parser.add_argument('--n_trials', type=int, default=50,
+                       help='Number of Optuna trials (default: 50)')
+    parser.add_argument('--tune_n_instances', type=int, default=3,
+                       help='Number of instances for tuning (default: 3)')
     parser.add_argument('--batch_size', type=int, default=600,
-                       help='Population size for JADE (default: 600)')
+                       help='Population size (default: 600)')
 
     # Optuna study parameters
-    parser.add_argument('--study_name', type=str, default='jade_tuning',
-                       help='Name for Optuna study (default: jade_tuning)')
-    parser.add_argument('--storage', type=str, default='sqlite:///optuna_jade.db',
-                       help='Optuna storage backend (default: sqlite:///optuna_jade.db)')
+    parser.add_argument('--study_name', type=str, default='code_tuning',
+                       help='Optuna study name (default: code_tuning)')
+    parser.add_argument('--storage', type=str, default='sqlite:///optuna_code.db',
+                       help='Optuna storage (default: sqlite:///optuna_code.db)')
     parser.add_argument('--load_if_exists', action='store_true',
-                       help='Load existing study if it exists (default: False, creates new study)')
+                       help='Load existing study if exists')
 
     # Search parameters
     parser.add_argument('--search_iterations', type=int, default=300,
-                       help='Maximum iterations per instance (default: 300)')
-    parser.add_argument('--search_timelimit', type=int, default=None,
-                       help='Time limit in seconds per instance (default: None)')
+                       help='Max iterations per instance (default: 300)')
+    parser.add_argument('--search_timelimit', type=int, default=75,
+                       help='Time limit per instance in seconds (default: 75)')
     parser.add_argument('--search_evaluations', type=int, default=None,
-                       help='Maximum evaluations per instance (default: None)')
+                       help='Max evaluations per instance (default: None)')
     parser.add_argument('--search_space_size', type=int, default=100,
-                       help='Dimensionality of search space (default: 100)')
+                       help='Search space dimensionality (default: 100)')
 
     # Other parameters
     parser.add_argument('--device', type=str, default='cuda',
-                       help='Device to use (cuda or cpu, default: cuda)')
+                       help='Device (cuda or cpu, default: cuda)')
     parser.add_argument('--problem', type=str, default=None,
-                       help='Problem type (TSP or CVRP, default: auto-detect from model)')
+                       help='Problem type (TSP or CVRP, default: auto-detect)')
     parser.add_argument('--problem_size', type=int, default=None,
-                       help='Problem size (default: auto-detect from model)')
+                       help='Problem size (default: auto-detect)')
     parser.add_argument('--output_path', type=str, default='',
                        help='Output directory (default: current directory)')
     parser.add_argument('--seed', type=int, default=1234,
-                       help='Random seed for reproducibility (default: 1234)')
+                       help='Random seed (default: 1234)')
 
     args = parser.parse_args()
 
@@ -263,7 +225,7 @@ def main():
     # Setup logging
     log_filename, logger = setup_logging(output_dir)
     logger.info("=" * 80)
-    logger.info("OPTUNA HYPERPARAMETER TUNING FOR EVOX JADE")
+    logger.info("OPTUNA HYPERPARAMETER TUNING FOR EVOX CODE")
     logger.info("=" * 80)
     logger.info(f"Log file: {os.path.join(output_dir, log_filename)}")
     logger.info(f"Output directory: {output_dir}")
@@ -294,12 +256,12 @@ def main():
     base_config.search_evaluations = args.search_evaluations
     base_config.problem = args.problem if args.problem else model_data['problem']
     base_config.problem_size = args.problem_size if args.problem_size else model_data['problem_size']
-    base_config.instances_path = args.instances_path  # Add instances_path for read_instance_pkl
+    base_config.instances_path = args.instances_path
+    base_config.seed = args.seed
 
     logger.info(f"Problem: {base_config.problem}{base_config.problem_size}")
     logger.info(f"Search space bound: {base_config.search_space_bound}")
     logger.info(f"Search space size: {base_config.search_space_size}")
-    logger.info(f"Search iterations: {base_config.search_iterations}")
 
     # Load model
     model = VAE_8(base_config).to(device)
@@ -312,18 +274,16 @@ def main():
     instances, solutions = read_instance_pkl(base_config)
 
     if instances is None or len(instances) == 0:
-        # Try reading with custom config
         class InstanceConfig:
             instances_path = args.instances_path
             problem = base_config.problem
-
         instances, solutions = read_instance_pkl(InstanceConfig())
 
     logger.info(f"Loaded {len(instances)} instances")
     if solutions:
         logger.info(f"Optimal solutions available: Yes")
     else:
-        logger.info(f"Optimal solutions available: No (will minimize raw cost)")
+        logger.info(f"Optimal solutions available: No")
 
     # Setup cost function
     if base_config.problem == "TSP":
@@ -339,14 +299,14 @@ def main():
     logger.info("")
     logger.info("TUNING CONFIGURATION:")
     logger.info(f"  Number of trials: {args.n_trials}")
-    logger.info(f"  Instances for tuning: {args.tune_n_instances if args.tune_n_instances else 'all (' + str(len(instances)) + ')'}")
+    logger.info(f"  Instances for tuning: {args.tune_n_instances}")
     logger.info(f"  Population size: {args.batch_size}")
     logger.info(f"  Study name: {args.study_name}")
     logger.info(f"  Storage: {args.storage}")
     logger.info("")
     logger.info("HYPERPARAMETER SEARCH SPACE:")
-    logger.info(f"  jade_c: LogUniform[0.01, 0.5]")
-    logger.info(f"  jade_num_diff_vectors: Categorical[1, 2]")
+    logger.info(f"  diff_padding_num: UniformInt[3, 10]")
+    logger.info(f"  replace: Categorical[True, False]")
     logger.info("")
     logger.info("=" * 80)
     logger.info("")
@@ -376,7 +336,7 @@ def main():
         study.optimize(
             lambda trial: objective(trial, objective_args),
             n_trials=args.n_trials,
-            show_progress_bar=False  # We have custom logging
+            show_progress_bar=False
         )
     except KeyboardInterrupt:
         logger.info("Optimization interrupted by user")
@@ -392,13 +352,13 @@ def main():
     logger.info(f"Trials completed: {len(study.trials)}")
     logger.info("")
     logger.info("BEST PARAMETERS:")
-    logger.info(f"  jade_c: {study.best_params['jade_c']:.6f}")
-    logger.info(f"  jade_num_diff_vectors: {study.best_params['jade_num_diff_vectors']}")
+    logger.info(f"  diff_padding_num: {study.best_params['diff_padding_num']}")
+    logger.info(f"  replace: {study.best_params['replace']}")
     logger.info(f"  Best mean gap: {study.best_value:.4f}%")
     logger.info("")
 
     # Save best parameters to JSON
-    best_params_file = os.path.join(output_dir, 'best_jade_params.json')
+    best_params_file = os.path.join(output_dir, 'best_code_params.json')
     best_params_data = {
         'best_params': study.best_params,
         'best_value': study.best_value,
@@ -407,7 +367,7 @@ def main():
         'timestamp': datetime.datetime.now().isoformat(),
         'instances_path': args.instances_path,
         'model_path': args.model_path,
-        'tune_n_instances': args.tune_n_instances if args.tune_n_instances else len(instances),
+        'tune_n_instances': args.tune_n_instances,
         'batch_size': args.batch_size
     }
 
@@ -417,43 +377,27 @@ def main():
     logger.info(f"Best parameters saved to: {best_params_file}")
     logger.info("")
 
-    # Generate Optuna visualizations
+    # Generate visualizations
     logger.info("Generating optimization visualizations...")
 
     try:
-        # Optimization history
         fig1 = plot_optimization_history(study)
         fig1.write_image(os.path.join(output_dir, 'optimization_history.png'))
         logger.info("  - Optimization history plot saved")
 
-        # Parameter importances (only if enough trials)
         if len(study.trials) >= 10:
             fig2 = plot_param_importances(study)
             fig2.write_image(os.path.join(output_dir, 'param_importances.png'))
             logger.info("  - Parameter importances plot saved")
 
-        # Parallel coordinate plot
         fig3 = plot_parallel_coordinate(study)
         fig3.write_image(os.path.join(output_dir, 'parallel_coordinate.png'))
         logger.info("  - Parallel coordinate plot saved")
 
     except Exception as e:
         logger.warning(f"Could not generate some visualizations: {e}")
-        logger.warning("Install kaleido for static image export: uv add kaleido")
+        logger.warning("Install kaleido: uv add kaleido")
 
-    logger.info("")
-    logger.info("=" * 80)
-    logger.info("NEXT STEPS:")
-    logger.info("")
-    logger.info("To use the optimized parameters, run:")
-    logger.info(f"  uv run python search.py \\")
-    logger.info(f"    --optimizer evox_jade \\")
-    logger.info(f"    --jade_c {study.best_params['jade_c']:.6f} \\")
-    logger.info(f"    --jade_num_diff_vectors {study.best_params['jade_num_diff_vectors']} \\")
-    logger.info(f"    --model_path {args.model_path} \\")
-    logger.info(f"    --instances_path {args.instances_path} \\")
-    logger.info(f"    --batch_sizes {args.batch_size} \\")
-    logger.info(f"    --save_plots")
     logger.info("")
     logger.info("=" * 80)
 

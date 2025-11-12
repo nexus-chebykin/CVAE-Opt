@@ -742,61 +742,71 @@ TUNABLE HYPERPARAMETERS:
 
    Impact: CRITICAL - Most important CMA-ES parameter
    Typical behavior:
-     - Too small (< 0.2): Slow convergence, may miss global optimum
-     - Optimal (0.2-0.5): Fast convergence to quality solutions
-     - Too large (> 0.8): Unstable, excessive exploration
+     - Too small (< 0.15): Very slow convergence, may miss global optimum
+     - Small (0.15-0.3): Conservative, good for fine-tuning
+     - Optimal (0.3-0.6): Fast convergence to quality solutions
+     - Large (0.6-1.0): High exploration, good for multimodal landscapes
+     - Too large (> 1.0): Risk of instability and excessive exploration
 
    NOTE: CMA-ES adapts sigma during evolution, but initial value affects
          early search behavior and convergence speed.
 
-2. use_lhs - Use Latin Hypercube Sampling for Initialization
-   Type: bool
-   Default: True
-   Description: Whether to initialize population using Latin Hypercube Sampling
-                (LHS) instead of uniform random sampling.
+2. CMA_rankmu - Rank-mu Update Learning Rate Multiplier
+   Type: float
+   Default: 1.0
+   Description: Multiplier for the learning rate of the rank-mu covariance
+                matrix update. The rank-mu update uses information from all
+                selected individuals (mu best solutions) to update the
+                covariance matrix.
 
-                - True: LHS "primes the pump" with well-distributed initial
-                        population, giving CMA-ES better starting distribution
-                - False: Standard uniform random initialization at origin
+                - > 1.0: Faster covariance adaptation from population
+                - = 1.0: Standard CMA-ES learning rate (default)
+                - < 1.0: Slower, more conservative covariance adaptation
 
-   Impact: MEDIUM - Affects initial search quality
+   Impact: MEDIUM - Affects covariance matrix adaptation speed
+   Typical range: [0.5, 2.0]
 
-   LHS advantages:
-     - Better space coverage in initial population
-     - Faster initial convergence
-     - More robust to initialization
+3. CMA_rankone - Rank-one Update Learning Rate Multiplier
+   Type: float
+   Default: 1.0
+   Description: Multiplier for the learning rate of the rank-one covariance
+                matrix update. The rank-one update uses the evolution path
+                (cumulative step direction) to update the covariance matrix.
 
-   When to use False:
-     - If you prefer pure CMA-ES behavior (no preprocessing)
-     - For benchmarking against standard CMA-ES
+                - > 1.0: Stronger influence of evolution path
+                - = 1.0: Standard CMA-ES learning rate (default)
+                - < 1.0: Weaker influence of evolution path
 
-ADDITIONAL PARAMETERS (Currently Not Exposed):
------------------------------------------------
+   Impact: MEDIUM - Affects evolution path influence on covariance
+   Typical range: [0.5, 2.0]
 
-The pycma library supports many advanced options. If initial tuning shows
-promise, consider exposing these in a second tuning phase:
-
-- popsize_factor: Multiplier for population size (default: 1.0)
-- CSA_dampfac: Damping for step-size adaptation (default: 1.0)
-- CMA_rankmu: Learning rate for rank-mu covariance update (default: 1.0)
-- CMA_rankone: Learning rate for rank-one covariance update (default: 1.0)
-
-For now, we keep it simple with sigma0 and use_lhs only.
+NOTE ON INITIALIZATION:
+-----------------------
+Latin Hypercube Sampling (LHS) will be used by default for initialization
+(use_lhs=True). This provides better initial space coverage and faster
+convergence compared to uniform random initialization.
 
 RECOMMENDED SEARCH SPACES:
 --------------------------
 
 sigma0:
-  - Range: [0.2, 0.8]
+  - Range: [0.15, 1.0]
   - Distribution: Uniform
-  - Justification: Literature recommends 0.2-0.5 of search range. We explore
-                   up to 0.8 to test if larger initial exploration helps with
-                   multimodal TSP/CVRP latent spaces.
+  - Justification: Extended range to explore both conservative (0.15-0.3) and
+                   aggressive (0.6-1.0) initial step sizes. Multimodal TSP/CVRP
+                   latent spaces may benefit from larger sigma0 values.
 
-use_lhs:
-  - Options: [True, False]
-  - Justification: Test whether LHS initialization improves performance.
-                   Expect True to be better, but worth confirming.
+CMA_rankmu:
+  - Range: [0.5, 2.0]
+  - Distribution: Uniform
+  - Justification: Standard range from CMA-ES literature. Values outside this
+                   range rarely improve performance and may cause instability.
+
+CMA_rankone:
+  - Range: [0.5, 2.0]
+  - Distribution: Uniform
+  - Justification: Standard range from CMA-ES literature. Balances evolution
+                   path influence with population-based adaptation.
 
 OPTUNA CODE EXAMPLE:
 --------------------
@@ -804,24 +814,73 @@ OPTUNA CODE EXAMPLE:
 def suggest_hyperparameters_cmaes(trial):
     """Suggest hyperparameters for Standard CMA-ES."""
     return {
-        'sigma0': trial.suggest_float('sigma0', 0.2, 0.8),
-        'use_lhs': trial.suggest_categorical('use_lhs', [True, False])
+        'sigma0': trial.suggest_float('sigma0', 0.15, 1.0),
+        'CMA_rankmu': trial.suggest_float('CMA_rankmu', 0.5, 2.0),
+        'CMA_rankone': trial.suggest_float('CMA_rankone', 0.5, 2.0)
     }
 
 IMPLEMENTATION NOTES:
 ---------------------
-- READY TO TUNE: cmaes.py already accepts both parameters
-- No code modifications needed
-- Simply pass suggested values to minimize() function
-- Current defaults: sigma0=0.5, use_lhs=True
+- NEEDS MODIFICATION: cmaes.py needs to expose CMA_rankmu and CMA_rankone
+- Current implementation accepts sigma0 and use_lhs
+- Required changes:
+  1. Add CMA_rankmu and CMA_rankone to minimize() function signature
+  2. Pass these parameters to CMA-ES options dict:
+
+     opts = {
+         'popsize': popsize,
+         'bounds': [-search_space_bound, search_space_bound],
+         'maxiter': cmaes_maxiter,
+         'verbose': -9,
+         'verb_disp': 0,
+         'verb_log': 0,
+         'CMA_rankmu': CMA_rankmu,    # NEW
+         'CMA_rankone': CMA_rankone   # NEW
+     }
+
+  3. Update search_control.py to read new config parameters
+  4. Set use_lhs=True by default (not tunable)
+
+- Current defaults: sigma0=0.5, CMA_rankmu=1.0, CMA_rankone=1.0, use_lhs=True
 
 EXPECTED CODE CHANGES:
 ----------------------
-None required - implementation already supports these parameters.
+
+In cmaes.py, update minimize() signature (around line 14):
+
+def minimize(
+    cost_func,
+    args,
+    search_space_bound,
+    search_space_size,
+    popsize,
+    sigma0,
+    maxiter,
+    maxtime,
+    maxevaluations=None,
+    use_lhs=True,           # Fixed at True
+    CMA_rankmu=1.0,         # NEW tunable parameter
+    CMA_rankone=1.0,        # NEW tunable parameter
+    seed=None,
+):
+
+Then add to opts dict (around line 69):
+
+opts = {
+    "popsize": popsize,
+    "bounds": [-search_space_bound, search_space_bound],
+    "maxiter": cmaes_maxiter,
+    "verbose": -9,
+    "verb_disp": 0,
+    "verb_log": 0,
+    "CMA_rankmu": CMA_rankmu,      # NEW
+    "CMA_rankone": CMA_rankone     # NEW
+}
 
 In search_control.py, ensure config has:
   config.cmaes_sigma0 = <value>
-  config.cmaes_use_lhs = <value>
+  config.cmaes_rankmu = <value>
+  config.cmaes_rankone = <value>
 
 ADVANTAGES OF CMA-ES:
 ---------------------
@@ -885,80 +944,70 @@ TUNABLE HYPERPARAMETERS:
                 CMA-ES. Each restart begins with this sigma0 value.
    Impact: CRITICAL - Affects all restarts
 
-2. restarts - Number of Restarts
-   Type: int
-   Default: 5
-   Description: Number of times to restart CMA-ES with increased population.
-                Total runs = restarts + 1 (initial run + restart runs).
-
-                With restarts=5 and incpopsize=2.0:
-                  - Run 0: popsize = 600
-                  - Run 1: popsize = 1200
-                  - Run 2: popsize = 2400
-                  - Run 3: popsize = 4800
-                  - Run 4: popsize = 9600
-                  - Run 5: popsize = 19200
-
-   Impact: HIGH - More restarts = more exploration but higher cost
-
-   Typical behavior:
-     - Low (3-4): Faster, less thorough exploration
-     - Medium (5-6): Balanced (default)
-     - High (7-10): Very thorough, expensive
-
-3. incpopsize - Population Size Multiplier
+2. CMA_rankmu - Rank-mu Update Learning Rate Multiplier
    Type: float
-   Default: 2.0
-   Description: Factor by which population size increases with each restart.
-                Standard IPOP-CMA-ES uses 2.0 (population doubling).
+   Default: 1.0
+   Description: Multiplier for the learning rate of the rank-mu covariance
+                matrix update. Same role as in standard CMA-ES, applied to
+                all restarts.
+   Impact: MEDIUM - Affects covariance matrix adaptation across restarts
 
-                Smaller values (1.5) = more gradual increase, more restarts
-                Larger values (2.5+) = aggressive increase, fewer restarts
+3. CMA_rankone - Rank-one Update Learning Rate Multiplier
+   Type: float
+   Default: 1.0
+   Description: Multiplier for the learning rate of the rank-one covariance
+                matrix update. Same role as in standard CMA-ES, applied to
+                all restarts.
+   Impact: MEDIUM - Affects evolution path influence across restarts
 
-   Impact: HIGH - Controls restart aggressiveness
+FIXED PARAMETERS (Not Tunable):
+--------------------------------
 
-   Typical values:
-     - Conservative (1.5): Gradual scaling, many small restarts
-     - Standard (2.0): Population doubling (recommended)
-     - Aggressive (2.5): Faster scaling, fewer large restarts
+restarts: FIXED at 5
+  - Empirical observation: Optimizer rarely completes more than 3 restarts
+    within 75s time limit due to population growth
+  - With restarts=5 and incpopsize=2.0:
+      * Run 0: popsize = 600
+      * Run 1: popsize = 1200
+      * Run 2: popsize = 2400
+      * Run 3: popsize = 4800 (rarely reached)
+      * Run 4-5: Rarely executed within time budget
+  - Fixed at 5 to allow algorithm to complete as many restarts as possible
 
-4. use_lhs - Use Latin Hypercube Sampling for First Run
-   Type: bool
-   Default: True
-   Description: Whether to use LHS initialization for the FIRST run only.
-                Subsequent restarts use standard random initialization.
+incpopsize: FIXED at 2.0
+  - Population doubling is the standard IPOP-CMA-ES strategy
+  - Well-studied and theoretically justified in literature
+  - Deviating from 2.0 rarely provides consistent improvements
+  - Fixed at default value from Auger & Hansen (2005)
 
-                Rationale: LHS helps first run converge faster. Restarts
-                explore different regions, so random init is appropriate.
+use_lhs: FIXED at True
+  - Latin Hypercube Sampling provides better initial coverage
+  - Always beneficial for first run initialization
+  - Fixed at True (not tunable)
 
-   Impact: MEDIUM - Affects initial search quality only
+NOTE ON INITIALIZATION:
+-----------------------
+LHS is used for the first run only. Subsequent restarts use standard random
+initialization to explore different regions of the search space.
 
 RECOMMENDED SEARCH SPACES:
 --------------------------
 
 sigma0:
-  - Range: [0.2, 0.8]
+  - Range: [0.15, 1.0]
   - Distribution: Uniform
-  - Justification: Same as standard CMA-ES
+  - Justification: Extended range same as standard CMA-ES. Critical for
+                   determining restart exploration behavior.
 
-restarts:
-  - Range: [3, 8]
-  - Distribution: Uniform integer
-  - Justification: With 75s limit, fewer than 3 restarts may not benefit from
-                   IPOP strategy. More than 8 may not complete within time.
-                   Consider computational budget:
-                   - More restarts = more exploration
-                   - But each restart after ~3-4 has huge population
-
-incpopsize:
-  - Range: [1.5, 2.5]
+CMA_rankmu:
+  - Range: [0.5, 2.0]
   - Distribution: Uniform
-  - Justification: Literature recommends 2.0. We explore ±25% to test if
-                   more gradual (1.5) or aggressive (2.5) scaling works better.
+  - Justification: Standard CMA-ES range, affects all restarts
 
-use_lhs:
-  - Options: [True, False]
-  - Justification: Test both; expect True to be better
+CMA_rankone:
+  - Range: [0.5, 2.0]
+  - Distribution: Uniform
+  - Justification: Standard CMA-ES range, affects all restarts
 
 OPTUNA CODE EXAMPLE:
 --------------------
@@ -966,35 +1015,71 @@ OPTUNA CODE EXAMPLE:
 def suggest_hyperparameters_ipop_cmaes(trial):
     """Suggest hyperparameters for IPOP-CMA-ES."""
     return {
-        'sigma0': trial.suggest_float('sigma0', 0.2, 0.8),
-        'restarts': trial.suggest_int('restarts', 3, 8),
-        'incpopsize': trial.suggest_float('incpopsize', 1.5, 2.5),
-        'use_lhs': trial.suggest_categorical('use_lhs', [True, False])
+        'sigma0': trial.suggest_float('sigma0', 0.15, 1.0),
+        'CMA_rankmu': trial.suggest_float('CMA_rankmu', 0.5, 2.0),
+        'CMA_rankone': trial.suggest_float('CMA_rankone', 0.5, 2.0)
     }
 
 IMPLEMENTATION NOTES:
 ---------------------
-- READY TO TUNE: ipop_cmaes.py already accepts all parameters
-- No code modifications needed
-- Simply pass suggested values to minimize() function
-- Current defaults: sigma0=0.5, restarts=5, incpopsize=2.0, use_lhs=True
+- NEEDS MODIFICATION: ipop_cmaes.py needs to expose CMA_rankmu and CMA_rankone
+- Required changes:
+  1. Add CMA_rankmu and CMA_rankone to minimize() function signature
+  2. Pass these parameters to CMA-ES options dict (same as standard CMA-ES)
+  3. Update search_control.py to read new config parameters
+  4. Set restarts=5, incpopsize=2.0, use_lhs=True by default (not tunable)
+
+- Current defaults: sigma0=0.5, restarts=5, incpopsize=2.0, use_lhs=True,
+                    CMA_rankmu=1.0, CMA_rankone=1.0
 
 EXPECTED CODE CHANGES:
 ----------------------
-None required - implementation already supports these parameters.
+
+In ipop_cmaes.py, update minimize() signature (around line 14):
+
+def minimize(
+    cost_func,
+    args,
+    search_space_bound,
+    search_space_size,
+    popsize=None,
+    sigma0=0.5,
+    maxiter=None,
+    maxtime=None,
+    maxevaluations=None,
+    restarts=5,            # Fixed at 5 (not tunable)
+    incpopsize=2.0,        # Fixed at 2.0 (not tunable)
+    use_lhs=True,          # Fixed at True (not tunable)
+    CMA_rankmu=1.0,        # NEW tunable parameter
+    CMA_rankone=1.0,       # NEW tunable parameter
+    seed=None,
+):
+
+Then add to opts dict (around line 88):
+
+opts = {
+    "bounds": [-search_space_bound, search_space_bound],
+    "maxiter": cmaes_maxiter,
+    "verbose": -9,
+    "verb_disp": 0,
+    "verb_log": 0,
+    "tolx": 1e-4,
+    "tolfun": 1e-4,
+    "CMA_rankmu": CMA_rankmu,      # NEW
+    "CMA_rankone": CMA_rankone     # NEW
+}
 
 In search_control.py, ensure config has:
   config.ipop_sigma0 = <value>
-  config.ipop_restarts = <value>
-  config.ipop_incpopsize = <value>
-  config.ipop_use_lhs = <value>
+  config.ipop_rankmu = <value>
+  config.ipop_rankone = <value>
 
 PARAMETER INTERACTION:
 ----------------------
-- High restarts + Low incpopsize: Many gradual restarts
-- Low restarts + High incpopsize: Few aggressive restarts
-- High sigma0 + Many restarts: Maximum exploration (expensive)
-- Low sigma0 + Few restarts: Fast exploitation
+- sigma0 affects all restarts uniformly
+- CMA_rankmu and CMA_rankone control adaptation speed across restarts
+- Higher sigma0 with faster adaptation (rankmu, rankone > 1.0): Aggressive exploration
+- Lower sigma0 with slower adaptation (rankmu, rankone < 1.0): Conservative refinement
 
 ADVANTAGES OF IPOP:
 -------------------
@@ -1062,61 +1147,68 @@ TUNABLE HYPERPARAMETERS:
                 for exploration.
    Impact: CRITICAL - Baseline for all restarts
 
-2. restarts - Total Number of Restarts
-   Type: int
-   Default: 5
-   Description: Total number of restarts (alternating between small and large).
-                The algorithm automatically decides when to do small vs large
-                restarts based on budget management.
-
-                Typical sequence (simplified):
-                  - Run 0: Initial (large, popsize=600)
-                  - Run 1: Small (popsize~400, varied sigma)
-                  - Run 2: Small (popsize~500, varied sigma)
-                  - Run 3: Large (popsize=1200, standard sigma)
-                  - Run 4: Small (popsize~300, varied sigma)
-                  - etc.
-
-   Impact: HIGH - More restarts = more exploration of small/large balance
-
-3. incpopsize - Population Size Multiplier for Large Restarts
+2. CMA_rankmu - Rank-mu Update Learning Rate Multiplier
    Type: float
-   Default: 2.0
-   Description: Factor by which large population increases (IPOP-style).
-                Small populations are sized randomly (~0.5-1.0 × initial popsize)
-                and NOT affected by this parameter.
-   Impact: HIGH - Controls large restart aggressiveness
+   Default: 1.0
+   Description: Multiplier for the learning rate of the rank-mu covariance
+                matrix update. Applied to all restarts (both small and large).
+   Impact: MEDIUM - Affects covariance matrix adaptation across all restarts
 
-4. use_lhs - Use Latin Hypercube Sampling for First Run
-   Type: bool
-   Default: True
-   Description: Whether to use LHS initialization for the FIRST run only.
-                Subsequent restarts (both small and large) use random init.
-   Impact: MEDIUM - Affects initial search quality
+3. CMA_rankone - Rank-one Update Learning Rate Multiplier
+   Type: float
+   Default: 1.0
+   Description: Multiplier for the learning rate of the rank-one covariance
+                matrix update. Applied to all restarts (both small and large).
+   Impact: MEDIUM - Affects evolution path influence across all restarts
+
+FIXED PARAMETERS (Not Tunable):
+--------------------------------
+
+restarts: FIXED at 5
+  - Same rationale as IPOP-CMA-ES
+  - Algorithm alternates between small and large restarts automatically
+  - Fixed at 5 to allow algorithm to explore small/large restart balance
+  - Typical sequence within time budget:
+      * Run 0: Initial (large, popsize=600)
+      * Run 1-2: Small restarts (popsize~300-500, varied sigma)
+      * Run 3: Large restart (popsize=1200, standard sigma)
+      * Run 4-5: Usually not completed within 75s time limit
+
+incpopsize: FIXED at 2.0
+  - Population doubling for large restarts (IPOP-style)
+  - Standard BIPOP-CMA-ES strategy from Hansen (2009)
+  - Only affects large population restarts
+  - Small population restarts use random sizing (~0.5-1.0 × initial)
+  - Fixed at default value from literature
+
+use_lhs: FIXED at True
+  - Latin Hypercube Sampling for first run initialization
+  - Always beneficial for initial coverage
+  - Fixed at True (not tunable)
+
+NOTE ON INITIALIZATION:
+-----------------------
+LHS is used for the first run only. Both small and large restarts use
+standard random initialization to explore different regions.
 
 RECOMMENDED SEARCH SPACES:
 --------------------------
 
 sigma0:
-  - Range: [0.2, 0.8]
+  - Range: [0.15, 1.0]
   - Distribution: Uniform
-  - Justification: Same as IPOP-CMA-ES; serves as baseline for both small
-                   and large restarts
+  - Justification: Extended range same as IPOP-CMA-ES. Serves as baseline
+                   for large restarts; small restarts randomize it.
 
-restarts:
-  - Range: [3, 8]
-  - Distribution: Uniform integer
-  - Justification: Same as IPOP-CMA-ES; need sufficient restarts to benefit
-                   from bi-population strategy
-
-incpopsize:
-  - Range: [1.5, 2.5]
+CMA_rankmu:
+  - Range: [0.5, 2.0]
   - Distribution: Uniform
-  - Justification: Same as IPOP-CMA-ES; controls large restart scaling
+  - Justification: Standard CMA-ES range, affects all restarts
 
-use_lhs:
-  - Options: [True, False]
-  - Justification: Test both; expect True to be better
+CMA_rankone:
+  - Range: [0.5, 2.0]
+  - Distribution: Uniform
+  - Justification: Standard CMA-ES range, affects all restarts
 
 OPTUNA CODE EXAMPLE:
 --------------------
@@ -1124,32 +1216,69 @@ OPTUNA CODE EXAMPLE:
 def suggest_hyperparameters_bipop_cmaes(trial):
     """Suggest hyperparameters for BIPOP-CMA-ES."""
     return {
-        'sigma0': trial.suggest_float('sigma0', 0.2, 0.8),
-        'restarts': trial.suggest_int('restarts', 3, 8),
-        'incpopsize': trial.suggest_float('incpopsize', 1.5, 2.5),
-        'use_lhs': trial.suggest_categorical('use_lhs', [True, False])
+        'sigma0': trial.suggest_float('sigma0', 0.15, 1.0),
+        'CMA_rankmu': trial.suggest_float('CMA_rankmu', 0.5, 2.0),
+        'CMA_rankone': trial.suggest_float('CMA_rankone', 0.5, 2.0)
     }
 
 IMPLEMENTATION NOTES:
 ---------------------
-- READY TO TUNE: bipop_cmaes.py already accepts all parameters
-- No code modifications needed
-- Simply pass suggested values to minimize() function
-- Current defaults: sigma0=0.5, restarts=5, incpopsize=2.0, use_lhs=True
+- NEEDS MODIFICATION: bipop_cmaes.py needs to expose CMA_rankmu and CMA_rankone
+- Required changes:
+  1. Add CMA_rankmu and CMA_rankone to minimize() function signature
+  2. Pass these parameters to CMA-ES options dict (same as IPOP-CMA-ES)
+  3. Update search_control.py to read new config parameters
+  4. Set restarts=5, incpopsize=2.0, use_lhs=True by default (not tunable)
+
+- Current defaults: sigma0=0.5, restarts=5, incpopsize=2.0, use_lhs=True,
+                    CMA_rankmu=1.0, CMA_rankone=1.0
 
 EXPECTED CODE CHANGES:
 ----------------------
-None required - implementation already supports these parameters.
+
+In bipop_cmaes.py, update minimize() signature (around line 14):
+
+def minimize(
+    cost_func,
+    args,
+    search_space_bound,
+    search_space_size,
+    popsize=None,
+    sigma0=0.5,
+    maxiter=None,
+    maxtime=None,
+    maxevaluations=None,
+    restarts=5,            # Fixed at 5 (not tunable)
+    incpopsize=2.0,        # Fixed at 2.0 (not tunable)
+    use_lhs=True,          # Fixed at True (not tunable)
+    CMA_rankmu=1.0,        # NEW tunable parameter
+    CMA_rankone=1.0,       # NEW tunable parameter
+    seed=None,
+):
+
+Then add to opts dict (around line 116):
+
+opts = {
+    "bounds": [-search_space_bound, search_space_bound],
+    "maxiter": cmaes_maxiter,
+    "verbose": -9,
+    "verb_disp": 0,
+    "verb_log": 0,
+    "tolx": 1e-4,
+    "tolfun": 1e-4,
+    "CMA_rankmu": CMA_rankmu,      # NEW
+    "CMA_rankone": CMA_rankone     # NEW
+}
 
 In search_control.py, ensure config has:
   config.bipop_sigma0 = <value>
-  config.bipop_restarts = <value>
-  config.bipop_incpopsize = <value>
-  config.bipop_use_lhs = <value>
+  config.bipop_rankmu = <value>
+  config.bipop_rankone = <value>
 
 BIPOP vs IPOP:
 --------------
-Same tunable parameters, but different restart strategy:
+Same tunable parameters (sigma0, CMA_rankmu, CMA_rankone), but different
+restart strategy:
 
 IPOP:
   - All restarts use increasing large populations
@@ -1165,8 +1294,9 @@ BIPOP:
 PARAMETER INTERACTION:
 ----------------------
 - sigma0 affects both small and large restarts (small restarts randomize it)
-- restarts must be sufficient to see small/large alternation benefit
+- CMA_rankmu and CMA_rankone control adaptation across all restart types
 - incpopsize only affects large restarts; small populations unaffected
+- Small restarts provide exploration; large restarts provide exploitation
 
 ADVANTAGES OF BIPOP:
 --------------------
@@ -1321,38 +1451,7 @@ TUNABLE HYPERPARAMETERS:
    Impact: HIGH - Controls genetic mixing
    Range: (0.0, 1.0]
 
-4. init - Population Initialization Method
-   Type: str (categorical)
-   Default: 'latinhypercube'
-   Description: Method for generating initial population.
-
-   Options:
-
-   a) 'latinhypercube': Latin Hypercube Sampling
-      - Stratified sampling ensuring good space coverage
-      - Each dimension divided into equal intervals, one sample per interval
-      - Best for exploration, recommended default
-
-   b) 'sobol': Sobol low-discrepancy sequence
-      - Quasi-random sequence with excellent uniformity
-      - Better than random for multi-dimensional spaces
-      - Good theoretical properties
-
-   c) 'halton': Halton low-discrepancy sequence
-      - Another quasi-random sequence
-      - Similar benefits to Sobol
-      - May have edge on very high dimensions
-
-   d) 'random': Uniform random sampling
-      - Standard random initialization
-      - Baseline comparison
-      - Least structured, most random
-
-   Impact: MEDIUM - Affects initial search quality and early convergence
-
-   Expected ranking: latinhypercube ≥ sobol ≥ halton > random
-
-5. updating - Population Update Strategy
+4. updating - Population Update Strategy
    Type: str (categorical)
    Default: 'deferred'
    Description: When to update population with trial vectors.
@@ -1375,6 +1474,15 @@ TUNABLE HYPERPARAMETERS:
    Impact: MEDIUM - Affects convergence dynamics
 
    'deferred' is standard DE; 'immediate' can be faster but less stable
+
+FIXED PARAMETERS (Not Tunable):
+--------------------------------
+
+init: FIXED at 'latinhypercube'
+  - Latin Hypercube Sampling provides superior initial space coverage
+  - Consistently outperforms other initialization methods in practice
+  - Stratified sampling ensures good distribution across all dimensions
+  - Fixed at 'latinhypercube' (not tunable)
 
 RECOMMENDED SEARCH SPACES:
 --------------------------
@@ -1404,10 +1512,6 @@ recombination:
   - Range: [0.7, 0.95]
   - Distribution: Uniform
   - Justification: Standard DE recommendation
-
-init:
-  - Options: ['latinhypercube', 'sobol', 'halton', 'random']
-  - Justification: Test all initialization methods
 
 updating:
   - Options: ['deferred', 'immediate']
@@ -1441,18 +1545,13 @@ def suggest_hyperparameters_scipy_de(trial):
     # 3. Recombination (crossover probability)
     recombination = trial.suggest_float('recombination', 0.7, 0.95)
 
-    # 4. Initialization method
-    init = trial.suggest_categorical('init',
-        ['latinhypercube', 'sobol', 'halton', 'random'])
-
-    # 5. Update strategy
+    # 4. Update strategy
     updating = trial.suggest_categorical('updating', ['deferred', 'immediate'])
 
     return {
         'strategy': strategy,
         'mutation': mutation,
         'recombination': recombination,
-        'init': init,
         'updating': updating
     }
 
@@ -1463,19 +1562,20 @@ IMPLEMENTATION NOTES:
     strategy='best1bin'
     mutation=(0.5, 1.0)
     recombination=0.9
+    init='latinhypercube'  (implicit, not currently set)
     vectorized=True
     updating='deferred'
 
 - Required changes:
-  1. Add parameters to minimize() function signature
+  1. Add tunable parameters to minimize() function signature
   2. Pass parameters to differential_evolution() call:
 
      result = differential_evolution(
          func=vectorized_objective,
          bounds=bounds,
-         strategy=strategy,              # NEW
-         mutation=mutation,              # NEW (was hardcoded)
-         recombination=recombination,    # NEW (was hardcoded)
+         strategy=strategy,              # NEW (tunable)
+         mutation=mutation,              # NEW (tunable, was hardcoded)
+         recombination=recombination,    # NEW (tunable, was hardcoded)
          vectorized=True,
          popsize=scipy_popsize,
          maxiter=maxiter if maxiter is not None else 1000,
@@ -1484,12 +1584,13 @@ IMPLEMENTATION NOTES:
          polish=False,
          atol=0,
          tol=0.0,
-         updating=updating,              # NEW
-         init=init,                      # NEW (currently no init param)
+         updating=updating,              # NEW (tunable)
+         init='latinhypercube',          # FIXED at 'latinhypercube'
          seed=seed
      )
 
   3. Update search_control.py to read new config parameters
+  4. Keep init='latinhypercube' fixed (not tunable)
 
 EXPECTED CODE CHANGES:
 ----------------------
@@ -1499,8 +1600,7 @@ In scipy_de.py, update minimize() signature (line 20):
 def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
              mutate, recombination, maxiter, maxtime, maxevaluations=None,
              strategy='best1bin', mutation=(0.5, 1.0),
-             recombination_scipy=0.9, init='latinhypercube',
-             updating='deferred', seed=None):
+             recombination_scipy=0.9, updating='deferred', seed=None):
 
 Note: We may need recombination_scipy separate from recombination parameter
 to avoid conflicts with the interface.
@@ -1762,24 +1862,26 @@ These require no code modifications:
   - Estimated time: 3 hours
 
 1.2. Standard CMA-ES
-  - File: cmaes.py (already parameterized)
+  - File: cmaes.py (NEEDS MODIFICATION for rankmu/rankone)
   - Script: optuna_cmaes_tune.py (NEW)
-  - Parameters: sigma0, use_lhs
-  - Estimated time: 3 hours
+  - Parameters: sigma0, CMA_rankmu, CMA_rankone
+  - Estimated time: 0.5 hours code + 3 hours tuning
 
 1.3. IPOP-CMA-ES
-  - File: ipop_cmaes.py (already parameterized)
+  - File: ipop_cmaes.py (NEEDS MODIFICATION for rankmu/rankone)
   - Script: optuna_ipop_tune.py (NEW)
-  - Parameters: sigma0, restarts, incpopsize, use_lhs
-  - Estimated time: 3 hours
+  - Parameters: sigma0, CMA_rankmu, CMA_rankone
+  - Fixed: restarts=5, incpopsize=2.0, use_lhs=True
+  - Estimated time: 0.5 hours code + 3 hours tuning
 
 1.4. BIPOP-CMA-ES
-  - File: bipop_cmaes.py (already parameterized)
+  - File: bipop_cmaes.py (NEEDS MODIFICATION for rankmu/rankone)
   - Script: optuna_bipop_tune.py (NEW)
-  - Parameters: sigma0, restarts, incpopsize, use_lhs
-  - Estimated time: 3 hours
+  - Parameters: sigma0, CMA_rankmu, CMA_rankone
+  - Fixed: restarts=5, incpopsize=2.0, use_lhs=True
+  - Estimated time: 0.5 hours code + 3 hours tuning
 
-Total Phase 1: ~12 hours tuning time
+Total Phase 1: ~1.5 hours coding + ~12 hours tuning time
 
 PHASE 2: EVOX OPTIMIZERS (Week 2)
 ----------------------------------
@@ -1826,22 +1928,23 @@ This requires more significant refactoring:
   - File: scipy_de.py (MAJOR MODIFY)
   - Changes:
       * Refactor minimize() to accept strategy, mutation, recombination,
-        init, updating parameters
+        updating parameters
       * Update differential_evolution() call
       * Handle conditional mutation (fixed vs dithering)
   - Script: optuna_scipy_de_tune.py (NEW)
-  - Parameters: strategy, mutation, recombination, init, updating
+  - Parameters: strategy, mutation, recombination, updating
+  - Fixed: init='latinhypercube'
   - Estimated time: 2 hours code + 3 hours tuning
 
 Total Phase 3: ~2 hours coding + ~3 hours tuning
 
 TOTAL PROJECT TIMELINE:
 ------------------------
-- Coding: ~4 hours
+- Coding: ~5.5 hours (1.5 + 2 + 2 for CMA-ES, EvoX, and SciPy modifications)
 - Tuning: ~27 hours (9 optimizers × ~3 hours each)
 - Analysis: ~3 hours (compile results, compare improvements)
 
-Total: ~34 hours (~4-5 days if running sequentially)
+Total: ~35.5 hours (~4-5 days if running sequentially)
 
 If running tuning in parallel with multiple GPUs/machines, timeline reduces
 significantly (limited by coding and analysis time).

@@ -1,15 +1,15 @@
 # ------------------------------------------------------------------------------+
-# Optuna-based Hyperparameter Tuning for EvoX JADE Optimizer
+# Optuna-based Hyperparameter Tuning for BIPOP-CMA-ES Optimizer
 #
-# This script performs automated hyperparameter search for the JADE algorithm
-# using the Optuna optimization framework.
+# This script performs automated hyperparameter search for the BIPOP-CMA-ES
+# algorithm using the Optuna optimization framework.
 #
 # Usage:
-#   uv run python optuna_jade_tune.py \
+#   uv run python optuna_bipop_tune.py \
 #     --model_path models/tsp_100_model.pt \
 #     --instances_path instances/tsp/test/tsp100_10inst_w_optimal.pkl \
-#     --n_trials 100 \
-#     --tune_n_instances 5
+#     --n_trials 50 \
+#     --tune_n_instances 3
 # ------------------------------------------------------------------------------+
 
 import argparse
@@ -54,7 +54,7 @@ def setup_logging(output_dir: str) -> Tuple[str, logging.Logger]:
     log_path = os.path.join(output_dir, log_filename)
 
     # Create logger
-    logger = logging.getLogger('optuna_jade_tuning')
+    logger = logging.getLogger('optuna_bipop_tuning')
     logger.setLevel(logging.INFO)
     logger.handlers.clear()
 
@@ -75,17 +75,18 @@ def setup_logging(output_dir: str) -> Tuple[str, logging.Logger]:
     return log_filename, logger
 
 
-def create_config_for_trial(base_config, jade_c: float, jade_num_diff_vectors: int):
+def create_config_for_trial(base_config, sigma0: float, CMA_rankmu: float, CMA_rankone: float):
     """
-    Create a configuration object for a trial with specific JADE parameters.
+    Create a configuration object for a trial with specific BIPOP-CMA-ES parameters.
 
     Args:
         base_config: Base configuration with model path, device, etc.
-        jade_c: JADE learning rate parameter
-        jade_num_diff_vectors: Number of difference vectors
+        sigma0: Initial step size
+        CMA_rankmu: Rank-mu learning rate
+        CMA_rankone: Rank-one learning rate
 
     Returns:
-        Config object with JADE parameters set
+        Config object with BIPOP-CMA-ES parameters set
     """
     # Create a simple config object (namespace)
     class Config:
@@ -100,19 +101,15 @@ def create_config_for_trial(base_config, jade_c: float, jade_num_diff_vectors: i
     config.search_iterations = base_config.search_iterations
     config.search_timelimit = base_config.search_timelimit
     config.search_evaluations = base_config.search_evaluations
-    config.optimizer = 'evox_jade'
+    config.seed = base_config.seed
+    config.optimizer = 'bipop_cmaes'
     config.problem = base_config.problem
     config.problem_size = base_config.problem_size
 
-    # Set JADE-specific parameters (these are what we're tuning)
-    config.jade_c = jade_c
-    config.jade_num_diff_vectors = jade_num_diff_vectors
-    config.jade_mean = None  # Keep uniform initialization
-    config.jade_stdev = None  # Keep uniform initialization
-
-    # Other optimizer parameters (not used by JADE but required by interface)
-    config.de_mutate = 0.3
-    config.de_recombine = 0.95
+    # Set BIPOP-CMA-ES-specific parameters (these are what we're tuning)
+    config.bipop_sigma0 = sigma0
+    config.bipop_rankmu = CMA_rankmu
+    config.bipop_rankone = CMA_rankone
 
     return config
 
@@ -132,16 +129,17 @@ def objective(trial: optuna.Trial, args) -> float:
     model, base_config, instances, solutions, cost_fn, batch_size, tune_n_instances, logger = args
 
     # Suggest hyperparameters
-    jade_c = trial.suggest_float('jade_c', 0.01, 0.5, log=True)
-    jade_num_diff_vectors = trial.suggest_categorical('jade_num_diff_vectors', [1, 2])
+    sigma0 = trial.suggest_float('sigma0', 0.15, 1.0)
+    CMA_rankmu = trial.suggest_float('CMA_rankmu', 0.5, 2.0)
+    CMA_rankone = trial.suggest_float('CMA_rankone', 0.5, 2.0)
 
     # Log trial start
     logger.info(f"=" * 80)
     logger.info(f"Trial {trial.number + 1} started")
-    logger.info(f"  Parameters: jade_c={jade_c:.6f}, jade_num_diff_vectors={jade_num_diff_vectors}")
+    logger.info(f"  Parameters: sigma0={sigma0:.6f}, CMA_rankmu={CMA_rankmu:.6f}, CMA_rankone={CMA_rankone:.6f}")
 
     # Create config for this trial
-    config = create_config_for_trial(base_config, jade_c, jade_num_diff_vectors)
+    config = create_config_for_trial(base_config, sigma0, CMA_rankmu, CMA_rankone)
 
     # Determine which instances to use for tuning
     if tune_n_instances is not None and tune_n_instances < len(instances):
@@ -199,7 +197,7 @@ def objective(trial: optuna.Trial, args) -> float:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Optuna-based hyperparameter tuning for EvoX JADE optimizer"
+        description="Optuna-based hyperparameter tuning for BIPOP-CMA-ES optimizer"
     )
 
     # Required parameters
@@ -209,26 +207,26 @@ def main():
                        help='Path to instances pickle file (with optimal solutions if available)')
 
     # Tuning parameters
-    parser.add_argument('--n_trials', type=int, default=100,
-                       help='Number of Optuna trials to run (default: 100)')
-    parser.add_argument('--tune_n_instances', type=int, default=None,
-                       help='Number of instances to use for tuning (default: None, uses all)')
+    parser.add_argument('--n_trials', type=int, default=50,
+                       help='Number of Optuna trials to run (default: 50)')
+    parser.add_argument('--tune_n_instances', type=int, default=3,
+                       help='Number of instances to use for tuning (default: 3)')
     parser.add_argument('--batch_size', type=int, default=600,
-                       help='Population size for JADE (default: 600)')
+                       help='Population size for BIPOP-CMA-ES (default: 600)')
 
     # Optuna study parameters
-    parser.add_argument('--study_name', type=str, default='jade_tuning',
-                       help='Name for Optuna study (default: jade_tuning)')
-    parser.add_argument('--storage', type=str, default='sqlite:///optuna_jade.db',
-                       help='Optuna storage backend (default: sqlite:///optuna_jade.db)')
+    parser.add_argument('--study_name', type=str, default='bipop_tuning',
+                       help='Name for Optuna study (default: bipop_tuning)')
+    parser.add_argument('--storage', type=str, default='sqlite:///optuna_bipop.db',
+                       help='Optuna storage backend (default: sqlite:///optuna_bipop.db)')
     parser.add_argument('--load_if_exists', action='store_true',
                        help='Load existing study if it exists (default: False, creates new study)')
 
     # Search parameters
     parser.add_argument('--search_iterations', type=int, default=300,
                        help='Maximum iterations per instance (default: 300)')
-    parser.add_argument('--search_timelimit', type=int, default=None,
-                       help='Time limit in seconds per instance (default: None)')
+    parser.add_argument('--search_timelimit', type=int, default=75,
+                       help='Time limit in seconds per instance (default: 75)')
     parser.add_argument('--search_evaluations', type=int, default=None,
                        help='Maximum evaluations per instance (default: None)')
     parser.add_argument('--search_space_size', type=int, default=100,
@@ -263,7 +261,7 @@ def main():
     # Setup logging
     log_filename, logger = setup_logging(output_dir)
     logger.info("=" * 80)
-    logger.info("OPTUNA HYPERPARAMETER TUNING FOR EVOX JADE")
+    logger.info("OPTUNA HYPERPARAMETER TUNING FOR BIPOP-CMA-ES")
     logger.info("=" * 80)
     logger.info(f"Log file: {os.path.join(output_dir, log_filename)}")
     logger.info(f"Output directory: {output_dir}")
@@ -295,6 +293,7 @@ def main():
     base_config.problem = args.problem if args.problem else model_data['problem']
     base_config.problem_size = args.problem_size if args.problem_size else model_data['problem_size']
     base_config.instances_path = args.instances_path  # Add instances_path for read_instance_pkl
+    base_config.seed = args.seed
 
     logger.info(f"Problem: {base_config.problem}{base_config.problem_size}")
     logger.info(f"Search space bound: {base_config.search_space_bound}")
@@ -339,14 +338,15 @@ def main():
     logger.info("")
     logger.info("TUNING CONFIGURATION:")
     logger.info(f"  Number of trials: {args.n_trials}")
-    logger.info(f"  Instances for tuning: {args.tune_n_instances if args.tune_n_instances else 'all (' + str(len(instances)) + ')'}")
+    logger.info(f"  Instances for tuning: {args.tune_n_instances}")
     logger.info(f"  Population size: {args.batch_size}")
     logger.info(f"  Study name: {args.study_name}")
     logger.info(f"  Storage: {args.storage}")
     logger.info("")
     logger.info("HYPERPARAMETER SEARCH SPACE:")
-    logger.info(f"  jade_c: LogUniform[0.01, 0.5]")
-    logger.info(f"  jade_num_diff_vectors: Categorical[1, 2]")
+    logger.info(f"  sigma0: Uniform[0.15, 1.0]")
+    logger.info(f"  CMA_rankmu: Uniform[0.5, 2.0]")
+    logger.info(f"  CMA_rankone: Uniform[0.5, 2.0]")
     logger.info("")
     logger.info("=" * 80)
     logger.info("")
@@ -392,13 +392,14 @@ def main():
     logger.info(f"Trials completed: {len(study.trials)}")
     logger.info("")
     logger.info("BEST PARAMETERS:")
-    logger.info(f"  jade_c: {study.best_params['jade_c']:.6f}")
-    logger.info(f"  jade_num_diff_vectors: {study.best_params['jade_num_diff_vectors']}")
+    logger.info(f"  sigma0: {study.best_params['sigma0']:.6f}")
+    logger.info(f"  CMA_rankmu: {study.best_params['CMA_rankmu']:.6f}")
+    logger.info(f"  CMA_rankone: {study.best_params['CMA_rankone']:.6f}")
     logger.info(f"  Best mean gap: {study.best_value:.4f}%")
     logger.info("")
 
     # Save best parameters to JSON
-    best_params_file = os.path.join(output_dir, 'best_jade_params.json')
+    best_params_file = os.path.join(output_dir, 'best_bipop_params.json')
     best_params_data = {
         'best_params': study.best_params,
         'best_value': study.best_value,
@@ -407,7 +408,7 @@ def main():
         'timestamp': datetime.datetime.now().isoformat(),
         'instances_path': args.instances_path,
         'model_path': args.model_path,
-        'tune_n_instances': args.tune_n_instances if args.tune_n_instances else len(instances),
+        'tune_n_instances': args.tune_n_instances,
         'batch_size': args.batch_size
     }
 
@@ -441,19 +442,6 @@ def main():
         logger.warning(f"Could not generate some visualizations: {e}")
         logger.warning("Install kaleido for static image export: uv add kaleido")
 
-    logger.info("")
-    logger.info("=" * 80)
-    logger.info("NEXT STEPS:")
-    logger.info("")
-    logger.info("To use the optimized parameters, run:")
-    logger.info(f"  uv run python search.py \\")
-    logger.info(f"    --optimizer evox_jade \\")
-    logger.info(f"    --jade_c {study.best_params['jade_c']:.6f} \\")
-    logger.info(f"    --jade_num_diff_vectors {study.best_params['jade_num_diff_vectors']} \\")
-    logger.info(f"    --model_path {args.model_path} \\")
-    logger.info(f"    --instances_path {args.instances_path} \\")
-    logger.info(f"    --batch_sizes {args.batch_size} \\")
-    logger.info(f"    --save_plots")
     logger.info("")
     logger.info("=" * 80)
 

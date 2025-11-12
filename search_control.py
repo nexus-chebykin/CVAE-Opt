@@ -93,14 +93,15 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
     # Reset batch size tracking for this instance
     _last_batch_size = None
 
-    # Pre-expand instance to batch_size (will be sliced dynamically for IPOP/BIPOP)
+    # Pre-expand instance to 3x batch_size to accommodate CoDE (3 strategies × popsize)
+    # Other optimizers will slice to their actual needs (safe due to expand() creating view)
     instance = torch.Tensor(instance)
-    instance = instance.unsqueeze(0).expand(batch_size, -1, -1)
+    instance = instance.unsqueeze(0).expand(batch_size * 3, -1, -1)
     instance = instance.to(config.device)
-    model.reset_decoder(batch_size, config)
+    model.reset_decoder(batch_size * 3, config)
 
-    # Update tracking (decoder was just reset to batch_size)
-    _last_batch_size = batch_size
+    # Update tracking (decoder was just reset to batch_size * 3)
+    _last_batch_size = batch_size * 3
 
     # Determine stopping criteria (use overrides if provided, otherwise use config values)
     maxiter = override_maxiter if override_maxiter is not None else config.search_iterations
@@ -286,6 +287,10 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             maxiter=maxiter,
             maxtime=maxtime,
             maxevaluations=maxevaluations,
+            base_vector=config.ode_base_vector,
+            num_difference_vectors=config.ode_num_difference_vectors,
+            differential_weight=config.ode_differential_weight,
+            cross_probability=config.ode_cross_probability,
             seed=config.seed
         )
     elif config.optimizer == 'ngopt':

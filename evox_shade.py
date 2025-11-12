@@ -54,7 +54,8 @@ class CVAEOptProblem(torch.nn.Module):
 
 
 def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
-             mutate, recombination, maxiter, maxtime, maxevaluations=None, seed=1234):
+             mutate, recombination, maxiter, maxtime, maxevaluations=None,
+             diff_padding_num=9, seed=1234):
     """
     Minimize objective function using EvoX SHADE algorithm.
 
@@ -72,6 +73,7 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
         maxiter: Maximum number of iterations (None = no limit)
         maxtime: Maximum wall-clock time in seconds (None = no limit)
         maxevaluations: Maximum number of function evaluations (None = no limit)
+        diff_padding_num: Number of differential padding vectors for diversity (default: 9)
 
     Returns:
         best_fitness: Best objective value found
@@ -117,7 +119,8 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
         pop_size=popsize,
         lb=lb,
         ub=ub,
-        device=device
+        device=device,
+        diff_padding_num=diff_padding_num
     )
 
     # Create workflow

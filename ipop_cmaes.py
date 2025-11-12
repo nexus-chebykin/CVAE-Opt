@@ -24,6 +24,8 @@ def minimize(
     restarts=5,
     incpopsize=2.0,
     use_lhs=True,
+    CMA_rankmu=1.0,
+    CMA_rankone=1.0,
     seed=None,
 ):
     """
@@ -42,6 +44,8 @@ def minimize(
         restarts: Number of restarts with increasing population (default: 5)
         incpopsize: Population size multiplier for each restart (default: 2.0)
         use_lhs: If True, initialize FIRST run only with LHS using "prime the pump" approach
+        CMA_rankmu: Rank-mu update learning rate multiplier (default: 1.0)
+        CMA_rankone: Rank-one update learning rate multiplier (default: 1.0)
         seed: Random seed for reproducibility (used for LHS initialization)
 
     Returns:
@@ -94,6 +98,8 @@ def minimize(
             # Set reasonable convergence tolerances to allow restarts
             "tolx": 1e-4,  # Allow convergence based on small x-changes
             "tolfun": 1e-4,  # Allow convergence based on small function value changes
+            "CMA_rankmu": CMA_rankmu,  # Rank-mu update learning rate multiplier
+            "CMA_rankone": CMA_rankone  # Rank-one update learning rate multiplier
         }
 
         # Only set popsize if specified by user (otherwise let CMA-ES decide)
