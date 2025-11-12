@@ -10,6 +10,7 @@
 import numpy as np
 import time
 import pygmo as pg
+from lhs_init import generate_lhs_population
 
 
 class PygmoProblem:
@@ -114,6 +115,8 @@ def minimize(
     maxiter,
     maxtime,
     maxevaluations=None,
+    use_lhs=True,
+    seed=None,
 ):
     """
     PSO Generational optimizer using pygmo library.
@@ -133,6 +136,8 @@ def minimize(
         maxiter: Maximum number of iterations
         maxtime: Maximum wall-clock time in seconds
         maxevaluations: Maximum number of function evaluations (optional)
+        use_lhs: If True, initialize population with Latin Hypercube Sampling
+        seed: Random seed for reproducibility (default: None uses pygmo default 1234)
 
     Returns:
         best_fitness: Best fitness value found
@@ -167,9 +172,37 @@ def minimize(
     bfe = pg.bfe()
 
     # 3. Create the initial population with batch evaluation enabled
-    # CRITICAL: Pass the bfe to population constructor to enable batch evaluation during initialization
-    # Without this, the initial population will be evaluated one-by-one (600 individual calls)
-    pop = pg.population(prob=prob, size=popsize, b=bfe, seed=1234)
+    # Use provided seed, or default to 1234 if not specified
+    population_seed = seed if seed is not None else 1234
+
+    if use_lhs:
+        # --- LHS INITIALIZATION ----------------+
+        # Generate LHS population
+        lhs_population = generate_lhs_population(
+            num_samples=popsize,
+            dimension=search_space_size,
+            lower_bound=-search_space_bound,
+            upper_bound=search_space_bound,
+            seed=population_seed
+        )
+
+        # Evaluate LHS population in batch
+        eval_start = time.time()
+        _, lhs_fitness = cost_func(lhs_population, *args)
+        lhs_fitness = np.array(lhs_fitness)
+        eval_time_total += time.time() - eval_start
+
+        # Create empty population and push LHS individuals with their fitness
+        # Note: We create with size=0 WITHOUT bfe to avoid evaluating empty population
+        # Individuals are pushed with pre-computed fitness values
+        pop = pg.population(prob=prob, size=0)
+        for i in range(popsize):
+            pop.push_back(lhs_population[i], [lhs_fitness[i]])
+    else:
+        # Standard uniform random initialization
+        # CRITICAL: Pass the bfe to population constructor to enable batch evaluation during initialization
+        # Without this, the initial population will be evaluated one-by-one (600 individual calls)
+        pop = pg.population(prob=prob, size=popsize, b=bfe, seed=population_seed)
 
     # 4. Create the pygmo algorithm (PSO_gen)
     # We set gen=1 to manually control generations for iteration-by-iteration tracking
@@ -179,7 +212,7 @@ def minimize(
     # - eta2 (cognitive component): 2.05
     # - max_vel: 0.5 (maximum allowed particle velocity)
     # - variant: 6 (PSO variant - 6 is canonical/global best, more standard than variant 5)
-    pso_algo = pg.pso_gen(gen=1, omega=0.7298, eta1=2.05, eta2=2.05, max_vel=0.5, variant=6, seed=1234)
+    pso_algo = pg.pso_gen(gen=1, omega=0.7298, eta1=2.05, eta2=2.05, max_vel=0.5, variant=6, seed=population_seed)
 
     # CRITICAL: Attach batch fitness evaluator to the algorithm for evolution
     # This enables true batch processing during the evolve() call

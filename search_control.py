@@ -120,7 +120,8 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             recombination=config.de_recombine,
             maxiter=maxiter,
             maxtime=maxtime,
-            maxevaluations=maxevaluations
+            maxevaluations=maxevaluations,
+            seed=config.seed
         )
     elif config.optimizer == 'cmaes':
         from cmaes import minimize
@@ -135,7 +136,9 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             sigma0=cmaes_sigma,
             maxiter=maxiter,
             maxtime=maxtime,
-            maxevaluations=maxevaluations
+            maxevaluations=maxevaluations,
+            use_lhs=True,  # CMA-ES always uses LHS for better initialization
+            seed=config.seed
         )
     elif config.optimizer == 'ipop_cmaes':
         from ipop_cmaes import minimize
@@ -152,7 +155,9 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             maxtime=maxtime,
             maxevaluations=maxevaluations,
             restarts=config.ipop_restarts,
-            incpopsize=config.ipop_incpopsize
+            incpopsize=config.ipop_incpopsize,
+            use_lhs=True,  # IPOP-CMA-ES always uses LHS for better initialization
+            seed=config.seed
         )
     elif config.optimizer == 'bipop_cmaes':
         from bipop_cmaes import minimize
@@ -169,21 +174,9 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             maxtime=maxtime,
             maxevaluations=maxevaluations,
             restarts=config.bipop_restarts,
-            incpopsize=config.bipop_incpopsize
-        )
-    elif config.optimizer == 'pygmo_de':
-        from pygmo_de import minimize
-        result_cost, result_tour, convergence_history, time_history, timing_breakdown = minimize(
-            decode,
-            (model, config, instance, cost_fn),
-            config.search_space_bound,
-            config.search_space_size,
-            popsize=batch_size,
-            mutate=config.de_mutate,
-            recombination=config.de_recombine,
-            maxiter=maxiter,
-            maxtime=maxtime,
-            maxevaluations=maxevaluations
+            incpopsize=config.bipop_incpopsize,
+            use_lhs=True,  # BIPOP-CMA-ES always uses LHS for better initialization
+            seed=config.seed
         )
     elif config.optimizer == 'scipy_de':
         from scipy_de import minimize
@@ -197,7 +190,8 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             recombination=config.de_recombine,
             maxiter=maxiter,
             maxtime=maxtime,
-            maxevaluations=maxevaluations
+            maxevaluations=maxevaluations,
+            seed=config.seed
         )
     elif config.optimizer == 'evox_jade':
         from evox_jade import minimize
@@ -211,7 +205,12 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             recombination=config.de_recombine,
             maxiter=maxiter,
             maxtime=maxtime,
-            maxevaluations=maxevaluations
+            maxevaluations=maxevaluations,
+            jade_c=config.jade_c,
+            jade_num_diff_vectors=config.jade_num_diff_vectors,
+            jade_mean=config.jade_mean,
+            jade_stdev=config.jade_stdev,
+            seed=config.seed
         )
     elif config.optimizer == 'pygmo_pso_gen':
         from pygmo_pso_gen import minimize
@@ -225,7 +224,9 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             recombination=config.de_recombine,
             maxiter=maxiter,
             maxtime=maxtime,
-            maxevaluations=maxevaluations
+            maxevaluations=maxevaluations,
+            use_lhs=True,  # PSO always uses LHS for better initialization
+            seed=config.seed
         )
     elif config.optimizer == 'evox_shade':
         from evox_shade import minimize
@@ -239,7 +240,8 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             recombination=config.de_recombine,
             maxiter=maxiter,
             maxtime=maxtime,
-            maxevaluations=maxevaluations
+            maxevaluations=maxevaluations,
+            seed=config.seed
         )
     elif config.optimizer == 'evox_sade':
         from evox_sade import minimize
@@ -253,7 +255,8 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             recombination=config.de_recombine,
             maxiter=maxiter,
             maxtime=maxtime,
-            maxevaluations=maxevaluations
+            maxevaluations=maxevaluations,
+            seed=config.seed
         )
     elif config.optimizer == 'evox_code':
         from evox_code import minimize
@@ -267,7 +270,8 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             recombination=config.de_recombine,
             maxiter=maxiter,
             maxtime=maxtime,
-            maxevaluations=maxevaluations
+            maxevaluations=maxevaluations,
+            seed=config.seed
         )
     elif config.optimizer == 'evox_ode':
         from evox_ode import minimize
@@ -281,7 +285,8 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             recombination=config.de_recombine,
             maxiter=maxiter,
             maxtime=maxtime,
-            maxevaluations=maxevaluations
+            maxevaluations=maxevaluations,
+            seed=config.seed
         )
     elif config.optimizer == 'ngopt':
         from ngopt import minimize
@@ -295,7 +300,9 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             recombination=config.de_recombine,
             maxiter=maxiter,
             maxtime=maxtime,
-            maxevaluations=maxevaluations
+            maxevaluations=maxevaluations,
+            use_lhs=True,  # NGOpt always uses LHS for better initialization
+            seed=config.seed
         )
     else:
         raise ValueError(f"Unknown optimizer: {config.optimizer}")
@@ -405,7 +412,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
         # Optimizer comparison mode: run all optimizers with fixed batch size
         fixed_batch_size = config.batch_sizes[0]
         logging.info(f"Running optimizer comparison mode with batch size {fixed_batch_size}")
-        logging.info(f"Comparing: DE, CMA-ES, IPOP-CMA-ES, BIPOP-CMA-ES, Scipy-DE, EvoX-JADE, Pygmo-PSO-Gen, EvoX-SHADE, EvoX-SaDE, EvoX-CoDE, EvoX-ODE, NGOpt (sigma={config.cmaes_sigma0})")
+        logging.info(f"Comparing: DE, CMA-ES, IPOP-CMA-ES, BIPOP-CMA-ES, Scipy-DE, EvoX-JADE, EvoX-SHADE, EvoX-SaDE, EvoX-CoDE, EvoX-ODE (sigma={config.cmaes_sigma0})")
 
         # Store results for each optimizer
         all_results = {'DE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
@@ -426,9 +433,6 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                        'EvoX-JADE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
                                      'ask_times': [], 'eval_times': [], 'tell_times': [],
                                      'instance_ids': [], 'optimal_values': []},
-                       'Pygmo-PSO-Gen': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
-                                         'ask_times': [], 'eval_times': [], 'tell_times': [],
-                                         'instance_ids': [], 'optimal_values': []},
                        'EvoX-SHADE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
                                       'ask_times': [], 'eval_times': [], 'tell_times': [],
                                       'instance_ids': [], 'optimal_values': []},
@@ -440,10 +444,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                                      'instance_ids': [], 'optimal_values': []},
                        'EvoX-ODE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
                                     'ask_times': [], 'eval_times': [], 'tell_times': [],
-                                    'instance_ids': [], 'optimal_values': []},
-                       'NGOpt': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
-                                 'ask_times': [], 'eval_times': [], 'tell_times': [],
-                                 'instance_ids': [], 'optimal_values': []}}
+                                    'instance_ids': [], 'optimal_values': []}}
 
         # Accumulator for averaging convergence data across instances
         all_instances_data = {'DE': {'convergence': [], 'time': []},
@@ -452,12 +453,10 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                               'BIPOP-CMA-ES': {'convergence': [], 'time': []},
                               'Scipy-DE': {'convergence': [], 'time': []},
                               'EvoX-JADE': {'convergence': [], 'time': []},
-                              'Pygmo-PSO-Gen': {'convergence': [], 'time': []},
                               'EvoX-SHADE': {'convergence': [], 'time': []},
                               'EvoX-SaDE': {'convergence': [], 'time': []},
                               'EvoX-CoDE': {'convergence': [], 'time': []},
-                              'EvoX-ODE': {'convergence': [], 'time': []},
-                              'NGOpt': {'convergence': [], 'time': []}}
+                              'EvoX-ODE': {'convergence': [], 'time': []}}
     elif sigma_sweep_mode:
         # Sigma sweep mode: loop over sigma values with fixed batch size
         sweep_values = config.cmaes_sigma_sweep
@@ -499,7 +498,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
             else:
                 optimal_value = None
 
-            for optimizer_name in ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES', 'Scipy-DE', 'EvoX-JADE', 'Pygmo-PSO-Gen', 'EvoX-SHADE', 'EvoX-SaDE', 'EvoX-CoDE', 'EvoX-ODE', 'NGOpt']:
+            for optimizer_name in ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES', 'Scipy-DE', 'EvoX-JADE', 'EvoX-SHADE', 'EvoX-SaDE', 'EvoX-CoDE', 'EvoX-ODE']:
                 logging.info(f"  Optimizer: {optimizer_name}")
                 start_time = time.time()
 
@@ -519,8 +518,6 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                     config.optimizer = 'scipy_de'
                 elif optimizer_name == 'EvoX-JADE':
                     config.optimizer = 'evox_jade'
-                elif optimizer_name == 'Pygmo-PSO-Gen':
-                    config.optimizer = 'pygmo_pso_gen'
                 elif optimizer_name == 'EvoX-SHADE':
                     config.optimizer = 'evox_shade'
                 elif optimizer_name == 'EvoX-SaDE':
@@ -529,8 +526,6 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                     config.optimizer = 'evox_code'
                 elif optimizer_name == 'EvoX-ODE':
                     config.optimizer = 'evox_ode'
-                elif optimizer_name == 'NGOpt':
-                    config.optimizer = 'ngopt'
 
                 # Determine stopping criteria based on mode
                 override_maxiter = None
@@ -708,7 +703,6 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 'cmaes': 'CMA-ES',
                 'ipop_cmaes': 'IPOP-CMA-ES',
                 'bipop_cmaes': 'BIPOP-CMA-ES',
-                'pygmo_de': 'Pygmo-DE',
                 'scipy_de': 'Scipy-DE',
                 'evox_jade': 'EvoX-JADE',
                 'pygmo_pso_gen': 'Pygmo-PSO-Gen',
@@ -755,7 +749,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
         if optimizer_comparison_mode:
             # Optimizer comparison mode: generate optimizer comparison plots (always, regardless of plot_mode)
             logging.info("Computing averaged convergence data across all instances for optimizer comparison...")
-            averaged_data = compute_averaged_convergence(all_instances_data, ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES', 'Scipy-DE', 'EvoX-JADE', 'Pygmo-PSO-Gen', 'EvoX-SHADE', 'EvoX-SaDE', 'EvoX-CoDE', 'EvoX-ODE', 'NGOpt'], optimal_values)
+            averaged_data = compute_averaged_convergence(all_instances_data, ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES', 'Scipy-DE', 'EvoX-JADE', 'EvoX-SHADE', 'EvoX-SaDE', 'EvoX-CoDE', 'EvoX-ODE'], optimal_values)
 
             # Generate optimizer comparison plots
             plot_optimizer_comparison_iterations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size)
@@ -781,7 +775,6 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 'cmaes': 'CMA-ES',
                 'ipop_cmaes': 'IPOP-CMA-ES',
                 'bipop_cmaes': 'BIPOP-CMA-ES',
-                'pygmo_de': 'Pygmo-DE',
                 'scipy_de': 'Scipy-DE',
                 'evox_jade': 'EvoX-JADE',
                 'pygmo_pso_gen': 'Pygmo-PSO-Gen',
@@ -804,7 +797,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
 
     if optimizer_comparison_mode:
         # Log results for each optimizer
-        for optimizer_name in ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES', 'Scipy-DE', 'EvoX-JADE', 'Pygmo-PSO-Gen', 'EvoX-SHADE', 'EvoX-SaDE', 'EvoX-CoDE', 'EvoX-ODE', 'NGOpt']:
+        for optimizer_name in ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES', 'Scipy-DE', 'EvoX-JADE', 'EvoX-SHADE', 'EvoX-SaDE', 'EvoX-CoDE', 'EvoX-ODE']:
             results = all_results[optimizer_name]
             logging.info(f"\n{optimizer_name}:")
             logging.info(f"  Mean cost: {np.mean(results['cost_values']):.4f}")

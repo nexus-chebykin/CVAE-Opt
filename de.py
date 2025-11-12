@@ -31,7 +31,7 @@ from random import sample
 import numpy as np
 import time
 
-def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mutate, recombination, maxiter, maxtime, maxevaluations=None):
+def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mutate, recombination, maxiter, maxtime, maxevaluations=None, seed=1234):
 
     # --- INITIALIZE A POPULATION (step #1) ----------------+
     start_time = time.time()
@@ -48,8 +48,23 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
     eval_time_total = 0.0
     tell_time_total = 0.0
 
+    # Set random seed for reproducibility
+    np.random.seed(seed)
+
     population = np.random.uniform(-search_space_bound, search_space_bound,
                                    (popsize, search_space_size))
+
+    # Evaluate initial population
+    eval_start = time.time()
+    _, population_cost_initial = cost_func(population, *args)
+    population_cost = np.array(population_cost_initial)
+    evaluations_done += popsize
+    eval_time_total += time.time() - eval_start
+
+    # Record initial best (iteration 0)
+    gen_best = min(population_cost)
+    convergence_history.append(gen_best)
+    time_history.append(time.time() - start_time)
 
     # --- SOLVE --------------------------------------------+
 

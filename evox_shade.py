@@ -54,7 +54,7 @@ class CVAEOptProblem(torch.nn.Module):
 
 
 def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
-             mutate, recombination, maxiter, maxtime, maxevaluations=None):
+             mutate, recombination, maxiter, maxtime, maxevaluations=None, seed=1234):
     """
     Minimize objective function using EvoX SHADE algorithm.
 
@@ -91,6 +91,12 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
     model, config, instance, cost_fn = args
     device = config.device if hasattr(config, 'device') else torch.device('cpu')
 
+    # Set random seeds for reproducibility
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
     # Set PyTorch default device for EvoX compatibility
     # Save original default device to restore later
     original_device = torch.get_default_device() if hasattr(torch, 'get_default_device') else None
@@ -125,6 +131,10 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
 
     # Track initial evaluation
     evaluations_done += popsize
+
+    # Record initial best (iteration 0)
+    convergence_history.append(problem.best_fitness)
+    time_history.append(time.time() - start_time)
 
     while True:
         iteration += 1

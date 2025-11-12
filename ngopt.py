@@ -10,10 +10,12 @@
 import nevergrad as ng
 import numpy as np
 import time
+from lhs_init import generate_lhs_population
 
 
 def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
-             mutate, recombination, maxiter, maxtime, maxevaluations=None):
+             mutate, recombination, maxiter, maxtime, maxevaluations=None,
+             use_lhs=True, seed=None):
     """
     Minimize objective function using Nevergrad NGOpt algorithm.
 
@@ -32,6 +34,8 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
         maxiter: Maximum number of iterations (None = no limit)
         maxtime: Maximum wall-clock time in seconds (None = no limit)
         maxevaluations: Maximum number of function evaluations (None = no limit)
+        use_lhs: If True, warm-start optimizer with Latin Hypercube Sampling
+        seed: Random seed for reproducibility (used for LHS initialization)
 
     Returns:
         best_fitness: Best objective value found
@@ -69,6 +73,68 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
         budget=999999,  # Large value, use external stopping criteria instead
         num_workers=popsize  # Enable batch evaluation with popsize workers
     )
+
+    # --- INITIALIZATION ----------------+
+    # Always evaluate and record initial population (iteration 0)
+    if use_lhs:
+        # LHS warm-start: Use Latin Hypercube Sampling for initial population
+        # Generate LHS population
+        lhs_population = generate_lhs_population(
+            num_samples=popsize,
+            dimension=search_space_size,
+            lower_bound=-search_space_bound,
+            upper_bound=search_space_bound,
+            seed=seed
+        )
+
+        # Evaluate LHS population in batch
+        eval_start = time.time()
+        _, lhs_costs = cost_func(lhs_population, *args)
+        lhs_costs_array = np.array(lhs_costs)
+        evaluations_done += popsize
+        eval_time_total += time.time() - eval_start
+
+        # Warm-start: tell optimizer about LHS samples
+        tell_start = time.time()
+        for lhs_point, lhs_cost in zip(lhs_population, lhs_costs_array):
+            # Create a candidate from the LHS point
+            candidate = optimizer.parametrization.spawn_child()
+            candidate.value = lhs_point
+            optimizer.tell(candidate, lhs_cost)
+        tell_time_total += time.time() - tell_start
+
+        # Track best from LHS initialization
+        min_idx = np.argmin(lhs_costs_array)
+        best_fitness = lhs_costs_array[min_idx]
+        best_solution = lhs_population[min_idx].copy()
+    else:
+        # No LHS: Evaluate initial random population from NGOpt
+        ask_start = time.time()
+        initial_candidates = [optimizer.ask() for _ in range(popsize)]
+        initial_population = np.array([cand.value for cand in initial_candidates])
+        ask_time_total += time.time() - ask_start
+
+        # Evaluate initial population
+        eval_start = time.time()
+        _, initial_costs = cost_func(initial_population, *args)
+        initial_costs_array = np.array(initial_costs)
+        evaluations_done += popsize
+        eval_time_total += time.time() - eval_start
+
+        # Tell optimizer about initial population
+        tell_start = time.time()
+        for candidate, cost in zip(initial_candidates, initial_costs_array):
+            optimizer.tell(candidate, cost)
+        tell_time_total += time.time() - tell_start
+
+        # Track best from initial population
+        min_idx = np.argmin(initial_costs_array)
+        best_fitness = initial_costs_array[min_idx]
+        best_solution = initial_population[min_idx].copy()
+
+    # Record initial convergence point (iteration 0)
+    convergence_history.append(best_fitness)
+    time_history.append(time.time() - start_time)
 
     # Main optimization loop
     iteration = 0

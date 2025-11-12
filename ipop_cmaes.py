@@ -8,6 +8,7 @@
 import numpy as np
 import time
 import cma
+from lhs_init import generate_lhs_population
 
 
 def minimize(
@@ -22,6 +23,8 @@ def minimize(
     maxevaluations=None,
     restarts=5,
     incpopsize=2.0,
+    use_lhs=True,
+    seed=None,
 ):
     """
     IPOP-CMA-ES optimizer: CMA-ES with increasing population restarts.
@@ -38,6 +41,8 @@ def minimize(
         maxevaluations: Maximum number of function evaluations
         restarts: Number of restarts with increasing population (default: 5)
         incpopsize: Population size multiplier for each restart (default: 2.0)
+        use_lhs: If True, initialize FIRST run only with LHS using "prime the pump" approach
+        seed: Random seed for reproducibility (used for LHS initialization)
 
     Returns:
         gen_best: Best fitness value found
@@ -75,7 +80,7 @@ def minimize(
         restarts_completed = restart_idx
 
         # Initialize CMA-ES for this restart
-        x0 = np.zeros(search_space_size)  # Start at origin (center of search space)
+        x0 = np.random.uniform(-search_space_bound, search_space_bound, search_space_size)  # Random initial mean across search space
 
         # If maxiter is None, use a very large number so time limit is the constraint
         cmaes_maxiter = maxiter if maxiter is not None else 1000000
@@ -99,6 +104,65 @@ def minimize(
 
         # Get actual population size from CMA-ES (needed if popsize was None)
         actual_popsize = es.popsize
+
+        # --- INITIALIZATION - FIRST RUN ONLY ----------------+
+        # Record initial population for the first restart only (restart_idx == 0)
+        # Subsequent restarts don't record initial population (they continue from previous)
+        if restart_idx == 0:
+            if use_lhs:
+                # LHS initialization: "Prime the Pump"
+                # CMA-ES requires ask() before tell() to initialize internal state
+                ask_start = time.time()
+                _ = es.ask()  # Discard the uniform random population
+                ask_time_total += time.time() - ask_start
+
+                # Generate LHS population to replace the ask() result
+                lhs_population = generate_lhs_population(
+                    num_samples=actual_popsize,
+                    dimension=search_space_size,
+                    lower_bound=-search_space_bound,
+                    upper_bound=search_space_bound,
+                    seed=seed
+                )
+
+                # Evaluate LHS population
+                eval_start = time.time()
+                _, lhs_fitness = cost_func(lhs_population, *args)
+                lhs_fitness = np.array(lhs_fitness)
+                eval_time_total += time.time() - eval_start
+                evaluations_done += actual_popsize
+
+                # Prime the pump: tell CMA-ES about the LHS population
+                tell_start = time.time()
+                es.tell(lhs_population.tolist(), lhs_fitness.tolist())
+                tell_time_total += time.time() - tell_start
+            else:
+                # No LHS: Evaluate initial random population from CMA-ES
+                ask_start = time.time()
+                initial_population = es.ask()
+                ask_time_total += time.time() - ask_start
+
+                # Evaluate initial population
+                eval_start = time.time()
+                _, initial_fitness = cost_func(np.array(initial_population), *args)
+                initial_fitness = np.array(initial_fitness)
+                eval_time_total += time.time() - eval_start
+                evaluations_done += actual_popsize
+
+                # Tell CMA-ES about initial population
+                tell_start = time.time()
+                es.tell(initial_population, initial_fitness.tolist())
+                tell_time_total += time.time() - tell_start
+
+            # Record initial convergence point (iteration 0)
+            gen_best = es.result.fbest
+            convergence_history.append(gen_best)
+            time_history.append(time.time() - start_time)
+
+            # Update global best
+            if gen_best < global_best_fitness:
+                global_best_fitness = gen_best
+                global_best_solution = es.result.xbest
 
         # --- OPTIMIZE WITH ASK-TELL PATTERN ----------------+
         restart_iteration = 0

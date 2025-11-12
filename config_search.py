@@ -41,9 +41,9 @@ def get_config(args=None):
 
     # Optimizer selection
     parser.add_argument('--optimizer', type=str, default='de',
-                        choices=['de', 'cmaes', 'ipop_cmaes', 'bipop_cmaes', 'pygmo_de', 'scipy_de', 'evox_jade', 'pygmo_pso_gen', 'evox_shade', 'evox_sade', 'evox_code', 'evox_ode', 'ngopt'],
+                        choices=['de', 'cmaes', 'ipop_cmaes', 'bipop_cmaes', 'scipy_de', 'evox_jade', 'pygmo_pso_gen', 'evox_shade', 'evox_sade', 'evox_code', 'evox_ode', 'ngopt'],
                         help='Optimizer to use: "de" (Differential Evolution), "cmaes" (CMA-ES), '
-                             '"ipop_cmaes" (IPOP-CMA-ES), "bipop_cmaes" (BIPOP-CMA-ES), "pygmo_de" (Pygmo DE), '
+                             '"ipop_cmaes" (IPOP-CMA-ES), "bipop_cmaes" (BIPOP-CMA-ES), '
                              '"scipy_de" (SciPy DE with adaptive dithering), "evox_jade" (EvoX JADE), '
                              '"pygmo_pso_gen" (Pygmo PSO Generational), "evox_shade" (EvoX SHADE), '
                              '"evox_sade" (EvoX SaDE), "evox_code" (EvoX CoDE), "evox_ode" (EvoX ODE), '
@@ -54,6 +54,16 @@ def get_config(args=None):
                         help='Mutation factor F for DE (default: 0.3)')
     parser.add_argument('--de_recombine', default=0.95, type=float,
                         help='Crossover rate CR for DE (default: 0.95)')
+
+    # JADE (EvoX) parameters
+    parser.add_argument('--jade_c', default=0.1, type=float,
+                        help='Learning rate for JADE adaptive parameters (default: 0.1, range: 0.01-0.5)')
+    parser.add_argument('--jade_num_diff_vectors', default=1, type=int,
+                        help='Number of difference vectors for JADE mutation (default: 1, options: 1 or 2)')
+    parser.add_argument('--jade_mean', default=None, type=float,
+                        help='Mean for JADE population initialization (default: None, uniform initialization)')
+    parser.add_argument('--jade_stdev', default=None, type=float,
+                        help='Standard deviation for JADE population initialization (default: None, uniform initialization)')
 
     # CMA-ES parameters
     parser.add_argument('--cmaes_sigma0', default=0.5, type=float,
@@ -82,6 +92,12 @@ def get_config(args=None):
     parser.add_argument('--compare_optimizers', default=False, action='store_true',
                         help='Compare all optimizers (DE, CMA-ES, IPOP-CMA-ES, BIPOP-CMA-ES, Pygmo-DE) with the same batch size. '
                              'Requires exactly one batch size.')
+
+    # Initialization strategy
+    parser.add_argument('--use_lhs_init', default=False, action='store_true',
+                        help='Use Latin Hypercube Sampling (LHS) for population initialization. '
+                             'Applicable to: CMA-ES, IPOP-CMA-ES, BIPOP-CMA-ES, Pygmo-PSO-Gen, NGOpt. '
+                             'Other optimizers ignore this flag (default: False, uniform random initialization).')
 
     config = parser.parse_args()
     config.device = torch.device(config.device)

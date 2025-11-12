@@ -1,0 +1,2272 @@
+================================================================================
+COMPREHENSIVE HYPERPARAMETER TUNING PLAN FOR CVAE-OPT OPTIMIZERS
+Using Optuna Framework
+================================================================================
+
+Author: Generated for CVAE-Opt Project
+Date: 2025-11-12
+Optuna Documentation: https://optuna.org/
+
+================================================================================
+TABLE OF CONTENTS
+================================================================================
+
+1. Introduction and Methodology
+2. Optimizer-Specific Hyperparameter Details
+   2.1  Standard DE (de.py)
+   2.2  EvoX ODE (Oppositional Differential Evolution)
+   2.3  EvoX CoDE (Composite Differential Evolution)
+   2.4  EvoX SHADE (Success-History based Adaptive DE)
+   2.5  EvoX SaDE (Self-adaptive Differential Evolution)
+   2.6  Standard CMA-ES
+   2.7  IPOP-CMA-ES (Increasing Population CMA-ES)
+   2.8  BIPOP-CMA-ES (Bi-Population CMA-ES)
+   2.9  SciPy Differential Evolution
+3. General Recommendations
+4. Implementation Roadmap
+5. Appendices
+
+================================================================================
+1. INTRODUCTION AND METHODOLOGY
+================================================================================
+
+This document provides a comprehensive plan for hyperparameter tuning of all
+optimization algorithms in the CVAE-Opt repository using the Optuna framework.
+
+TUNING CONFIGURATION:
+---------------------
+- Number of trials: 50 per optimizer
+- Number of instances: 3 (for robust, generalizable hyperparameters)
+- Time limit per instance: 75 seconds (matches real-world application)
+- Total tuning time per optimizer: ~3.1 hours
+- Population size (batch_size): FIXED at 600
+- Search space bounds: FIXED (as defined by model Z_bound)
+- Optimization direction: MINIMIZE (mean optimality gap %)
+
+OPTUNA SETUP:
+-------------
+- Sampler: TPESampler (Tree-structured Parzen Estimator)
+- Study direction: minimize
+- Storage: SQLite database (persistent, resumable)
+- Objective: Mean optimality gap (%) across 3 tuning instances
+
+EXCLUDED OPTIMIZER:
+-------------------
+- EvoX JADE: Already tuned (see optuna_jade_tune.py)
+  - Tuned parameters: jade_c, jade_num_diff_vectors
+
+GENERAL METHODOLOGY:
+--------------------
+1. For each optimizer, identify all tunable hyperparameters
+2. Define appropriate search spaces based on literature and documentation
+3. Create Optuna objective function that:
+   - Suggests hyperparameters for current trial
+   - Creates config with suggested parameters
+   - Evaluates on 3 tuning instances
+   - Returns mean optimality gap
+4. Run 50 trials with TPE sampler
+5. Save best hyperparameters to JSON
+6. Generate visualizations (optimization history, parameter importance, etc.)
+
+SEARCH SPACE DESIGN PRINCIPLES:
+--------------------------------
+- Use log-scale for parameters spanning orders of magnitude
+- Use categorical for discrete strategy choices
+- Keep ranges wide enough for exploration, narrow enough for efficiency
+- Base ranges on algorithm literature and empirical recommendations
+- Consider parameter interactions and constraints
+
+================================================================================
+2. OPTIMIZER-SPECIFIC HYPERPARAMETER DETAILS
+================================================================================
+
+For each optimizer below, we provide:
+- Brief algorithm description
+- Complete list of tunable hyperparameters with detailed explanations
+- Recommended Optuna search spaces
+- Code examples for parameter suggestion
+- Implementation notes and required changes
+
+================================================================================
+2.1 STANDARD DE (de.py)
+================================================================================
+
+ALGORITHM DESCRIPTION:
+----------------------
+Classic Differential Evolution with DE/rand/1/bin strategy. This is the
+baseline implementation from Nathan Rooy's simple DE algorithm.
+
+Mutation: child = x_rand1 + F * (x_rand2 - x_rand3)
+Selection: Uses uniform crossover with probability CR
+
+This serves as the baseline for comparison with more advanced DE variants.
+
+TUNABLE HYPERPARAMETERS:
+-------------------------
+
+1. mutate (F) - Mutation Scaling Factor
+   Type: float
+   Default: 0.5
+   Description: Controls the amplification of differential variation between
+                individuals. Higher values increase exploration and diversity,
+                while lower values favor exploitation and convergence.
+   Impact: CRITICAL - Most important DE parameter
+   Typical behavior:
+     - F < 0.4: Slow convergence, risk of premature stagnation
+     - F = 0.4-0.6: Balanced exploration/exploitation
+     - F = 0.6-0.8: More explorative, better for complex landscapes
+     - F > 1.0: Very exploratory, risk of instability
+
+2. recombination (CR) - Crossover Probability
+   Type: float
+   Default: 0.9
+   Description: Probability that a dimension is inherited from the mutant
+                (donor) vector rather than the target vector. Higher values
+                mean more dimensions are taken from the donor, increasing
+                diversity. Lower values preserve more of the target.
+   Impact: HIGH - Controls balance between parent and donor inheritance
+   Typical behavior:
+     - CR < 0.5: More conservative, slow mixing
+     - CR = 0.7-0.9: Recommended for most problems
+     - CR > 0.95: Aggressive mixing, can be unstable
+
+RECOMMENDED SEARCH SPACES:
+--------------------------
+
+mutate (F):
+  - Range: [0.4, 1.0]
+  - Distribution: Log-uniform (log=True)
+  - Justification: Most literature recommends 0.4-0.8; we extend to 1.0 to
+                   explore more aggressive values. Log-scale because the
+                   difference between 0.4 and 0.5 is more significant than
+                   between 0.9 and 1.0.
+
+recombination (CR):
+  - Range: [0.7, 0.95]
+  - Distribution: Uniform
+  - Justification: Values below 0.7 typically underperform; 0.9 is most common
+                   recommendation. We explore 0.7-0.95 to find optimal balance.
+
+OPTUNA CODE EXAMPLE:
+--------------------
+
+def suggest_hyperparameters_de(trial):
+    """Suggest hyperparameters for Standard DE."""
+    return {
+        'mutate': trial.suggest_float('mutate', 0.4, 1.0, log=True),
+        'recombination': trial.suggest_float('recombination', 0.7, 0.95)
+    }
+
+IMPLEMENTATION NOTES:
+---------------------
+- READY TO TUNE: de.py already accepts both parameters
+- No code modifications needed
+- Simply pass suggested values to minimize() function
+- Current defaults in search_control.py: F=0.5, CR=0.9
+
+PARAMETER INTERACTION:
+----------------------
+- High F + High CR: Maximum exploration (good for multimodal)
+- Low F + Low CR: Maximum exploitation (good near optimum)
+- High F + Low CR: Aggressive mutation, conservative crossover
+- Low F + High CR: Conservative mutation, aggressive crossover
+
+LITERATURE RECOMMENDATIONS:
+---------------------------
+- Price et al. (2005): F=0.5, CR=0.9 (default values)
+- Storn & Price (1997): F in [0.5, 1.0], CR in [0.8, 1.0]
+- Das & Suganthan (2011): F=0.5, CR=0.9 for most problems
+
+================================================================================
+2.2 EVOX ODE (Oppositional Differential Evolution)
+================================================================================
+
+ALGORITHM DESCRIPTION:
+----------------------
+ODE extends standard DE with opposition-based learning. It simultaneously
+considers both a candidate solution and its opposite point in the search space,
+which can accelerate convergence by better exploring the landscape.
+
+Key innovation: For a point x in [lb, ub], the opposite point is:
+  x_opposite = lb + ub - x
+
+ODE uses opposition for initialization and generation jumping (periodic
+evaluation of opposite population).
+
+Reference: Rahnamayan et al. (2008), IEEE TEC 12(1):64-79
+Documentation: https://evox.readthedocs.io/en/latest/apidocs/evox/evox.algorithms.so.de_variants.ode.html
+
+TUNABLE HYPERPARAMETERS:
+-------------------------
+
+1. base_vector - Mutation Base Vector Strategy
+   Type: str (categorical)
+   Default: 'rand'
+   Options: ['best', 'rand']
+   Description: Determines which vector serves as the base for mutation.
+     - 'rand': Uses a randomly selected individual (DE/rand strategy)
+               More exploratory, better for multimodal landscapes
+     - 'best': Uses the current best individual (DE/best strategy)
+               More exploitative, faster convergence but higher risk of
+               premature convergence
+   Impact: HIGH - Fundamentally changes search behavior
+
+2. num_difference_vectors - Number of Difference Vectors
+   Type: int (categorical)
+   Default: 1
+   Options: [1, 2]
+   Constraint: Must be < popsize/2 (with popsize=600, max is 299, so 1-2 safe)
+   Description: Number of difference vectors used in mutation.
+     - 1: Classic DE mutation: base + F*(x1 - x2)
+          Simpler, more stable, computationally cheaper
+     - 2: Extended mutation: base + F*(x1 - x2) + F*(x3 - x4)
+          More diversity, better for high-dimensional problems
+   Impact: MEDIUM - Affects exploration diversity
+
+3. differential_weight (F) - Mutation Scaling Factor
+   Type: float
+   Default: 0.5
+   Description: Amplification factor for difference vectors. Same role as
+                mutate parameter in standard DE. Controls exploration vs
+                exploitation balance.
+   Impact: CRITICAL - Most sensitive parameter
+
+4. cross_probability (CR) - Crossover Probability
+   Type: float
+   Default: 0.9
+   Constraint: Must be > 0.0
+   Description: Probability of inheriting dimension from donor vector.
+                Equivalent to recombination in standard DE.
+   Impact: HIGH - Controls genetic mixing
+
+RECOMMENDED SEARCH SPACES:
+--------------------------
+
+base_vector:
+  - Options: ['best', 'rand']
+  - Justification: Try both strategies; problem-dependent which is better
+
+num_difference_vectors:
+  - Options: [1, 2]
+  - Justification: More than 2 adds complexity without much benefit for
+                   popsize=600. Literature typically uses 1-2.
+
+differential_weight (F):
+  - Range: [0.4, 1.0]
+  - Distribution: Log-uniform (log=True)
+  - Justification: Same as standard DE; opposition-based learning benefits
+                   from slightly higher F for exploration
+
+cross_probability (CR):
+  - Range: [0.7, 0.95]
+  - Distribution: Uniform
+  - Justification: Must be > 0 (constraint); standard DE recommendations apply
+
+OPTUNA CODE EXAMPLE:
+--------------------
+
+def suggest_hyperparameters_ode(trial):
+    """Suggest hyperparameters for EvoX ODE."""
+    return {
+        'base_vector': trial.suggest_categorical('base_vector',
+                                                   ['best', 'rand']),
+        'num_difference_vectors': trial.suggest_categorical(
+                                      'num_difference_vectors', [1, 2]),
+        'differential_weight': trial.suggest_float('differential_weight',
+                                                    0.4, 1.0, log=True),
+        'cross_probability': trial.suggest_float('cross_probability',
+                                                  0.7, 0.95)
+    }
+
+IMPLEMENTATION NOTES:
+---------------------
+- NEEDS MODIFICATION: evox_ode.py currently uses all defaults
+- Required changes:
+  1. Add parameters to minimize() function signature
+  2. Pass parameters to ODE() constructor:
+
+     algorithm = ODE(
+         pop_size=popsize,
+         lb=lb,
+         ub=ub,
+         device=device,
+         base_vector=base_vector,
+         num_difference_vectors=num_difference_vectors,
+         differential_weight=differential_weight,
+         cross_probability=cross_probability
+     )
+
+  3. Update search_control.py to read new config parameters
+
+EXPECTED CODE CHANGES:
+----------------------
+
+In evox_ode.py, update minimize() signature:
+
+def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
+             mutate, recombination, maxiter, maxtime, maxevaluations=None,
+             base_vector='rand', num_difference_vectors=1,
+             differential_weight=0.5, cross_probability=0.9, seed=1234):
+
+Then pass to ODE constructor (around line 116-121).
+
+PARAMETER INTERACTION:
+----------------------
+- base_vector='best' + high F: Fast convergence, risk of local optima
+- base_vector='rand' + high F: Maximum exploration
+- num_difference_vectors=2: More randomization, good with high CR
+- Opposition-based learning amplifies effect of F, so slightly lower F than
+  standard DE might be beneficial
+
+================================================================================
+2.3 EVOX CODE (Composite Differential Evolution)
+================================================================================
+
+ALGORITHM DESCRIPTION:
+----------------------
+CoDE combines three DE mutation strategies with three parameter settings in a
+composite trial vector generation framework. It uses a pool of control
+parameter pairs (F, CR) and randomly selects from them, which provides
+automatic parameter adaptation without learning.
+
+Three strategies used:
+  1. rand/1/bin: x_base = random, 1 difference vector
+  2. rand/2/bin: x_base = random, 2 difference vectors
+  3. current-to-rand/1: x_base = current, directed toward random
+
+Three default (F, CR) pairs:
+  1. (1.0, 0.1) - High mutation, low crossover
+  2. (1.0, 0.9) - High mutation, high crossover
+  3. (0.8, 0.2) - Moderate mutation, low crossover
+
+Reference: Wang et al. (2011), IEEE TEC 15(1):55-66
+Documentation: https://evox.readthedocs.io/en/latest/apidocs/evox/evox.algorithms.so.de_variants.code.html
+
+TUNABLE HYPERPARAMETERS:
+-------------------------
+
+1. diff_padding_num - Differential Padding Number
+   Type: int
+   Default: 5
+   Description: Number of differential padding vectors for diversity maintenance.
+                Padding adds extra difference vectors to trial generation to
+                enhance population diversity and prevent premature convergence.
+                Higher values increase computational cost but improve diversity.
+   Impact: MEDIUM-HIGH - Affects exploration capacity
+   Typical behavior:
+     - Low (3-5): Less diverse, faster convergence
+     - Medium (6-10): Balanced diversity
+     - High (>10): Very diverse, slower convergence
+
+2. param_pool (ADVANCED) - Control Parameter Pool
+   Type: tensor of (F, CR) pairs
+   Default: [[1.0, 0.1], [1.0, 0.9], [0.8, 0.2]]
+   Description: Pool of (F, CR) parameter combinations. CoDE randomly selects
+                one pair for each trial vector generation. The pool represents
+                different exploration/exploitation strategies.
+   Impact: HIGH - But complex to tune (6 sub-parameters)
+   Note: For simplicity, we recommend tuning only diff_padding_num first.
+         Advanced tuning can optimize the (F, CR) pairs themselves.
+
+3. replace - Population Replacement Strategy
+   Type: bool
+   Default: False
+   Description: Whether to allow replacement of individuals in population.
+     - False: Standard greedy selection (child replaces parent only if better)
+     - True: Alternative replacement strategy
+   Impact: LOW - Usually False works well
+
+RECOMMENDED SEARCH SPACES:
+--------------------------
+
+SIMPLE APPROACH (Recommended for first tuning):
+------------------------------------------------
+
+diff_padding_num:
+  - Range: [3, 10]
+  - Distribution: Uniform integer
+  - Justification: Default is 5; explore 3-10 to find optimal diversity level
+
+replace:
+  - Options: [True, False]
+  - Justification: Test both strategies, though False is standard
+
+ADVANCED APPROACH (Optional second tuning):
+--------------------------------------------
+
+If simple tuning works well, you can then tune the param_pool by tuning
+6 parameters (three F values, three CR values):
+
+F1, F2, F3:
+  - Range: [0.5, 1.2]
+  - Description: Three mutation factors for param_pool
+
+CR1, CR2, CR3:
+  - Range: [0.1, 0.95]
+  - Description: Three crossover rates for param_pool
+
+Then construct: param_pool = [[F1, CR1], [F2, CR2], [F3, CR3]]
+
+OPTUNA CODE EXAMPLE (SIMPLE):
+------------------------------
+
+def suggest_hyperparameters_code(trial):
+    """Suggest hyperparameters for EvoX CoDE (simple approach)."""
+    return {
+        'diff_padding_num': trial.suggest_int('diff_padding_num', 3, 10),
+        'replace': trial.suggest_categorical('replace', [True, False])
+    }
+
+OPTUNA CODE EXAMPLE (ADVANCED):
+--------------------------------
+
+def suggest_hyperparameters_code_advanced(trial):
+    """Suggest hyperparameters for EvoX CoDE (advanced approach)."""
+    # Tune the three (F, CR) pairs
+    F1 = trial.suggest_float('F1', 0.5, 1.2)
+    CR1 = trial.suggest_float('CR1', 0.1, 0.95)
+
+    F2 = trial.suggest_float('F2', 0.5, 1.2)
+    CR2 = trial.suggest_float('CR2', 0.1, 0.95)
+
+    F3 = trial.suggest_float('F3', 0.5, 1.2)
+    CR3 = trial.suggest_float('CR3', 0.1, 0.95)
+
+    # Construct param_pool as tensor
+    import torch
+    param_pool = torch.tensor([[F1, CR1], [F2, CR2], [F3, CR3]])
+
+    return {
+        'diff_padding_num': trial.suggest_int('diff_padding_num', 3, 10),
+        'param_pool': param_pool,
+        'replace': trial.suggest_categorical('replace', [True, False])
+    }
+
+IMPLEMENTATION NOTES:
+---------------------
+- NEEDS MODIFICATION: evox_code.py currently uses all defaults
+- Required changes:
+  1. Add parameters to minimize() function signature
+  2. Pass to CoDE() constructor:
+
+     algorithm = CoDE(
+         pop_size=popsize,
+         lb=lb,
+         ub=ub,
+         device=device,
+         diff_padding_num=diff_padding_num,
+         replace=replace
+         # param_pool=param_pool  # if doing advanced tuning
+     )
+
+RECOMMENDATION:
+---------------
+Start with SIMPLE approach (tune only diff_padding_num and replace).
+If results are promising, consider ADVANCED approach in a second tuning phase.
+
+The default param_pool from Wang et al. (2011) is already well-designed, so
+tuning it may give only marginal improvements.
+
+================================================================================
+2.4 EVOX SHADE (Success-History based Adaptive Differential Evolution)
+================================================================================
+
+ALGORITHM DESCRIPTION:
+----------------------
+SHADE improves upon JADE by maintaining a historical memory of successful
+parameter values. Instead of adapting F and CR individually, SHADE stores
+successful (F, CR) pairs in a memory and samples from this memory for
+parameter generation, using weighted Lehmer mean for updating.
+
+Key innovation: Historical memory M_F and M_CR store successful parameters
+  - Memory size H (typically popsize or larger)
+  - Successful parameters from generation t update memory
+  - New parameters sampled from memory using Cauchy/Normal distributions
+
+SHADE automatically adapts F and CR, making it largely parameter-free.
+
+Reference: Tanabe & Fukunaga (2013), IEEE CEC pp. 71-78
+Documentation: https://evox.readthedocs.io/en/latest/apidocs/evox/evox.algorithms.so.de_variants.shade.html
+
+TUNABLE HYPERPARAMETERS:
+-------------------------
+
+1. diff_padding_num - Differential Padding Number
+   Type: int
+   Default: 9
+   Description: Number of differential padding vectors for trial generation.
+                Controls diversity in mutation by adding extra difference
+                vectors. SHADE uses current-to-pbest mutation strategy with
+                padding for enhanced exploration.
+   Impact: MEDIUM - Primary tunable parameter
+   Typical behavior:
+     - Low (5-7): Faster convergence, less diverse
+     - Medium (8-10): Balanced (default=9 from paper)
+     - High (11-15): More diverse, slower initial convergence
+
+NOTE ON LIMITED PARAMETERS:
+---------------------------
+SHADE has very few tunable parameters because:
+- F and CR are adapted automatically via success-history mechanism
+- Memory size H is internally set (typically = popsize)
+- Mutation strategy is fixed (current-to-pbest/1)
+- The algorithm is designed to be largely parameter-free
+
+This makes SHADE easier to tune but also less flexible than other variants.
+
+RECOMMENDED SEARCH SPACES:
+--------------------------
+
+diff_padding_num:
+  - Range: [5, 15]
+  - Distribution: Uniform integer
+  - Justification: Default is 9; explore ±50% range to find optimal diversity
+                   level for TSP/CVRP latent space optimization
+
+OPTUNA CODE EXAMPLE:
+--------------------
+
+def suggest_hyperparameters_shade(trial):
+    """Suggest hyperparameters for EvoX SHADE."""
+    return {
+        'diff_padding_num': trial.suggest_int('diff_padding_num', 5, 15)
+    }
+
+IMPLEMENTATION NOTES:
+---------------------
+- NEEDS MODIFICATION: evox_shade.py currently uses default
+- Required changes:
+  1. Add diff_padding_num parameter to minimize() signature
+  2. Pass to SHADE() constructor:
+
+     algorithm = SHADE(
+         pop_size=popsize,
+         lb=lb,
+         ub=ub,
+         device=device,
+         diff_padding_num=diff_padding_num
+     )
+
+  3. Update search_control.py to read config parameter
+
+EXPECTED CODE CHANGES:
+----------------------
+
+In evox_shade.py, update minimize() signature:
+
+def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
+             mutate, recombination, maxiter, maxtime, maxevaluations=None,
+             diff_padding_num=9, seed=1234):
+
+Then pass to SHADE constructor (around line 116-121).
+
+ADVANTAGES OF SHADE:
+--------------------
+- Automatic parameter adaptation (no need to tune F, CR)
+- Robust across different problem types
+- Success-history mechanism learns from good parameter values
+- Generally outperforms basic JADE on complex problems
+
+DISADVANTAGES:
+--------------
+- Limited tunability (only one main parameter)
+- Slightly more memory overhead (stores history)
+- May be overkill for simple problems where static F, CR work well
+
+WHEN TO USE SHADE:
+------------------
+- When you want automatic parameter adaptation
+- For complex, multimodal optimization landscapes
+- When you don't want to manually tune F and CR
+- As a robust "set and forget" option
+
+================================================================================
+2.5 EVOX SADE (Self-adaptive Differential Evolution)
+================================================================================
+
+ALGORITHM DESCRIPTION:
+----------------------
+SaDE adapts both mutation strategy selection and CR parameter during evolution.
+It maintains a pool of four DE mutation strategies and learns which strategies
+work best through a probability-based selection mechanism.
+
+Four strategies in pool:
+  1. DE/rand/1/bin
+  2. DE/rand/2/bin
+  3. DE/rand-to-best/2/bin
+  4. DE/current-to-rand/1
+
+Strategy probabilities are updated based on success rates, and CR values are
+adapted using Normal distribution sampling from a memory of successful CRs.
+
+Reference: Qin & Suganthan (2005), IEEE CEC Vol. 2, pp. 1785-1791
+Documentation: https://evox.readthedocs.io/en/latest/apidocs/evox/evox.algorithms.so.de_variants.sade.html
+
+TUNABLE HYPERPARAMETERS:
+-------------------------
+
+1. diff_padding_num - Differential Padding Number
+   Type: int
+   Default: 9
+   Description: Number of differential padding vectors for diversity.
+                Similar role as in SHADE - controls exploration capacity
+                by adding extra difference vectors to mutation.
+   Impact: MEDIUM-HIGH - Affects population diversity
+
+2. LP - Learning Period (Memory Size)
+   Type: int
+   Default: 50
+   Description: Size of the memory window for adaptation. Controls how many
+                generations of history are used to adapt:
+                  - CR value distribution
+                  - Strategy selection probabilities
+                Smaller LP = faster adaptation to recent trends
+                Larger LP = more stable adaptation based on longer history
+   Impact: MEDIUM - Controls adaptation speed
+   Typical behavior:
+     - Low (20-40): Fast adaptation, responsive to recent success
+     - Medium (50-70): Balanced adaptation (default from paper)
+     - High (80-100): Slow adaptation, more stable probabilities
+
+RECOMMENDED SEARCH SPACES:
+--------------------------
+
+diff_padding_num:
+  - Range: [5, 15]
+  - Distribution: Uniform integer
+  - Justification: Same as SHADE; explore around default of 9
+
+LP (Learning Period):
+  - Range: [30, 100]
+  - Distribution: Uniform integer
+  - Justification: Default is 50; explore range to balance adaptation speed
+                   vs stability. With 75s time limit and popsize=600,
+                   we expect ~50-150 generations, so LP in [30,100] is
+                   reasonable to capture learning.
+
+OPTUNA CODE EXAMPLE:
+--------------------
+
+def suggest_hyperparameters_sade(trial):
+    """Suggest hyperparameters for EvoX SaDE."""
+    return {
+        'diff_padding_num': trial.suggest_int('diff_padding_num', 5, 15),
+        'LP': trial.suggest_int('LP', 30, 100)
+    }
+
+IMPLEMENTATION NOTES:
+---------------------
+- NEEDS MODIFICATION: evox_sade.py currently uses all defaults
+- Required changes:
+  1. Add parameters to minimize() function signature
+  2. Pass to SaDE() constructor:
+
+     algorithm = SaDE(
+         pop_size=popsize,
+         lb=lb,
+         ub=ub,
+         device=device,
+         diff_padding_num=diff_padding_num,
+         LP=LP
+     )
+
+  3. Update search_control.py to read config parameters
+
+EXPECTED CODE CHANGES:
+----------------------
+
+In evox_sade.py, update minimize() signature:
+
+def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
+             mutate, recombination, maxiter, maxtime, maxevaluations=None,
+             diff_padding_num=9, LP=50, seed=1234):
+
+Then pass to SaDE constructor (around line 118-123).
+
+PARAMETER INTERACTION:
+----------------------
+- diff_padding_num and LP are relatively independent
+- Higher LP with higher diff_padding_num: More stable, diverse search
+- Lower LP with lower diff_padding_num: Faster convergence, more exploitation
+
+ADVANTAGES OF SADE:
+-------------------
+- Automatic strategy selection (learns which DE variant works best)
+- Automatic CR adaptation
+- Robust across different problem types
+- Four strategies provide good coverage of DE landscape
+
+COMPARISON WITH SHADE:
+----------------------
+- SaDE: Strategy selection + CR adaptation
+- SHADE: F and CR adaptation via success-history
+- Both are self-adaptive, but adapt different aspects
+- SHADE typically has edge on continuous optimization
+- SaDE might be better when different strategies suit different search phases
+
+================================================================================
+2.6 STANDARD CMA-ES
+================================================================================
+
+ALGORITHM DESCRIPTION:
+----------------------
+Covariance Matrix Adaptation Evolution Strategy (CMA-ES) is a state-of-the-art
+continuous optimization algorithm. Unlike DE which uses differences between
+individuals, CMA-ES maintains and adapts a full covariance matrix to model
+promising search directions.
+
+Key components:
+  - Mean vector: Center of search distribution
+  - Step size (sigma): Controls exploration radius
+  - Covariance matrix C: Models correlations between dimensions
+  - Evolution paths: Track successful search directions
+
+CMA-ES is particularly effective for ill-conditioned and non-separable problems.
+
+Reference: Hansen & Ostermeier (2001), Evolutionary Computation 9(2):159-195
+Documentation: https://github.com/CMA-ES/pycma
+API Docs: https://cma-es.github.io/apidocs-pycma/cma.options_parameters.html
+
+TUNABLE HYPERPARAMETERS:
+-------------------------
+
+1. sigma0 - Initial Step Size
+   Type: float
+   Default: 0.5
+   Description: Initial standard deviation (step size) for the search
+                distribution. Controls the initial exploration radius.
+                Typically set to 0.2-0.5 of the search range.
+
+                With search_space_bound = B, search range is [-B, +B] = 2B.
+                sigma0 = 0.5 means initial std dev is 0.5 * 2B = B.
+
+   Impact: CRITICAL - Most important CMA-ES parameter
+   Typical behavior:
+     - Too small (< 0.2): Slow convergence, may miss global optimum
+     - Optimal (0.2-0.5): Fast convergence to quality solutions
+     - Too large (> 0.8): Unstable, excessive exploration
+
+   NOTE: CMA-ES adapts sigma during evolution, but initial value affects
+         early search behavior and convergence speed.
+
+2. use_lhs - Use Latin Hypercube Sampling for Initialization
+   Type: bool
+   Default: True
+   Description: Whether to initialize population using Latin Hypercube Sampling
+                (LHS) instead of uniform random sampling.
+
+                - True: LHS "primes the pump" with well-distributed initial
+                        population, giving CMA-ES better starting distribution
+                - False: Standard uniform random initialization at origin
+
+   Impact: MEDIUM - Affects initial search quality
+
+   LHS advantages:
+     - Better space coverage in initial population
+     - Faster initial convergence
+     - More robust to initialization
+
+   When to use False:
+     - If you prefer pure CMA-ES behavior (no preprocessing)
+     - For benchmarking against standard CMA-ES
+
+ADDITIONAL PARAMETERS (Currently Not Exposed):
+-----------------------------------------------
+
+The pycma library supports many advanced options. If initial tuning shows
+promise, consider exposing these in a second tuning phase:
+
+- popsize_factor: Multiplier for population size (default: 1.0)
+- CSA_dampfac: Damping for step-size adaptation (default: 1.0)
+- CMA_rankmu: Learning rate for rank-mu covariance update (default: 1.0)
+- CMA_rankone: Learning rate for rank-one covariance update (default: 1.0)
+
+For now, we keep it simple with sigma0 and use_lhs only.
+
+RECOMMENDED SEARCH SPACES:
+--------------------------
+
+sigma0:
+  - Range: [0.2, 0.8]
+  - Distribution: Uniform
+  - Justification: Literature recommends 0.2-0.5 of search range. We explore
+                   up to 0.8 to test if larger initial exploration helps with
+                   multimodal TSP/CVRP latent spaces.
+
+use_lhs:
+  - Options: [True, False]
+  - Justification: Test whether LHS initialization improves performance.
+                   Expect True to be better, but worth confirming.
+
+OPTUNA CODE EXAMPLE:
+--------------------
+
+def suggest_hyperparameters_cmaes(trial):
+    """Suggest hyperparameters for Standard CMA-ES."""
+    return {
+        'sigma0': trial.suggest_float('sigma0', 0.2, 0.8),
+        'use_lhs': trial.suggest_categorical('use_lhs', [True, False])
+    }
+
+IMPLEMENTATION NOTES:
+---------------------
+- READY TO TUNE: cmaes.py already accepts both parameters
+- No code modifications needed
+- Simply pass suggested values to minimize() function
+- Current defaults: sigma0=0.5, use_lhs=True
+
+EXPECTED CODE CHANGES:
+----------------------
+None required - implementation already supports these parameters.
+
+In search_control.py, ensure config has:
+  config.cmaes_sigma0 = <value>
+  config.cmaes_use_lhs = <value>
+
+ADVANTAGES OF CMA-ES:
+---------------------
+- Invariant to rotations (handles non-separable problems)
+- Automatic step-size adaptation
+- Highly effective on continuous optimization
+- State-of-the-art on many benchmarks
+
+DISADVANTAGES:
+--------------
+- Computationally expensive (O(n²) per generation for n dimensions)
+- Requires more evaluations than DE for simple problems
+- Not naturally parallel (though can be parallelized)
+
+WHEN TO USE CMA-ES:
+-------------------
+- For ill-conditioned, non-separable problems
+- When search space has strong correlations between dimensions
+- When you need robust, state-of-the-art continuous optimization
+- As a strong baseline for comparison
+
+SIGMA0 TUNING TIPS:
+-------------------
+- If search stagnates early: Try larger sigma0
+- If search is unstable/chaotic: Try smaller sigma0
+- For multimodal landscapes: Larger sigma0 helps explore multiple basins
+- For unimodal landscapes: Smaller sigma0 enables faster local convergence
+
+================================================================================
+2.7 IPOP-CMA-ES (Increasing Population CMA-ES)
+================================================================================
+
+ALGORITHM DESCRIPTION:
+----------------------
+IPOP-CMA-ES extends standard CMA-ES with a restart strategy using increasing
+population sizes. When CMA-ES converges (based on stopping criteria), it
+restarts with a larger population and new random initialization.
+
+Restart strategy:
+  - Run 0: popsize = initial_popsize
+  - Run 1: popsize = initial_popsize × incpopsize
+  - Run 2: popsize = initial_popsize × incpopsize²
+  - etc.
+
+Population doubling (incpopsize=2) is standard and recommended in literature.
+
+Key insight: Larger populations are better for multimodal problems but more
+expensive. IPOP starts small (cheap exploration) and progressively increases
+population (broader exploration) if needed.
+
+Reference: Auger & Hansen (2005), GECCO pp. 415-422
+Documentation: https://cma-es.github.io/apidocs-pycma/
+
+TUNABLE HYPERPARAMETERS:
+-------------------------
+
+1. sigma0 - Initial Step Size
+   Type: float
+   Default: 0.5
+   Description: Initial step size for each restart. Same role as in standard
+                CMA-ES. Each restart begins with this sigma0 value.
+   Impact: CRITICAL - Affects all restarts
+
+2. restarts - Number of Restarts
+   Type: int
+   Default: 5
+   Description: Number of times to restart CMA-ES with increased population.
+                Total runs = restarts + 1 (initial run + restart runs).
+
+                With restarts=5 and incpopsize=2.0:
+                  - Run 0: popsize = 600
+                  - Run 1: popsize = 1200
+                  - Run 2: popsize = 2400
+                  - Run 3: popsize = 4800
+                  - Run 4: popsize = 9600
+                  - Run 5: popsize = 19200
+
+   Impact: HIGH - More restarts = more exploration but higher cost
+
+   Typical behavior:
+     - Low (3-4): Faster, less thorough exploration
+     - Medium (5-6): Balanced (default)
+     - High (7-10): Very thorough, expensive
+
+3. incpopsize - Population Size Multiplier
+   Type: float
+   Default: 2.0
+   Description: Factor by which population size increases with each restart.
+                Standard IPOP-CMA-ES uses 2.0 (population doubling).
+
+                Smaller values (1.5) = more gradual increase, more restarts
+                Larger values (2.5+) = aggressive increase, fewer restarts
+
+   Impact: HIGH - Controls restart aggressiveness
+
+   Typical values:
+     - Conservative (1.5): Gradual scaling, many small restarts
+     - Standard (2.0): Population doubling (recommended)
+     - Aggressive (2.5): Faster scaling, fewer large restarts
+
+4. use_lhs - Use Latin Hypercube Sampling for First Run
+   Type: bool
+   Default: True
+   Description: Whether to use LHS initialization for the FIRST run only.
+                Subsequent restarts use standard random initialization.
+
+                Rationale: LHS helps first run converge faster. Restarts
+                explore different regions, so random init is appropriate.
+
+   Impact: MEDIUM - Affects initial search quality only
+
+RECOMMENDED SEARCH SPACES:
+--------------------------
+
+sigma0:
+  - Range: [0.2, 0.8]
+  - Distribution: Uniform
+  - Justification: Same as standard CMA-ES
+
+restarts:
+  - Range: [3, 8]
+  - Distribution: Uniform integer
+  - Justification: With 75s limit, fewer than 3 restarts may not benefit from
+                   IPOP strategy. More than 8 may not complete within time.
+                   Consider computational budget:
+                   - More restarts = more exploration
+                   - But each restart after ~3-4 has huge population
+
+incpopsize:
+  - Range: [1.5, 2.5]
+  - Distribution: Uniform
+  - Justification: Literature recommends 2.0. We explore ±25% to test if
+                   more gradual (1.5) or aggressive (2.5) scaling works better.
+
+use_lhs:
+  - Options: [True, False]
+  - Justification: Test both; expect True to be better
+
+OPTUNA CODE EXAMPLE:
+--------------------
+
+def suggest_hyperparameters_ipop_cmaes(trial):
+    """Suggest hyperparameters for IPOP-CMA-ES."""
+    return {
+        'sigma0': trial.suggest_float('sigma0', 0.2, 0.8),
+        'restarts': trial.suggest_int('restarts', 3, 8),
+        'incpopsize': trial.suggest_float('incpopsize', 1.5, 2.5),
+        'use_lhs': trial.suggest_categorical('use_lhs', [True, False])
+    }
+
+IMPLEMENTATION NOTES:
+---------------------
+- READY TO TUNE: ipop_cmaes.py already accepts all parameters
+- No code modifications needed
+- Simply pass suggested values to minimize() function
+- Current defaults: sigma0=0.5, restarts=5, incpopsize=2.0, use_lhs=True
+
+EXPECTED CODE CHANGES:
+----------------------
+None required - implementation already supports these parameters.
+
+In search_control.py, ensure config has:
+  config.ipop_sigma0 = <value>
+  config.ipop_restarts = <value>
+  config.ipop_incpopsize = <value>
+  config.ipop_use_lhs = <value>
+
+PARAMETER INTERACTION:
+----------------------
+- High restarts + Low incpopsize: Many gradual restarts
+- Low restarts + High incpopsize: Few aggressive restarts
+- High sigma0 + Many restarts: Maximum exploration (expensive)
+- Low sigma0 + Few restarts: Fast exploitation
+
+ADVANTAGES OF IPOP:
+-------------------
+- Automatic restart strategy
+- Progressive exploration with increasing populations
+- Good for multimodal problems
+- Better than standard CMA-ES on difficult landscapes
+
+DISADVANTAGES:
+--------------
+- Population can grow very large (computational cost)
+- May not complete many restarts within time limit
+- Later restarts may be too expensive given evaluation budget
+
+WHEN TO USE IPOP:
+-----------------
+- For multimodal problems where restarts help
+- When you suspect multiple basins of attraction
+- When standard CMA-ES converges prematurely
+- As an automatic multi-start strategy
+
+TUNING STRATEGY:
+----------------
+The interplay between restarts and incpopsize is important:
+- If time limit is restrictive: Favor fewer restarts with moderate incpopsize
+- If seeking global optimum: Favor more restarts with lower incpopsize
+- With popsize=600 and 75s limit, expect ~2-4 restarts to complete
+
+Monitor timing_breakdown['restarts'] to see how many restarts actually complete.
+
+================================================================================
+2.8 BIPOP-CMA-ES (Bi-Population CMA-ES)
+================================================================================
+
+ALGORITHM DESCRIPTION:
+----------------------
+BIPOP-CMA-ES extends IPOP-CMA-ES by alternating between two types of restarts:
+  1. Large population restarts (IPOP-style): For exploitation
+  2. Small population restarts: For exploration
+
+Budget management ensures balanced use of both restart types.
+
+Restart strategy:
+  - Large population (IPOP): popsize × incpopsize, standard sigma
+  - Small population: random popsize (~0.5-1.0 × initial), varied sigma
+
+Algorithm alternates between small runs (exploration) until budget_small ≥
+budget_large, then does a large run (exploitation) with increased population.
+
+Key insight: Small populations with varied parameters explore more diverse
+regions of the search space, while large populations exploit promising regions.
+This combination is more robust than pure IPOP.
+
+Reference: Hansen (2009), GECCO pp. 455-462
+Documentation: https://cma-es.github.io/apidocs-pycma/
+
+TUNABLE HYPERPARAMETERS:
+-------------------------
+
+1. sigma0 - Initial Step Size for Large Populations
+   Type: float
+   Default: 0.5
+   Description: Initial step size for large population restarts. Small
+                population restarts use randomized sigma (sigma0 × [0.5-1.5])
+                for exploration.
+   Impact: CRITICAL - Baseline for all restarts
+
+2. restarts - Total Number of Restarts
+   Type: int
+   Default: 5
+   Description: Total number of restarts (alternating between small and large).
+                The algorithm automatically decides when to do small vs large
+                restarts based on budget management.
+
+                Typical sequence (simplified):
+                  - Run 0: Initial (large, popsize=600)
+                  - Run 1: Small (popsize~400, varied sigma)
+                  - Run 2: Small (popsize~500, varied sigma)
+                  - Run 3: Large (popsize=1200, standard sigma)
+                  - Run 4: Small (popsize~300, varied sigma)
+                  - etc.
+
+   Impact: HIGH - More restarts = more exploration of small/large balance
+
+3. incpopsize - Population Size Multiplier for Large Restarts
+   Type: float
+   Default: 2.0
+   Description: Factor by which large population increases (IPOP-style).
+                Small populations are sized randomly (~0.5-1.0 × initial popsize)
+                and NOT affected by this parameter.
+   Impact: HIGH - Controls large restart aggressiveness
+
+4. use_lhs - Use Latin Hypercube Sampling for First Run
+   Type: bool
+   Default: True
+   Description: Whether to use LHS initialization for the FIRST run only.
+                Subsequent restarts (both small and large) use random init.
+   Impact: MEDIUM - Affects initial search quality
+
+RECOMMENDED SEARCH SPACES:
+--------------------------
+
+sigma0:
+  - Range: [0.2, 0.8]
+  - Distribution: Uniform
+  - Justification: Same as IPOP-CMA-ES; serves as baseline for both small
+                   and large restarts
+
+restarts:
+  - Range: [3, 8]
+  - Distribution: Uniform integer
+  - Justification: Same as IPOP-CMA-ES; need sufficient restarts to benefit
+                   from bi-population strategy
+
+incpopsize:
+  - Range: [1.5, 2.5]
+  - Distribution: Uniform
+  - Justification: Same as IPOP-CMA-ES; controls large restart scaling
+
+use_lhs:
+  - Options: [True, False]
+  - Justification: Test both; expect True to be better
+
+OPTUNA CODE EXAMPLE:
+--------------------
+
+def suggest_hyperparameters_bipop_cmaes(trial):
+    """Suggest hyperparameters for BIPOP-CMA-ES."""
+    return {
+        'sigma0': trial.suggest_float('sigma0', 0.2, 0.8),
+        'restarts': trial.suggest_int('restarts', 3, 8),
+        'incpopsize': trial.suggest_float('incpopsize', 1.5, 2.5),
+        'use_lhs': trial.suggest_categorical('use_lhs', [True, False])
+    }
+
+IMPLEMENTATION NOTES:
+---------------------
+- READY TO TUNE: bipop_cmaes.py already accepts all parameters
+- No code modifications needed
+- Simply pass suggested values to minimize() function
+- Current defaults: sigma0=0.5, restarts=5, incpopsize=2.0, use_lhs=True
+
+EXPECTED CODE CHANGES:
+----------------------
+None required - implementation already supports these parameters.
+
+In search_control.py, ensure config has:
+  config.bipop_sigma0 = <value>
+  config.bipop_restarts = <value>
+  config.bipop_incpopsize = <value>
+  config.bipop_use_lhs = <value>
+
+BIPOP vs IPOP:
+--------------
+Same tunable parameters, but different restart strategy:
+
+IPOP:
+  - All restarts use increasing large populations
+  - Monotonic population growth
+  - Focuses on exploitation with progressively broader search
+
+BIPOP:
+  - Alternates between small (exploration) and large (exploitation)
+  - Budget-managed to balance both
+  - More robust on multimodal problems
+  - Generally outperforms IPOP in benchmarks
+
+PARAMETER INTERACTION:
+----------------------
+- sigma0 affects both small and large restarts (small restarts randomize it)
+- restarts must be sufficient to see small/large alternation benefit
+- incpopsize only affects large restarts; small populations unaffected
+
+ADVANTAGES OF BIPOP:
+--------------------
+- More robust than IPOP (combines exploration + exploitation restarts)
+- Better on multimodal problems
+- Automatic budget management between restart types
+- Generally state-of-the-art for restart-based CMA-ES
+
+DISADVANTAGES:
+--------------
+- More complex than IPOP or standard CMA-ES
+- Still computationally expensive with large populations
+- May not complete many restarts within tight time budgets
+
+WHEN TO USE BIPOP:
+------------------
+- For difficult multimodal problems
+- When IPOP or standard CMA-ES converge prematurely
+- When you want automatic exploration/exploitation balance
+- As the most robust CMA-ES variant for unknown landscapes
+
+TUNING RECOMMENDATIONS:
+-----------------------
+- BIPOP parameters are same as IPOP, so tuning results should be similar
+- Main difference is internal restart management (small vs large)
+- If IPOP tuning found optimal parameters, use same starting point for BIPOP
+- BIPOP may benefit from slightly more restarts to leverage small/large mix
+
+================================================================================
+2.9 SCIPY DIFFERENTIAL EVOLUTION
+================================================================================
+
+ALGORITHM DESCRIPTION:
+----------------------
+SciPy's differential_evolution is a feature-rich DE implementation with many
+strategies and adaptive mechanisms. It includes:
+  - Multiple mutation strategies (best/rand, 1/2 diff vectors, etc.)
+  - Adaptive parameter dithering (F varies each generation)
+  - Multiple initialization methods (Latin Hypercube, Sobol, Halton, random)
+  - Synchronous (deferred) or asynchronous (immediate) updating
+
+Current implementation uses:
+  - strategy='best1bin' (DE/best/1/bin)
+  - mutation=(0.5, 1.0): Adaptive dithering - F ∈ [0.5, 1.0] random each gen
+  - recombination=0.9: Fixed high crossover
+  - init='latinhypercube': LHS initialization
+  - updating='deferred': Classic synchronous DE
+
+Reference: SciPy documentation
+Documentation: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.differential_evolution.html
+
+TUNABLE HYPERPARAMETERS:
+-------------------------
+
+1. strategy - DE Mutation Strategy
+   Type: str (categorical)
+   Default: 'best1bin'
+   Description: Differential evolution strategy. Format: base/num_vectors/crossover
+
+   Available strategies:
+
+   a) 'best1bin': DE/best/1/bin
+      - Base: Current best individual
+      - Mutation: best + F*(x1 - x2)
+      - Crossover: Binomial
+      - Behavior: Fast convergence, exploitative, risk of premature convergence
+
+   b) 'best1exp': DE/best/1/exp
+      - Same as best1bin but with exponential crossover
+      - Crossover: Exponential (consecutive dimensions)
+      - Behavior: Similar to best1bin but different mixing
+
+   c) 'rand1bin': DE/rand/1/bin
+      - Base: Random individual
+      - Mutation: rand + F*(x1 - x2)
+      - Crossover: Binomial
+      - Behavior: More explorative, robust, slower convergence
+
+   d) 'rand1exp': DE/rand/1/exp
+      - Same as rand1bin but with exponential crossover
+
+   e) 'rand2bin': DE/rand/2/bin
+      - Mutation: rand + F*(x1 - x2) + F*(x3 - x4)
+      - Uses 2 difference vectors
+      - Behavior: Very diverse, good for multimodal
+
+   f) 'rand2exp': DE/rand/2/exp
+      - Same as rand2bin but with exponential crossover
+
+   g) 'best2bin': DE/best/2/bin
+      - Base: Best individual, 2 difference vectors
+      - Mutation: best + F*(x1 - x2) + F*(x3 - x4)
+      - Behavior: Exploitative with high diversity
+
+   h) 'best2exp': DE/best/2/exp
+      - Same as best2bin but with exponential crossover
+
+   i) 'randtobest1bin': DE/rand-to-best/1/bin
+      - Mutation: rand + F*(best - rand) + F*(x1 - x2)
+      - Behavior: Balanced exploration/exploitation
+
+   j) 'randtobest1exp': DE/rand-to-best/1/exp
+      - Same as randtobest1bin but with exponential crossover
+
+   k) 'currenttobest1bin': DE/current-to-best/1/bin
+      - Mutation: current + F*(best - current) + F*(x1 - x2)
+      - Behavior: Directed toward best, adaptive to current position
+
+   l) 'currenttobest1exp': DE/current-to-best/1/exp
+      - Same as currenttobest1bin but with exponential crossover
+
+   Impact: CRITICAL - Fundamentally changes algorithm behavior
+
+   Recommended subset for tuning (to keep search manageable):
+     - 'best1bin': Fast, exploitative (current default)
+     - 'rand1bin': Robust, explorative
+     - 'randtobest1bin': Balanced
+     - 'currenttobest1bin': Adaptive
+
+2. mutation (F) - Mutation Factor
+   Type: float OR tuple of (min, max)
+   Default: (0.5, 1.0)
+   Description: Differential weight for mutations.
+
+   Two modes:
+
+   a) Fixed F (float):
+      - Single value used for all generations
+      - Example: mutation=0.8
+      - Behavior: Consistent exploration level
+
+   b) Adaptive dithering (tuple):
+      - F randomly sampled from [min, max] each generation
+      - Example: mutation=(0.5, 1.0)
+      - Behavior: Variable exploration, more robust
+      - Current default in scipy_de.py
+
+   Impact: CRITICAL - Controls exploration vs exploitation
+
+   Typical values:
+     - Conservative fixed: 0.5
+     - Standard fixed: 0.8
+     - Aggressive fixed: 1.0
+     - Dithering ranges: (0.5, 1.0), (0.3, 1.2), (0.4, 0.9)
+
+3. recombination (CR) - Crossover Probability
+   Type: float
+   Default: 0.9
+   Description: Probability of taking dimension from donor vector.
+                Standard DE parameter. SciPy only supports fixed CR
+                (not tuple/dithering like mutation).
+   Impact: HIGH - Controls genetic mixing
+   Range: (0.0, 1.0]
+
+4. init - Population Initialization Method
+   Type: str (categorical)
+   Default: 'latinhypercube'
+   Description: Method for generating initial population.
+
+   Options:
+
+   a) 'latinhypercube': Latin Hypercube Sampling
+      - Stratified sampling ensuring good space coverage
+      - Each dimension divided into equal intervals, one sample per interval
+      - Best for exploration, recommended default
+
+   b) 'sobol': Sobol low-discrepancy sequence
+      - Quasi-random sequence with excellent uniformity
+      - Better than random for multi-dimensional spaces
+      - Good theoretical properties
+
+   c) 'halton': Halton low-discrepancy sequence
+      - Another quasi-random sequence
+      - Similar benefits to Sobol
+      - May have edge on very high dimensions
+
+   d) 'random': Uniform random sampling
+      - Standard random initialization
+      - Baseline comparison
+      - Least structured, most random
+
+   Impact: MEDIUM - Affects initial search quality and early convergence
+
+   Expected ranking: latinhypercube ≥ sobol ≥ halton > random
+
+5. updating - Population Update Strategy
+   Type: str (categorical)
+   Default: 'deferred'
+   Description: When to update population with trial vectors.
+
+   Options:
+
+   a) 'deferred': Synchronous (Classic DE)
+      - Evaluate entire population of trial vectors
+      - Update entire population at once after all evaluations
+      - Population changes generation-by-generation
+      - Advantage: Stable, well-studied, easier to analyze
+
+   b) 'immediate': Asynchronous
+      - Update population immediately when trial is better
+      - Trial vectors see updated population during same generation
+      - More greedy, faster convergence
+      - Advantage: Uses most recent information, can converge faster
+      - Disadvantage: Less theoretical foundation, order-dependent
+
+   Impact: MEDIUM - Affects convergence dynamics
+
+   'deferred' is standard DE; 'immediate' can be faster but less stable
+
+RECOMMENDED SEARCH SPACES:
+--------------------------
+
+strategy:
+  - Options: ['best1bin', 'rand1bin', 'randtobest1bin', 'currenttobest1bin']
+  - Justification: These 4 cover the main strategy types (best-based, rand-based,
+                   hybrid). Full 12-strategy search would be inefficient.
+                   Can expand if results suggest benefit.
+
+mutation:
+  Recommend TWO approaches and let Optuna choose:
+
+  Approach A - Fixed F:
+    - Range: [0.5, 1.0]
+    - Distribution: Uniform
+
+  Approach B - Adaptive dithering:
+    - Two parameters: mutation_low, mutation_high
+    - mutation_low range: [0.3, 0.7]
+    - mutation_high range: [0.8, 1.5]
+    - Construct: mutation = (mutation_low, mutation_high)
+
+  Use conditional suggestion in Optuna (see code example)
+
+recombination:
+  - Range: [0.7, 0.95]
+  - Distribution: Uniform
+  - Justification: Standard DE recommendation
+
+init:
+  - Options: ['latinhypercube', 'sobol', 'halton', 'random']
+  - Justification: Test all initialization methods
+
+updating:
+  - Options: ['deferred', 'immediate']
+  - Justification: Test both update strategies
+
+OPTUNA CODE EXAMPLE:
+--------------------
+
+def suggest_hyperparameters_scipy_de(trial):
+    """Suggest hyperparameters for SciPy Differential Evolution."""
+
+    # 1. Strategy selection
+    strategy = trial.suggest_categorical('strategy',
+        ['best1bin', 'rand1bin', 'randtobest1bin', 'currenttobest1bin'])
+
+    # 2. Mutation: Choose between fixed and adaptive dithering
+    use_adaptive_mutation = trial.suggest_categorical('use_adaptive_mutation',
+                                                       [True, False])
+    if use_adaptive_mutation:
+        # Adaptive dithering: F ∈ [mutation_low, mutation_high]
+        mutation_low = trial.suggest_float('mutation_low', 0.3, 0.7)
+        mutation_high = trial.suggest_float('mutation_high', 0.8, 1.5)
+        # Ensure mutation_low < mutation_high
+        if mutation_low >= mutation_high:
+            mutation_high = mutation_low + 0.2
+        mutation = (mutation_low, mutation_high)
+    else:
+        # Fixed F
+        mutation = trial.suggest_float('mutation_fixed', 0.5, 1.0)
+
+    # 3. Recombination (crossover probability)
+    recombination = trial.suggest_float('recombination', 0.7, 0.95)
+
+    # 4. Initialization method
+    init = trial.suggest_categorical('init',
+        ['latinhypercube', 'sobol', 'halton', 'random'])
+
+    # 5. Update strategy
+    updating = trial.suggest_categorical('updating', ['deferred', 'immediate'])
+
+    return {
+        'strategy': strategy,
+        'mutation': mutation,
+        'recombination': recombination,
+        'init': init,
+        'updating': updating
+    }
+
+IMPLEMENTATION NOTES:
+---------------------
+- NEEDS SIGNIFICANT MODIFICATION: scipy_de.py has hardcoded parameters
+- Current implementation (lines 162-177) hardcodes:
+    strategy='best1bin'
+    mutation=(0.5, 1.0)
+    recombination=0.9
+    vectorized=True
+    updating='deferred'
+
+- Required changes:
+  1. Add parameters to minimize() function signature
+  2. Pass parameters to differential_evolution() call:
+
+     result = differential_evolution(
+         func=vectorized_objective,
+         bounds=bounds,
+         strategy=strategy,              # NEW
+         mutation=mutation,              # NEW (was hardcoded)
+         recombination=recombination,    # NEW (was hardcoded)
+         vectorized=True,
+         popsize=scipy_popsize,
+         maxiter=maxiter if maxiter is not None else 1000,
+         callback=callback,
+         workers=1,
+         polish=False,
+         atol=0,
+         tol=0.0,
+         updating=updating,              # NEW
+         init=init,                      # NEW (currently no init param)
+         seed=seed
+     )
+
+  3. Update search_control.py to read new config parameters
+
+EXPECTED CODE CHANGES:
+----------------------
+
+In scipy_de.py, update minimize() signature (line 20):
+
+def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
+             mutate, recombination, maxiter, maxtime, maxevaluations=None,
+             strategy='best1bin', mutation=(0.5, 1.0),
+             recombination_scipy=0.9, init='latinhypercube',
+             updating='deferred', seed=None):
+
+Note: We may need recombination_scipy separate from recombination parameter
+to avoid conflicts with the interface.
+
+Then update differential_evolution() call (lines 162-177).
+
+PARAMETER INTERACTION:
+----------------------
+- 'best' strategies work well with fixed low F (exploitation)
+- 'rand' strategies work well with dithering or high F (exploration)
+- 'immediate' updating favors lower F (more greedy)
+- 'deferred' updating allows higher F (more exploration per generation)
+- LHS/Sobol init works better with rand-based strategies (avoid bias)
+
+ADVANTAGES OF SCIPY DE:
+-----------------------
+- Many strategies and options available
+- Well-tested, maintained library
+- Vectorized evaluation (GPU-friendly)
+- Adaptive dithering built-in
+
+DISADVANTAGES:
+--------------
+- No advanced self-adaptation like JADE/SHADE
+- More parameters to tune than simple DE
+- Some parameter combinations may not work well
+
+WHEN TO USE SCIPY DE:
+---------------------
+- When you want a robust, well-maintained DE implementation
+- When you need flexibility in strategy selection
+- For benchmarking against standard DE strategies
+- As a strong baseline with adaptive dithering
+
+================================================================================
+3. GENERAL RECOMMENDATIONS
+================================================================================
+
+TUNING ORDER:
+-------------
+Recommended order based on implementation readiness:
+
+1. READY TO TUNE (no code changes needed):
+   - Standard DE (de.py)
+   - Standard CMA-ES (cmaes.py)
+   - IPOP-CMA-ES (ipop_cmaes.py)
+   - BIPOP-CMA-ES (bipop_cmaes.py)
+
+2. MINOR MODIFICATIONS (add parameters to function signatures):
+   - EvoX ODE (evox_ode.py)
+   - EvoX CoDE (evox_code.py)
+   - EvoX SHADE (evox_shade.py)
+   - EvoX SaDE (evox_sade.py)
+
+3. MAJOR MODIFICATIONS (refactor parameter handling):
+   - SciPy DE (scipy_de.py)
+
+OPTUNA CONFIGURATION:
+---------------------
+
+For each optimizer tuning script, use:
+
+```python
+import optuna
+
+# Create study with TPE sampler
+study = optuna.create_study(
+    study_name='<optimizer_name>_tuning',
+    storage='sqlite:///<optimizer_name>_tuning.db',
+    direction='minimize',
+    load_if_exists=args.load_if_exists,
+    sampler=optuna.samplers.TPESampler(seed=args.seed)
+)
+
+# Run optimization
+study.optimize(
+    lambda trial: objective(trial, objective_args),
+    n_trials=50,
+    show_progress_bar=False  # Use custom logging instead
+)
+
+# Access best parameters
+best_params = study.best_params
+best_value = study.best_value
+```
+
+TRIAL BUDGET:
+-------------
+- 50 trials per optimizer is reasonable for:
+  - 2-4 parameters: Excellent coverage
+  - 5-6 parameters: Good exploration
+  - 7+ parameters: Basic exploration (may need more trials)
+
+- TPE sampler typically needs:
+  - Minimum: 10-20 trials to start learning
+  - Effective: 30-50 trials for good results
+  - Diminishing returns after: 100+ trials
+
+TIME BUDGET:
+------------
+With 50 trials × 3 instances × 75 seconds:
+  - Approximate time per trial: 3 × 75s = 225s = 3.75 min
+  - Total tuning time: 50 × 3.75 min ≈ 187.5 min ≈ 3.1 hours
+
+This assumes minimal overhead. Actual time may be higher due to:
+  - Model loading/inference time
+  - Optuna overhead
+  - Logging and result storage
+
+SEARCH SPACE TIPS:
+------------------
+
+1. Use log-scale for parameters spanning orders of magnitude:
+   - Example: trial.suggest_float('param', 0.01, 1.0, log=True)
+   - Good for: F, learning rates, small scale parameters
+
+2. Use uniform for bounded continuous parameters:
+   - Example: trial.suggest_float('param', 0.0, 1.0)
+   - Good for: CR, probabilities, sigma values
+
+3. Use categorical for discrete choices:
+   - Example: trial.suggest_categorical('param', ['opt1', 'opt2'])
+   - Good for: Strategies, boolean options, discrete integer choices
+
+4. Use int for discrete numeric parameters:
+   - Example: trial.suggest_int('param', 1, 10)
+   - Good for: Population sizes, memory sizes, iteration counts
+
+VALIDATION STRATEGY:
+--------------------
+
+After tuning each optimizer:
+
+1. Cross-validation:
+   - Tune on 3 instances (as planned)
+   - Validate on remaining test instances
+   - Check if optimal parameters generalize
+
+2. Sensitivity analysis:
+   - Use Optuna's parameter importance plot
+   - Identify most critical parameters
+   - Consider fixing less important parameters to defaults
+
+3. Comparison:
+   - Compare optimized vs default parameters on full test set
+   - Measure improvement (gap reduction %)
+   - Statistical significance testing (if applicable)
+
+4. Documentation:
+   - Save best parameters to JSON
+   - Record mean/std gap on tuning instances
+   - Note any interesting findings or patterns
+
+TROUBLESHOOTING:
+----------------
+
+If tuning results are poor:
+
+1. Not enough trials:
+   - Increase to 75-100 trials for complex search spaces
+
+2. Search space too wide:
+   - Narrow ranges based on literature
+   - Use log-scale where appropriate
+
+3. Instance selection bias:
+   - Try different subset of tuning instances
+   - Ensure instances are representative
+
+4. Time limit too restrictive:
+   - If optimizer rarely completes iterations, increase time
+   - Or reduce search space size
+
+5. Optuna not converging:
+   - Check TPE sampler is being used
+   - Ensure seed is set for reproducibility
+   - View optimization history plot to diagnose
+
+REPRODUCIBILITY:
+----------------
+
+For reproducible tuning results:
+
+1. Set all random seeds:
+   ```python
+   np.random.seed(args.seed)
+   torch.manual_seed(args.seed)
+   if torch.cuda.is_available():
+       torch.cuda.manual_seed_all(args.seed)
+   ```
+
+2. Use consistent instance ordering:
+   ```python
+   tuning_instances = instances[:3]  # Always first 3 instances
+   ```
+
+3. Use fixed Optuna seed:
+   ```python
+   sampler=optuna.samplers.TPESampler(seed=args.seed)
+   ```
+
+4. Document environment:
+   - PyTorch version
+   - CUDA version (if using GPU)
+   - EvoX version
+   - pycma version
+   - SciPy version
+
+EXPECTED IMPROVEMENTS:
+----------------------
+
+Rough expectations for hyperparameter tuning impact:
+
+- Standard DE: 5-15% improvement (F and CR are quite sensitive)
+- CMA-ES variants: 10-20% improvement (sigma0 is critical)
+- IPOP/BIPOP: 15-25% improvement (restart strategy is powerful)
+- EvoX variants: 5-10% improvement (fewer parameters, self-adaptive)
+- SciPy DE: 10-20% improvement (strategy selection is impactful)
+
+These are rough estimates. Actual improvements depend heavily on:
+- Problem characteristics (TSP vs CVRP, instance difficulty)
+- Default parameter quality
+- Search space coverage
+- Time budget sufficiency
+
+PARALLEL TUNING:
+----------------
+
+If you have multiple GPUs or machines:
+
+- Optuna supports parallel optimization with shared database
+- Multiple processes can run trials simultaneously
+- Storage must be accessible to all processes (SQLite or PostgreSQL)
+
+Example:
+```bash
+# Terminal 1
+uv run python optuna_de_tune.py --storage sqlite:///de_tuning.db --load_if_exists
+
+# Terminal 2 (simultaneously)
+uv run python optuna_de_tune.py --storage sqlite:///de_tuning.db --load_if_exists
+```
+
+Both will contribute trials to the same study.
+
+================================================================================
+4. IMPLEMENTATION ROADMAP
+================================================================================
+
+PHASE 1: READY-TO-TUNE OPTIMIZERS (Week 1)
+-------------------------------------------
+
+These require no code modifications:
+
+1.1. Standard DE
+  - File: de.py (already parameterized)
+  - Script: optuna_de_tune.py (NEW)
+  - Parameters: mutate, recombination
+  - Estimated time: 3 hours
+
+1.2. Standard CMA-ES
+  - File: cmaes.py (already parameterized)
+  - Script: optuna_cmaes_tune.py (NEW)
+  - Parameters: sigma0, use_lhs
+  - Estimated time: 3 hours
+
+1.3. IPOP-CMA-ES
+  - File: ipop_cmaes.py (already parameterized)
+  - Script: optuna_ipop_tune.py (NEW)
+  - Parameters: sigma0, restarts, incpopsize, use_lhs
+  - Estimated time: 3 hours
+
+1.4. BIPOP-CMA-ES
+  - File: bipop_cmaes.py (already parameterized)
+  - Script: optuna_bipop_tune.py (NEW)
+  - Parameters: sigma0, restarts, incpopsize, use_lhs
+  - Estimated time: 3 hours
+
+Total Phase 1: ~12 hours tuning time
+
+PHASE 2: EVOX OPTIMIZERS (Week 2)
+----------------------------------
+
+These require adding parameters to minimize() signatures:
+
+2.1. EvoX ODE
+  - File: evox_ode.py (MODIFY)
+  - Changes: Add 4 parameters to minimize(), pass to ODE()
+  - Script: optuna_ode_tune.py (NEW)
+  - Parameters: base_vector, num_difference_vectors, differential_weight,
+                cross_probability
+  - Estimated time: 0.5 hours code + 3 hours tuning
+
+2.2. EvoX CoDE
+  - File: evox_code.py (MODIFY)
+  - Changes: Add 2 parameters to minimize(), pass to CoDE()
+  - Script: optuna_code_tune.py (NEW)
+  - Parameters: diff_padding_num, replace
+  - Estimated time: 0.5 hours code + 3 hours tuning
+
+2.3. EvoX SHADE
+  - File: evox_shade.py (MODIFY)
+  - Changes: Add 1 parameter to minimize(), pass to SHADE()
+  - Script: optuna_shade_tune.py (NEW)
+  - Parameters: diff_padding_num
+  - Estimated time: 0.5 hours code + 3 hours tuning
+
+2.4. EvoX SaDE
+  - File: evox_sade.py (MODIFY)
+  - Changes: Add 2 parameters to minimize(), pass to SaDE()
+  - Script: optuna_sade_tune.py (NEW)
+  - Parameters: diff_padding_num, LP
+  - Estimated time: 0.5 hours code + 3 hours tuning
+
+Total Phase 2: ~2 hours coding + ~12 hours tuning
+
+PHASE 3: SCIPY DE (Week 3)
+---------------------------
+
+This requires more significant refactoring:
+
+3.1. SciPy DE
+  - File: scipy_de.py (MAJOR MODIFY)
+  - Changes:
+      * Refactor minimize() to accept strategy, mutation, recombination,
+        init, updating parameters
+      * Update differential_evolution() call
+      * Handle conditional mutation (fixed vs dithering)
+  - Script: optuna_scipy_de_tune.py (NEW)
+  - Parameters: strategy, mutation, recombination, init, updating
+  - Estimated time: 2 hours code + 3 hours tuning
+
+Total Phase 3: ~2 hours coding + ~3 hours tuning
+
+TOTAL PROJECT TIMELINE:
+------------------------
+- Coding: ~4 hours
+- Tuning: ~27 hours (9 optimizers × ~3 hours each)
+- Analysis: ~3 hours (compile results, compare improvements)
+
+Total: ~34 hours (~4-5 days if running sequentially)
+
+If running tuning in parallel with multiple GPUs/machines, timeline reduces
+significantly (limited by coding and analysis time).
+
+DELIVERABLES:
+-------------
+
+For each optimizer:
+1. Tuning script (optuna_<optimizer>_tune.py)
+2. Best parameters JSON (best_<optimizer>_params.json)
+3. Tuning database (optuna_<optimizer>.db)
+4. Visualization plots:
+   - optimization_history.png
+   - param_importances.png (if ≥10 trials)
+   - parallel_coordinate.png
+5. Tuning log (optuna_tuning_<timestamp>.log)
+
+Final summary:
+6. Comparative analysis document
+7. Parameter recommendations for each optimizer
+8. Updated search_control.py with optimal defaults (optional)
+
+SCRIPT TEMPLATE:
+----------------
+
+Use optuna_jade_tune.py as template for creating other tuning scripts.
+
+Key sections to adapt:
+
+1. Import optimizer module:
+   ```python
+   import <optimizer_module>  # e.g., import de, import cmaes, etc.
+   ```
+
+2. Define create_config_for_trial():
+   ```python
+   def create_config_for_trial(base_config, **optimizer_params):
+       # Set optimizer-specific parameters on config
+       config.optimizer = '<optimizer_name>'
+       config.<param1> = optimizer_params['param1']
+       # ... etc
+       return config
+   ```
+
+3. Define objective() function:
+   ```python
+   def objective(trial: optuna.Trial, args) -> float:
+       # Suggest hyperparameters
+       param1 = trial.suggest_float('param1', min_val, max_val)
+       # ...
+
+       # Create config
+       config = create_config_for_trial(base_config, param1=param1, ...)
+
+       # Evaluate on tuning instances
+       gaps = []
+       for instance in tuning_instances:
+           objective_value, solution, ... = solve_instance(
+               model, instance, config, cost_fn, batch_size)
+           gap = calculate_gap(objective_value, optimal_value)
+           gaps.append(gap)
+
+       return np.mean(gaps)
+   ```
+
+4. Main loop:
+   ```python
+   study = optuna.create_study(...)
+   study.optimize(lambda trial: objective(trial, args), n_trials=50)
+   ```
+
+5. Save results:
+   ```python
+   # Save best params to JSON
+   # Generate visualizations
+   # Log summary
+   ```
+
+CODE REUSE:
+-----------
+
+Much code can be shared across tuning scripts:
+- setup_logging() (identical)
+- Model loading (identical)
+- Instance loading (identical)
+- Gap calculation (identical)
+- Visualization generation (identical)
+
+Consider creating a shared optuna_utils.py module with common functions.
+
+TESTING STRATEGY:
+-----------------
+
+Before full 50-trial tuning:
+
+1. Test with n_trials=3 to verify:
+   - Parameters are correctly suggested
+   - Config is correctly created
+   - solve_instance() runs without errors
+   - Gap is correctly calculated
+   - Logging works
+
+2. If successful, run full 50 trials
+
+3. Monitor first few trials manually to catch issues early
+
+DEBUGGING TIPS:
+---------------
+
+Common issues and solutions:
+
+1. "Parameter not found in config":
+   - Ensure parameter is added to config in create_config_for_trial()
+   - Check search_control.py reads the parameter correctly
+
+2. "Algorithm constructor error":
+   - Verify parameter names match algorithm documentation
+   - Check parameter types (int vs float, tensor vs scalar)
+   - Ensure device is correctly specified
+
+3. "Study already exists":
+   - Use --load_if_exists flag to resume
+   - Or delete SQLite database to start fresh
+
+4. "Trial failed":
+   - Optuna will skip failed trials and continue
+   - Check logs for error messages
+   - Fix issue and resume study
+
+5. "Out of memory":
+   - Reduce batch_size (popsize) temporarily
+   - Or use smaller model/instances for testing
+   - Check for memory leaks in optimizer implementation
+
+================================================================================
+5. APPENDICES
+================================================================================
+
+APPENDIX A: DOCUMENTATION LINKS
+--------------------------------
+
+Optuna:
+  - Official docs: https://optuna.org/
+  - API reference: https://optuna.readthedocs.io/
+  - Tutorial: https://optuna.readthedocs.io/en/stable/tutorial/index.html
+  - Visualization: https://optuna.readthedocs.io/en/stable/reference/visualization/index.html
+
+EvoX:
+  - Main docs: https://evox.readthedocs.io/
+  - JADE: https://evox.readthedocs.io/en/latest/apidocs/evox/evox.algorithms.so.de_variants.jade.html
+  - ODE: https://evox.readthedocs.io/en/latest/apidocs/evox/evox.algorithms.so.de_variants.ode.html
+  - CoDE: https://evox.readthedocs.io/en/latest/apidocs/evox/evox.algorithms.so.de_variants.code.html
+  - SHADE: https://evox.readthedocs.io/en/latest/apidocs/evox/evox.algorithms.so.de_variants.shade.html
+  - SaDE: https://evox.readthedocs.io/en/latest/apidocs/evox/evox.algorithms.so.de_variants.sade.html
+
+CMA-ES:
+  - pycma docs: https://github.com/CMA-ES/pycma
+  - API reference: https://cma-es.github.io/apidocs-pycma/
+  - Options: https://cma-es.github.io/apidocs-pycma/cma.options_parameters.html
+  - Tutorial: https://github.com/CMA-ES/pycma/blob/master/README.md
+
+SciPy:
+  - differential_evolution: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.differential_evolution.html
+  - Optimization guide: https://docs.scipy.org/doc/scipy/tutorial/optimize.html
+
+Papers:
+  - DE: Storn & Price (1997), Journal of Global Optimization 11:341-359
+  - JADE: Zhang & Sanderson (2009), IEEE TEC 13(5):945-958
+  - ODE: Rahnamayan et al. (2008), IEEE TEC 12(1):64-79
+  - CoDE: Wang et al. (2011), IEEE TEC 15(1):55-66
+  - SHADE: Tanabe & Fukunaga (2013), IEEE CEC pp. 71-78
+  - SaDE: Qin & Suganthan (2005), IEEE CEC Vol. 2, pp. 1785-1791
+  - CMA-ES: Hansen & Ostermeier (2001), Evolutionary Computation 9(2):159-195
+  - IPOP-CMA-ES: Auger & Hansen (2005), GECCO pp. 415-422
+  - BIPOP-CMA-ES: Hansen (2009), GECCO pp. 455-462
+
+APPENDIX B: OPTUNA BEST PRACTICES
+----------------------------------
+
+1. Study Management:
+   - Use persistent storage (SQLite or PostgreSQL)
+   - Set study_name for identification
+   - Use load_if_exists=True to resume interrupted tuning
+   - Prune failed trials with try-except in objective
+
+2. Sampler Selection:
+   - TPESampler: Best for ≤100 dimensions, sequential optimization
+   - CmaEsSampler: Alternative for continuous spaces (ironic for tuning CMA-ES!)
+   - RandomSampler: Baseline comparison
+   - GridSampler: For small discrete spaces
+
+3. Pruning:
+   - Not applicable here (single objective evaluation per trial)
+   - Useful for iterative training (e.g., ML model training)
+
+4. Parallel Optimization:
+   - SQLite: Good for single-machine, multi-process
+   - PostgreSQL: Better for distributed multi-machine
+   - Set n_jobs=-1 in optimize() for parallel trials (if applicable)
+
+5. Visualization:
+   - Generate after study completes
+   - Requires kaleido for static image export: uv add kaleido
+   - Available plots:
+       * plot_optimization_history(): Convergence over trials
+       * plot_param_importances(): Which parameters matter most
+       * plot_parallel_coordinate(): Parameter combinations
+       * plot_slice(): 1D parameter effects
+       * plot_contour(): 2D parameter interactions (for 2-param studies)
+
+6. Callbacks:
+   - Log after each trial
+   - Save intermediate best params
+   - Early stopping if convergence detected
+
+7. Search Space Design:
+   - Start wide, narrow in second tuning phase if needed
+   - Use log-scale for exponential parameters
+   - Use categorical for discrete choices
+   - Avoid redundant parameters (e.g., don't tune both F and 1-F)
+
+8. Reproducibility:
+   - Set seed in TPESampler
+   - Set seed in numpy/torch
+   - Fix instance ordering
+   - Document library versions
+
+APPENDIX C: SEARCH SPACE DESIGN THEORY
+---------------------------------------
+
+Log-scale vs Linear:
+
+- Use log-scale when:
+    * Parameter spans multiple orders of magnitude (0.01 to 1.0)
+    * Effect is proportional to relative change (e.g., learning rates)
+    * Small values are as important as large values
+
+- Use linear when:
+    * Parameter spans single order of magnitude (0.7 to 0.95)
+    * Effect is proportional to absolute change (e.g., probabilities)
+    * Uniform sampling makes sense
+
+Integer vs Float:
+
+- Use int for:
+    * Truly discrete parameters (population size, memory length)
+    * When decimal values are meaningless
+
+- Use float for:
+    * Continuous parameters (F, CR, sigma)
+    * When any value in range is valid
+
+Categorical vs Ordinal:
+
+- Use categorical for:
+    * Unordered choices (strategies, initialization methods)
+    * Boolean flags
+
+- Could use ordinal for:
+    * Ordered discrete choices (but int is usually better)
+    * Example: small/medium/large → int values 1/2/3
+
+Conditional Parameters:
+
+- Some parameters only apply with certain choices
+- Example: mutation_low, mutation_high only if use_adaptive_mutation=True
+- Optuna handles this via conditional suggestions in objective function
+
+Search Space Size:
+
+- Total combinations = product of cardinalities
+- Example: 4 strategies × 10 F values × 10 CR values = 400 combinations
+- With 50 trials, sampling ~12.5% of space
+- TPE learns which regions are promising and focuses there
+
+Constraints:
+
+- Handle constraints in objective function
+- Example: Ensure mutation_low < mutation_high
+- Invalid trials can return inf or raise exception (Optuna will skip)
+
+APPENDIX D: PARAMETER INTERACTION ANALYSIS
+-------------------------------------------
+
+Some parameters interact strongly:
+
+1. F (mutation) and CR (crossover):
+   - High F + High CR: Maximum diversity, very explorative
+   - High F + Low CR: Aggressive mutation, conservative inheritance
+   - Low F + High CR: Conservative mutation, aggressive inheritance
+   - Low F + Low CR: Minimum diversity, very exploitative
+
+2. Strategy and F:
+   - 'best' strategies prefer lower F (avoid instability)
+   - 'rand' strategies work well with higher F (need diversity)
+
+3. sigma0 and restarts (CMA-ES):
+   - High sigma + many restarts: Thorough global search (expensive)
+   - Low sigma + few restarts: Fast local search
+
+4. Population size and time limit:
+   - Large popsize: Fewer iterations within time limit
+   - Small popsize: More iterations but less diversity per iteration
+   - With fixed popsize=600, this is not tunable
+
+5. diff_padding_num and adaptive parameters (EvoX):
+   - Higher padding adds diversity, may compensate for conservative F/CR
+   - Lower padding requires well-tuned F/CR for good performance
+
+After tuning, analyze parameter importance plots to identify:
+  - Most critical parameters (focus manual tuning here)
+  - Interacting parameters (2D contour plots)
+  - Independent parameters (can be fixed to defaults)
+
+APPENDIX E: EXPECTED RESULTS FORMAT
+------------------------------------
+
+After tuning, each optimizer will have:
+
+best_<optimizer>_params.json:
+```json
+{
+  "best_params": {
+    "param1": value1,
+    "param2": value2,
+    ...
+  },
+  "best_value": 2.34,  // mean gap %
+  "n_trials": 50,
+  "study_name": "<optimizer>_tuning",
+  "timestamp": "2025-11-12T14:30:00",
+  "instances_path": "instances/tsp/test/tsp100_10inst.pkl",
+  "model_path": "models/tsp_100_model.pt",
+  "tune_n_instances": 3,
+  "batch_size": 600
+}
+```
+
+Tuning log excerpt:
+```
+[14:30:15][INFO] Trial 1 started
+[14:30:15][INFO]   Parameters: param1=0.5, param2=0.85
+[14:30:15][INFO]   Using first 3 instances for tuning
+[14:30:20][INFO]   Instance 0: gap=3.45%, cost=1234.5, optimal=1193.2, time=4.8s
+[14:30:25][INFO]   Instance 1: gap=2.89%, cost=2345.6, optimal=2279.3, time=5.1s
+[14:30:30][INFO]   Instance 2: gap=4.12%, cost=1876.9, optimal=1802.3, time=5.3s
+[14:30:30][INFO]   Trial 1 completed:
+[14:30:30][INFO]     Mean gap: 3.49%
+[14:30:30][INFO]     Std gap: 0.62%
+[14:30:30][INFO]     Total time: 15.2s
+================================================================================
+[14:30:35][INFO] Trial 2 started
+...
+```
+
+Comparative summary (after all tuning):
+```
+Optimizer        Default Gap    Tuned Gap    Improvement    Best Parameters
+---------------------------------------------------------------------------
+Standard DE      4.23%          3.45%        18.4%          F=0.65, CR=0.88
+EvoX JADE        3.89%          3.12%        19.8%          c=0.08, ndv=2
+EvoX ODE         4.01%          3.67%        8.5%           base=rand, F=0.72
+...
+CMA-ES           3.56%          2.98%        16.3%          sigma=0.35, lhs=T
+IPOP-CMA-ES      3.21%          2.45%        23.7%          sigma=0.4, r=6
+BIPOP-CMA-ES     3.18%          2.38%        25.2%          sigma=0.38, r=7
+SciPy DE         4.15%          3.29%        20.7%          strat=rand1bin
+---------------------------------------------------------------------------
+```
+
+APPENDIX F: TROUBLESHOOTING CHECKLIST
+--------------------------------------
+
+If tuning produces unexpected results:
+
+□ Verify parameters are correctly passed to algorithm
+□ Check that config attributes match algorithm expectations
+□ Confirm instance loading works (test with 1 instance first)
+□ Validate gap calculation (compare with manual computation)
+□ Ensure random seeds are set for reproducibility
+□ Check time limit allows reasonable convergence
+□ Verify search space ranges are sensible
+□ Test with n_trials=3 before full run
+□ Monitor first few trials for errors
+□ Check GPU memory usage (if using CUDA)
+□ Verify batch_size=600 is respected
+□ Confirm search bounds are correct
+□ Test objective function returns valid float
+□ Check for NaN or inf in results
+
+If performance doesn't improve:
+
+□ Widen search space (may be too narrow)
+□ Increase number of trials (50 may be insufficient)
+□ Use more tuning instances (3 may not be representative)
+□ Check if time limit is too restrictive
+□ Verify default parameters aren't already optimal
+□ Consider problem-specific parameter interactions
+□ Analyze parameter importance plots
+□ Try different Optuna sampler
+□ Compare with grid search baseline
+
+If code modifications fail:
+
+□ Check function signatures match
+□ Verify parameter names are correct
+□ Ensure types are correct (int vs float, tensor vs scalar)
+□ Test modified code with default parameters first
+□ Add debug print statements
+□ Use try-except to catch errors
+□ Check algorithm documentation for correct API
+□ Verify imports are correct
+
+================================================================================
+END OF HYPERPARAMETER TUNING PLAN
+================================================================================
+
+This document provides comprehensive guidance for tuning all 9 remaining
+optimizers in the CVAE-Opt repository using Optuna.
+
+For questions or issues during implementation, refer to:
+  - Optimizer documentation (Appendix A)
+  - Optuna documentation (https://optuna.org/)
+  - This document's troubleshooting sections
+
+Good luck with hyperparameter tuning!
+
+================================================================================

@@ -54,7 +54,8 @@ class CVAEOptProblem(torch.nn.Module):
 
 
 def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
-             mutate, recombination, maxiter, maxtime, maxevaluations=None):
+             mutate, recombination, maxiter, maxtime, maxevaluations=None,
+             jade_c=0.1, jade_num_diff_vectors=1, jade_mean=None, jade_stdev=None, seed=1234):
     """
     Minimize objective function using EvoX JADE algorithm.
 
@@ -69,6 +70,10 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
         maxiter: Maximum number of iterations (None = no limit)
         maxtime: Maximum wall-clock time in seconds (None = no limit)
         maxevaluations: Maximum number of function evaluations (None = no limit)
+        jade_c: Learning rate for adaptive parameters (default: 0.1)
+        jade_num_diff_vectors: Number of difference vectors in mutation (default: 1)
+        jade_mean: Mean for population initialization (default: None, uniform initialization)
+        jade_stdev: Standard deviation for population initialization (default: None, uniform initialization)
 
     Returns:
         best_fitness: Best objective value found
@@ -88,6 +93,12 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
     model, config, instance, cost_fn = args
     device = config.device if hasattr(config, 'device') else torch.device('cpu')
 
+    # Set random seeds for reproducibility
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
     # Set PyTorch default device for EvoX compatibility
     # Save original default device to restore later
     original_device = torch.get_default_device() if hasattr(torch, 'get_default_device') else None
@@ -98,18 +109,28 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
     problem = CVAEOptProblem(cost_func, args)
 
     # Initialize JADE algorithm
-    # JADE uses default parameters: c=0.1 (adaptation rate)
     # Reference: https://evox.readthedocs.io/en/latest/apidocs/evox/evox.algorithms.so.de_variants.jade.html
     lb = torch.full((search_space_size,), -search_space_bound, device=device)
     ub = torch.full((search_space_size,), search_space_bound, device=device)
 
-    algorithm = JaDE(
-        pop_size=popsize,
-        lb=lb,
-        ub=ub,
-        c=0.1,  # Learning rate for adaptive parameters
-        device=device
-    )
+    # Prepare initialization parameters
+    jade_kwargs = {
+        'pop_size': popsize,
+        'lb': lb,
+        'ub': ub,
+        'c': jade_c,  # Learning rate for adaptive parameters
+        'device': device
+    }
+
+    # Add optional parameters if provided
+    if jade_mean is not None:
+        jade_kwargs['mean'] = jade_mean if isinstance(jade_mean, torch.Tensor) else torch.tensor(jade_mean, device=device)
+    if jade_stdev is not None:
+        jade_kwargs['stdev'] = jade_stdev if isinstance(jade_stdev, torch.Tensor) else torch.tensor(jade_stdev, device=device)
+    if jade_num_diff_vectors is not None and jade_num_diff_vectors != 1:
+        jade_kwargs['num_difference_vectors'] = jade_num_diff_vectors
+
+    algorithm = JaDE(**jade_kwargs)
 
     # Create workflow
     workflow = StdWorkflow(algorithm, problem)
@@ -122,6 +143,10 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
 
     # Track initial evaluation
     evaluations_done += popsize
+
+    # Record initial best (iteration 0)
+    convergence_history.append(problem.best_fitness)
+    time_history.append(time.time() - start_time)
 
     while True:
         iteration += 1

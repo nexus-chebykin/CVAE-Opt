@@ -18,7 +18,7 @@ import time
 
 
 def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
-             mutate, recombination, maxiter, maxtime, maxevaluations=None):
+             mutate, recombination, maxiter, maxtime, maxevaluations=None, seed=None):
     """
     Minimize using SciPy's Differential Evolution with adaptive dithering.
 
@@ -136,6 +136,19 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
     # Set bounds for all dimensions
     bounds = [(-search_space_bound, search_space_bound)] * search_space_size
 
+    # Set random seed for reproducibility
+    np.random.seed(seed if seed is not None else 1234)
+
+    # Evaluate initial population (full batch) for iteration 0 baseline
+    # This ensures scipy_de starts from the same quality as other optimizers
+    initial_population = np.random.uniform(-search_space_bound, search_space_bound, (popsize, search_space_size))
+    _, initial_costs = cost_func(initial_population, *args)
+    initial_costs_array = np.array(initial_costs)
+    initial_cost = np.min(initial_costs_array)  # Best of initial population
+    convergence_history.append(initial_cost)
+    time_history.append(time.time() - start_time)
+    evaluations_done[0] += popsize  # Track all evaluations
+
     # Run SciPy's differential evolution
     # Key parameters:
     # - strategy='best1bin': Most common DE strategy (DE/best/1/bin)
@@ -161,7 +174,7 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
             atol=0,  # Disable absolute tolerance stopping
             tol=0.0,  # Disable relative tolerance stopping
             updating='deferred',  # Classic DE (evaluate all candidates before updating)
-            seed=None  # Use global random state (controlled by np.random.seed in search.py)
+            seed=seed  # Use provided seed (passed from config.seed)
         )
     except StopIteration:
         # SciPy uses StopIteration internally, catch it if raised
