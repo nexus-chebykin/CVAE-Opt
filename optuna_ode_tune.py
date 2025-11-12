@@ -103,7 +103,7 @@ def objective(trial: optuna.Trial, args) -> float:
 
     # Suggest hyperparameters
     base_vector = trial.suggest_categorical('base_vector', ['best', 'rand'])
-    num_difference_vectors = trial.suggest_categorical('num_difference_vectors', [1, 2])
+    num_difference_vectors = trial.suggest_categorical('num_difference_vectors', [1])
     differential_weight = trial.suggest_float('differential_weight', 0.4, 1.0, log=True)
     cross_probability = trial.suggest_float('cross_probability', 0.7, 0.95)
 
@@ -317,7 +317,7 @@ def main():
     logger.info("")
     logger.info("HYPERPARAMETER SEARCH SPACE:")
     logger.info(f"  base_vector: Categorical['best', 'rand']")
-    logger.info(f"  num_difference_vectors: Categorical[1, 2]")
+    logger.info(f"  num_difference_vectors: Categorical[1]")
     logger.info(f"  differential_weight: LogUniform[0.4, 1.0]")
     logger.info(f"  cross_probability: Uniform[0.7, 0.95]")
     logger.info("")
