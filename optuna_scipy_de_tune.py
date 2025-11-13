@@ -113,6 +113,10 @@ def create_config_for_trial(base_config, strategy: str, mutation, recombination:
     config.scipy_de_recombination = recombination
     config.scipy_de_updating = updating
 
+    # Set required DE parameters (not directly used by SciPy DE, but needed by search_control.py interface)
+    config.de_mutate = "rand"  # Default value for interface compatibility
+    config.de_recombine = recombination if isinstance(recombination, (int, float)) else 0.9  # Use recombination or default
+
     return config
 
 

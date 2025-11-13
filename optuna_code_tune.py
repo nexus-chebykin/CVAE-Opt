@@ -87,6 +87,10 @@ def create_config_for_trial(base_config, diff_padding_num: int, replace: bool):
     config.code_diff_padding_num = diff_padding_num
     config.code_replace = replace
 
+    # Set required DE parameters (not used by CoDE, but needed by search_control.py interface)
+    config.de_mutate = "rand"  # Default value for interface compatibility
+    config.de_recombine = 0.9  # Default value for interface compatibility
+
     return config
 
 

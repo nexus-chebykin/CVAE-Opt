@@ -103,7 +103,7 @@ def objective(trial: optuna.Trial, args) -> float:
 
     # Suggest hyperparameters
     base_vector = trial.suggest_categorical('base_vector', ['best', 'rand'])
-    num_difference_vectors = trial.suggest_categorical('num_difference_vectors', [1, 2])
+    num_difference_vectors = 1  # Fixed to 1 to avoid EvoX library broadcasting bug when > 1
     differential_weight = trial.suggest_float('differential_weight', 0.4, 1.0, log=True)
     cross_probability = trial.suggest_float('cross_probability', 0.7, 0.95)
 
@@ -317,7 +317,7 @@ def main():
     logger.info("")
     logger.info("HYPERPARAMETER SEARCH SPACE:")
     logger.info(f"  base_vector: Categorical['best', 'rand']")
-    logger.info(f"  num_difference_vectors: Categorical[1, 2]")
+    logger.info(f"  num_difference_vectors: Fixed[1] (to avoid EvoX library bug)")
     logger.info(f"  differential_weight: LogUniform[0.4, 1.0]")
     logger.info(f"  cross_probability: Uniform[0.7, 0.95]")
     logger.info("")
@@ -366,7 +366,7 @@ def main():
     logger.info("")
     logger.info("BEST PARAMETERS:")
     logger.info(f"  base_vector: {study.best_params['base_vector']}")
-    logger.info(f"  num_difference_vectors: {study.best_params['num_difference_vectors']}")
+    logger.info(f"  num_difference_vectors: 1 (fixed)")
     logger.info(f"  differential_weight: {study.best_params['differential_weight']:.6f}")
     logger.info(f"  cross_probability: {study.best_params['cross_probability']:.6f}")
     logger.info(f"  Best mean gap: {study.best_value:.4f}%")
@@ -374,8 +374,11 @@ def main():
 
     # Save best parameters to JSON
     best_params_file = os.path.join(output_dir, 'best_ode_params.json')
+    # Add num_difference_vectors since it's fixed and not in study.best_params
+    best_params_with_fixed = dict(study.best_params)
+    best_params_with_fixed['num_difference_vectors'] = 1
     best_params_data = {
-        'best_params': study.best_params,
+        'best_params': best_params_with_fixed,
         'best_value': study.best_value,
         'n_trials': len(study.trials),
         'study_name': args.study_name,

@@ -1,0 +1,112 @@
+======================================================================
+REMAINING OPTIMIZERS COMPREHENSIVE TEST
+======================================================================
+Testing 6 optimizers:
+  - CoDE
+  - SHADE
+  - SaDE
+  - IPOP-CMA-ES
+  - BIPOP-CMA-ES
+  - SciPy DE
+
+Configuration:
+  Trials per optimizer: 2
+  Instances per trial: 1
+  Batch size: 100
+  Search time limit: 10s
+
+🧹 Cleaning up previous test artifacts...
+
+======================================================================
+Testing: CoDE
+======================================================================
+Running: uv run python optuna_code_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_1inst_w_optimal.pkl --n_trials 2 --tune_n_instances 1 --batch_size 100 --search_timelimit 10
+✓ Script completed in 27.5s
+✓ Database created: optuna_code.db
+✓ Database has 2 trials (expected 2)
+✓ JSON output: runs/optuna_tune_12.11.2025_18-23-10/best_code_params.json
+✓ JSON has best_params
+✓ JSON has best_value (gap: 1.3132850742404223)
+✓ JSON has n_trials: 2
+✗ Log file created
+
+🧹 Cleaning up previous test artifacts...
+
+======================================================================
+Testing: SHADE
+======================================================================
+Running: uv run python optuna_shade_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_1inst_w_optimal.pkl --n_trials 2 --tune_n_instances 1 --batch_size 100 --search_timelimit 10
+✓ Script completed in 27.4s
+✓ Database created: optuna_shade.db
+✓ Database has 2 trials (expected 2)
+✓ JSON output: runs/optuna_tune_12.11.2025_18-23-39/best_shade_params.json
+✓ JSON has best_params
+✓ JSON has best_value (gap: 1.6230289787939167)
+✓ JSON has n_trials: 2
+✗ Log file created
+
+🧹 Cleaning up previous test artifacts...
+
+======================================================================
+Testing: SaDE
+======================================================================
+Running: uv run python optuna_sade_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_1inst_w_optimal.pkl --n_trials 2 --tune_n_instances 1 --batch_size 100 --search_timelimit 10
+✓ Script completed in 27.5s
+✓ Database created: optuna_sade.db
+✓ Database has 2 trials (expected 2)
+✓ JSON output: runs/optuna_tune_12.11.2025_18-24-07/best_sade_params.json
+✓ JSON has best_params
+✓ JSON has best_value (gap: 2.5703752642803)
+✓ JSON has n_trials: 2
+✗ Log file created
+
+🧹 Cleaning up previous test artifacts...
+
+======================================================================
+Testing: IPOP-CMA-ES
+======================================================================
+Running: uv run python optuna_ipop_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_1inst_w_optimal.pkl --n_trials 2 --tune_n_instances 1 --batch_size 100 --search_timelimit 10
+✓ Script completed in 25.8s
+✓ Database created: optuna_ipop.db
+✓ Database has 2 trials (expected 2)
+✗ JSON output not found in runs/optuna_tune_*/ directories
+
+🧹 Cleaning up previous test artifacts...
+
+======================================================================
+Testing: BIPOP-CMA-ES
+======================================================================
+Running: uv run python optuna_bipop_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_1inst_w_optimal.pkl --n_trials 2 --tune_n_instances 1 --batch_size 100 --search_timelimit 10
+✓ Script completed in 25.8s
+✓ Database created: optuna_bipop.db
+✓ Database has 2 trials (expected 2)
+✗ JSON output not found in runs/optuna_tune_*/ directories
+
+🧹 Cleaning up previous test artifacts...
+
+======================================================================
+Testing: SciPy DE
+======================================================================
+Running: uv run python optuna_scipy_de_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_1inst_w_optimal.pkl --n_trials 2 --tune_n_instances 1 --batch_size 100 --search_timelimit 10
+✓ Script completed in 25.9s
+✓ Database created: optuna_scipy_de.db
+✓ Database has 2 trials (expected 2)
+✓ JSON output: runs/optuna_tune_12.11.2025_18-25-29/best_scipy_de_params.json
+✓ JSON has best_params
+✓ JSON has best_value (gap: 2.034819322877923)
+✓ JSON has n_trials: 2
+✗ Log file created
+
+======================================================================
+TEST SUMMARY
+======================================================================
+❌ FAILED: CoDE
+❌ FAILED: SHADE
+❌ FAILED: SaDE
+❌ FAILED: IPOP-CMA-ES
+❌ FAILED: BIPOP-CMA-ES
+❌ FAILED: SciPy DE
+
+Overall: 0/6 optimizers passed
+
+⚠️  6 optimizer(s) need fixes

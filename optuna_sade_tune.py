@@ -109,6 +109,10 @@ def create_config_for_trial(base_config, diff_padding_num: int, LP: int):
     config.evox_sade_diff_padding_num = diff_padding_num
     config.evox_sade_LP = LP
 
+    # Set required DE parameters (not used by SaDE, but needed by search_control.py interface)
+    config.de_mutate = "rand"  # Default value for interface compatibility
+    config.de_recombine = 0.9  # Default value for interface compatibility
+
     return config
 
 

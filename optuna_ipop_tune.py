@@ -111,6 +111,14 @@ def create_config_for_trial(base_config, sigma0: float, CMA_rankmu: float, CMA_r
     config.ipop_rankmu = CMA_rankmu
     config.ipop_rankone = CMA_rankone
 
+    # Set required CMA-ES parameter (needed by search_control.py interface)
+    config.cmaes_sigma0 = sigma0  # Use the same sigma0 value
+
+    # Set IPOP-specific parameters (not tuned, using defaults)
+    config.ipop_initial_popsize = None  # Use CMA-ES default popsize
+    config.ipop_restarts = 5  # Default number of restarts
+    config.ipop_incpopsize = 2.0  # Default population increase factor
+
     return config
 
 
