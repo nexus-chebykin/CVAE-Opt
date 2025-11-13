@@ -45,28 +45,36 @@ def setup_logging(output_dir: str) -> Tuple[str, logging.Logger]:
     log_filename = f"optuna_tuning_{timestamp}.log"
     log_path = os.path.join(output_dir, log_filename)
 
-    logger = logging.getLogger('optuna_ode_tuning')
+    logger = logging.getLogger("optuna_ode_tuning")
     logger.setLevel(logging.INFO)
     logger.handlers.clear()
 
-    file_handler = logging.FileHandler(log_path, mode='w')
+    file_handler = logging.FileHandler(log_path, mode="w")
     file_handler.setLevel(logging.INFO)
-    file_formatter = logging.Formatter('[%(asctime)s][%(levelname)s] %(message)s', datefmt='%H:%M:%S')
+    file_formatter = logging.Formatter(
+        "[%(asctime)s][%(levelname)s] %(message)s", datefmt="%H:%M:%S"
+    )
     file_handler.setFormatter(file_formatter)
     logger.addHandler(file_handler)
 
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(logging.INFO)
-    console_formatter = logging.Formatter('[%(levelname)s] %(message)s')
+    console_formatter = logging.Formatter("[%(levelname)s] %(message)s")
     console_handler.setFormatter(console_formatter)
     logger.addHandler(console_handler)
 
     return log_filename, logger
 
 
-def create_config_for_trial(base_config, base_vector: str, num_difference_vectors: int,
-                            differential_weight: float, cross_probability: float):
+def create_config_for_trial(
+    base_config,
+    base_vector: str,
+    num_difference_vectors: int,
+    differential_weight: float,
+    cross_probability: float,
+):
     """Create a configuration object for a trial with specific ODE parameters."""
+
     class Config:
         pass
 
@@ -80,7 +88,7 @@ def create_config_for_trial(base_config, base_vector: str, num_difference_vector
     config.search_timelimit = base_config.search_timelimit
     config.search_evaluations = base_config.search_evaluations
     config.seed = base_config.seed
-    config.optimizer = 'evox_ode'
+    config.optimizer = "evox_ode"
     config.problem = base_config.problem
     config.problem_size = base_config.problem_size
 
@@ -99,23 +107,41 @@ def create_config_for_trial(base_config, base_vector: str, num_difference_vector
 
 def objective(trial: optuna.Trial, args) -> float:
     """Optuna objective function to minimize."""
-    model, base_config, instances, solutions, cost_fn, batch_size, tune_n_instances, logger = args
+    (
+        model,
+        base_config,
+        instances,
+        solutions,
+        cost_fn,
+        batch_size,
+        tune_n_instances,
+        logger,
+    ) = args
 
     # Suggest hyperparameters
-    base_vector = trial.suggest_categorical('base_vector', ['best', 'rand'])
-    num_difference_vectors = trial.suggest_categorical('num_difference_vectors', [1])
-    differential_weight = trial.suggest_float('differential_weight', 0.4, 1.0, log=True)
-    cross_probability = trial.suggest_float('cross_probability', 0.7, 0.95)
+    base_vector = trial.suggest_categorical("base_vector", ["best", "rand"])
+    num_difference_vectors = (
+        1  # Fixed to 1 to avoid EvoX library broadcasting bug when > 1
+    )
+    differential_weight = trial.suggest_float("differential_weight", 0.4, 1.0, log=True)
+    cross_probability = trial.suggest_float("cross_probability", 0.7, 0.95)
 
     # Log trial start
     logger.info(f"=" * 80)
     logger.info(f"Trial {trial.number + 1} started")
-    logger.info(f"  Parameters: base_vector={base_vector}, num_difference_vectors={num_difference_vectors}, "
-               f"differential_weight={differential_weight:.6f}, cross_probability={cross_probability:.6f}")
+    logger.info(
+        f"  Parameters: base_vector={base_vector}, num_difference_vectors={num_difference_vectors}, "
+        f"differential_weight={differential_weight:.6f}, cross_probability={cross_probability:.6f}"
+    )
 
     # Create config for this trial
-    config = create_config_for_trial(base_config, base_vector, num_difference_vectors,
-                                     differential_weight, cross_probability)
+    config = create_config_for_trial(
+        base_config,
+        base_vector,
+        num_difference_vectors,
+        differential_weight,
+        cross_probability,
+    )
 
     # Determine which instances to use for tuning
     if tune_n_instances is not None and tune_n_instances < len(instances):
@@ -135,26 +161,34 @@ def objective(trial: optuna.Trial, args) -> float:
         instance_start = time.time()
 
         # Solve instance with current hyperparameters
-        objective_value, solution, convergence_history, time_history, timing_breakdown = solve_instance(
-            model, instance, config, cost_fn, batch_size
-        )
+        (
+            objective_value,
+            solution,
+            convergence_history,
+            time_history,
+            timing_breakdown,
+        ) = solve_instance(model, instance, config, cost_fn, batch_size)
 
         # Calculate gap if optimal solution is available
         if tuning_solutions:
             optimal_value = cost_fn(
                 torch.Tensor(instance).unsqueeze(0),
-                torch.Tensor(tuning_solutions[i]).long().unsqueeze(0)
+                torch.Tensor(tuning_solutions[i]).long().unsqueeze(0),
             ).item()
             gap = (objective_value / optimal_value - 1) * 100
             gaps.append(gap)
 
             instance_time = time.time() - instance_start
-            logger.info(f"  Instance {i}: gap={gap:.2f}%, cost={objective_value:.4f}, "
-                       f"optimal={optimal_value:.4f}, time={instance_time:.1f}s")
+            logger.info(
+                f"  Instance {i}: gap={gap:.2f}%, cost={objective_value:.4f}, "
+                f"optimal={optimal_value:.4f}, time={instance_time:.1f}s"
+            )
         else:
             gaps.append(objective_value)
             instance_time = time.time() - instance_start
-            logger.info(f"  Instance {i}: cost={objective_value:.4f}, time={instance_time:.1f}s")
+            logger.info(
+                f"  Instance {i}: cost={objective_value:.4f}, time={instance_time:.1f}s"
+            )
 
     # Calculate mean gap
     mean_gap = np.mean(gaps)
@@ -176,60 +210,111 @@ def main():
     )
 
     # Required parameters
-    parser.add_argument('--model_path', type=str, required=True,
-                       help='Path to trained model checkpoint')
-    parser.add_argument('--instances_path', type=str, required=True,
-                       help='Path to instances pickle file')
+    parser.add_argument(
+        "--model_path", type=str, required=True, help="Path to trained model checkpoint"
+    )
+    parser.add_argument(
+        "--instances_path",
+        type=str,
+        required=True,
+        help="Path to instances pickle file",
+    )
 
     # Tuning parameters
-    parser.add_argument('--n_trials', type=int, default=50,
-                       help='Number of Optuna trials (default: 50)')
-    parser.add_argument('--tune_n_instances', type=int, default=3,
-                       help='Number of instances for tuning (default: 3)')
-    parser.add_argument('--batch_size', type=int, default=600,
-                       help='Population size (default: 600)')
+    parser.add_argument(
+        "--n_trials", type=int, default=50, help="Number of Optuna trials (default: 50)"
+    )
+    parser.add_argument(
+        "--tune_n_instances",
+        type=int,
+        default=3,
+        help="Number of instances for tuning (default: 3)",
+    )
+    parser.add_argument(
+        "--batch_size", type=int, default=600, help="Population size (default: 600)"
+    )
 
     # Optuna study parameters
-    parser.add_argument('--study_name', type=str, default='ode_tuning',
-                       help='Optuna study name (default: ode_tuning)')
-    parser.add_argument('--storage', type=str, default='sqlite:///optuna_ode.db',
-                       help='Optuna storage (default: sqlite:///optuna_ode.db)')
-    parser.add_argument('--load_if_exists', action='store_true',
-                       help='Load existing study if exists')
+    parser.add_argument(
+        "--study_name",
+        type=str,
+        default="ode_tuning",
+        help="Optuna study name (default: ode_tuning)",
+    )
+    parser.add_argument(
+        "--storage",
+        type=str,
+        default="sqlite:///optuna_ode.db",
+        help="Optuna storage (default: sqlite:///optuna_ode.db)",
+    )
+    parser.add_argument(
+        "--load_if_exists", action="store_true", help="Load existing study if exists"
+    )
 
     # Search parameters
-    parser.add_argument('--search_iterations', type=int, default=300,
-                       help='Max iterations per instance (default: 300)')
-    parser.add_argument('--search_timelimit', type=int, default=75,
-                       help='Time limit per instance in seconds (default: 75)')
-    parser.add_argument('--search_evaluations', type=int, default=None,
-                       help='Max evaluations per instance (default: None)')
-    parser.add_argument('--search_space_size', type=int, default=100,
-                       help='Search space dimensionality (default: 100)')
+    parser.add_argument(
+        "--search_iterations",
+        type=int,
+        default=300,
+        help="Max iterations per instance (default: 300)",
+    )
+    parser.add_argument(
+        "--search_timelimit",
+        type=int,
+        default=75,
+        help="Time limit per instance in seconds (default: 75)",
+    )
+    parser.add_argument(
+        "--search_evaluations",
+        type=int,
+        default=None,
+        help="Max evaluations per instance (default: None)",
+    )
+    parser.add_argument(
+        "--search_space_size",
+        type=int,
+        default=100,
+        help="Search space dimensionality (default: 100)",
+    )
 
     # Other parameters
-    parser.add_argument('--device', type=str, default='cuda',
-                       help='Device (cuda or cpu, default: cuda)')
-    parser.add_argument('--problem', type=str, default=None,
-                       help='Problem type (TSP or CVRP, default: auto-detect)')
-    parser.add_argument('--problem_size', type=int, default=None,
-                       help='Problem size (default: auto-detect)')
-    parser.add_argument('--output_path', type=str, default='',
-                       help='Output directory (default: current directory)')
-    parser.add_argument('--seed', type=int, default=1234,
-                       help='Random seed (default: 1234)')
+    parser.add_argument(
+        "--device", type=str, default="cuda", help="Device (cuda or cpu, default: cuda)"
+    )
+    parser.add_argument(
+        "--problem",
+        type=str,
+        default=None,
+        help="Problem type (TSP or CVRP, default: auto-detect)",
+    )
+    parser.add_argument(
+        "--problem_size",
+        type=int,
+        default=None,
+        help="Problem size (default: auto-detect)",
+    )
+    parser.add_argument(
+        "--output_path",
+        type=str,
+        default="",
+        help="Output directory (default: current directory)",
+    )
+    parser.add_argument(
+        "--seed", type=int, default=1234, help="Random seed (default: 1234)"
+    )
 
     args = parser.parse_args()
 
     # Setup output directory
-    if args.output_path == '':
+    if args.output_path == "":
         args.output_path = os.getcwd()
 
     now = datetime.datetime.now()
     run_id = f"{now.hour:02d}-{now.minute:02d}-{now.second:02d}"
     output_dir = os.path.join(
-        args.output_path, 'runs',
-        f"optuna_tune_{now.day}.{now.month}.{now.year}_{run_id}"
+        args.output_path,
+        "runs",
+        f"optuna_tune_{now.day}.{now.month}.{now.year}_{run_id}",
     )
     os.makedirs(output_dir, exist_ok=True)
 
@@ -260,13 +345,15 @@ def main():
 
     base_config = BaseConfig()
     base_config.device = device
-    base_config.search_space_bound = model_data['Z_bound']
+    base_config.search_space_bound = model_data["Z_bound"]
     base_config.search_space_size = args.search_space_size
     base_config.search_iterations = args.search_iterations
     base_config.search_timelimit = args.search_timelimit
     base_config.search_evaluations = args.search_evaluations
-    base_config.problem = args.problem if args.problem else model_data['problem']
-    base_config.problem_size = args.problem_size if args.problem_size else model_data['problem_size']
+    base_config.problem = args.problem if args.problem else model_data["problem"]
+    base_config.problem_size = (
+        args.problem_size if args.problem_size else model_data["problem_size"]
+    )
     base_config.instances_path = args.instances_path
     base_config.seed = args.seed
 
@@ -276,7 +363,7 @@ def main():
 
     # Load model
     model = VAE_8(base_config).to(device)
-    model.load_state_dict(model_data['parameters'])
+    model.load_state_dict(model_data["parameters"])
     model.eval()
     logger.info("Model loaded successfully")
 
@@ -285,9 +372,11 @@ def main():
     instances, solutions = read_instance_pkl(base_config)
 
     if instances is None or len(instances) == 0:
+
         class InstanceConfig:
             instances_path = args.instances_path
             problem = base_config.problem
+
         instances, solutions = read_instance_pkl(InstanceConfig())
 
     logger.info(f"Loaded {len(instances)} instances")
@@ -302,7 +391,9 @@ def main():
     elif base_config.problem == "CVRP":
         cost_fn = cvrp.tours_length
         if solutions:
-            solutions = [cvrp.solution_to_single_tour(solution) for solution in solutions]
+            solutions = [
+                cvrp.solution_to_single_tour(solution) for solution in solutions
+            ]
     else:
         raise ValueError(f"Unknown problem type: {base_config.problem}")
 
@@ -317,7 +408,7 @@ def main():
     logger.info("")
     logger.info("HYPERPARAMETER SEARCH SPACE:")
     logger.info(f"  base_vector: Categorical['best', 'rand']")
-    logger.info(f"  num_difference_vectors: Categorical[1]")
+    logger.info(f"  num_difference_vectors: Categorical[1, 2]")
     logger.info(f"  differential_weight: LogUniform[0.4, 1.0]")
     logger.info(f"  cross_probability: Uniform[0.7, 0.95]")
     logger.info("")
@@ -328,15 +419,21 @@ def main():
     study = optuna.create_study(
         study_name=args.study_name,
         storage=args.storage,
-        direction='minimize',
+        direction="minimize",
         load_if_exists=args.load_if_exists,
-        sampler=optuna.samplers.TPESampler(seed=args.seed)
+        sampler=optuna.samplers.TPESampler(seed=args.seed),
     )
 
     # Prepare arguments for objective function
     objective_args = (
-        model, base_config, instances, solutions, cost_fn,
-        args.batch_size, args.tune_n_instances, logger
+        model,
+        base_config,
+        instances,
+        solutions,
+        cost_fn,
+        args.batch_size,
+        args.tune_n_instances,
+        logger,
     )
 
     # Run optimization
@@ -349,7 +446,7 @@ def main():
         study.optimize(
             lambda trial: objective(trial, objective_args),
             n_trials=args.n_trials,
-            show_progress_bar=False
+            show_progress_bar=False,
         )
     except KeyboardInterrupt:
         logger.info("Optimization interrupted by user")
@@ -366,27 +463,32 @@ def main():
     logger.info("")
     logger.info("BEST PARAMETERS:")
     logger.info(f"  base_vector: {study.best_params['base_vector']}")
-    logger.info(f"  num_difference_vectors: {study.best_params['num_difference_vectors']}")
-    logger.info(f"  differential_weight: {study.best_params['differential_weight']:.6f}")
+    logger.info(f"  num_difference_vectors: 1 (fixed)")
+    logger.info(
+        f"  differential_weight: {study.best_params['differential_weight']:.6f}"
+    )
     logger.info(f"  cross_probability: {study.best_params['cross_probability']:.6f}")
     logger.info(f"  Best mean gap: {study.best_value:.4f}%")
     logger.info("")
 
     # Save best parameters to JSON
-    best_params_file = os.path.join(output_dir, 'best_ode_params.json')
+    best_params_file = os.path.join(output_dir, "best_ode_params.json")
+    # Add num_difference_vectors since it's fixed and not in study.best_params
+    best_params_with_fixed = dict(study.best_params)
+    best_params_with_fixed["num_difference_vectors"] = 1
     best_params_data = {
-        'best_params': study.best_params,
-        'best_value': study.best_value,
-        'n_trials': len(study.trials),
-        'study_name': args.study_name,
-        'timestamp': datetime.datetime.now().isoformat(),
-        'instances_path': args.instances_path,
-        'model_path': args.model_path,
-        'tune_n_instances': args.tune_n_instances,
-        'batch_size': args.batch_size
+        "best_params": best_params_with_fixed,
+        "best_value": study.best_value,
+        "n_trials": len(study.trials),
+        "study_name": args.study_name,
+        "timestamp": datetime.datetime.now().isoformat(),
+        "instances_path": args.instances_path,
+        "model_path": args.model_path,
+        "tune_n_instances": args.tune_n_instances,
+        "batch_size": args.batch_size,
     }
 
-    with open(best_params_file, 'w') as f:
+    with open(best_params_file, "w") as f:
         json.dump(best_params_data, f, indent=2)
 
     logger.info(f"Best parameters saved to: {best_params_file}")
@@ -397,16 +499,16 @@ def main():
 
     try:
         fig1 = plot_optimization_history(study)
-        fig1.write_image(os.path.join(output_dir, 'optimization_history.png'))
+        fig1.write_image(os.path.join(output_dir, "optimization_history.png"))
         logger.info("  - Optimization history plot saved")
 
         if len(study.trials) >= 10:
             fig2 = plot_param_importances(study)
-            fig2.write_image(os.path.join(output_dir, 'param_importances.png'))
+            fig2.write_image(os.path.join(output_dir, "param_importances.png"))
             logger.info("  - Parameter importances plot saved")
 
         fig3 = plot_parallel_coordinate(study)
-        fig3.write_image(os.path.join(output_dir, 'parallel_coordinate.png'))
+        fig3.write_image(os.path.join(output_dir, "parallel_coordinate.png"))
         logger.info("  - Parallel coordinate plot saved")
 
     except Exception as e:

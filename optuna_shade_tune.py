@@ -86,6 +86,10 @@ def create_config_for_trial(base_config, diff_padding_num: int):
     # Set SHADE-specific parameters (these are what we're tuning)
     config.shade_diff_padding_num = diff_padding_num
 
+    # Set required DE parameters (not used by SHADE, but needed by search_control.py interface)
+    config.de_mutate = "rand"  # Default value for interface compatibility
+    config.de_recombine = 0.9  # Default value for interface compatibility
+
     return config
 
 

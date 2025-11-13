@@ -1,0 +1,591 @@
+======================================================================
+REMAINING OPTIMIZERS COMPREHENSIVE TEST
+======================================================================
+Testing 6 optimizers:
+  - CoDE
+  - SHADE
+  - SaDE
+  - IPOP-CMA-ES
+  - BIPOP-CMA-ES
+  - SciPy DE
+
+Configuration:
+  Trials per optimizer: 2
+  Instances per trial: 1
+  Batch size: 100
+  Search time limit: 10s
+
+🧹 Cleaning up previous test artifacts...
+
+======================================================================
+Testing: CoDE
+======================================================================
+Running: uv run python optuna_code_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_1inst_w_optimal.pkl --n_trials 2 --tune_n_instances 1 --batch_size 100 --search_timelimit 10
+❌ CoDE FAILED - Script error
+Exit code: 1
+STDOUT:
+[INFO] ================================================================================
+[INFO] OPTUNA HYPERPARAMETER TUNING FOR EVOX CODE
+[INFO] ================================================================================
+[INFO] Log file: /home/superior/vini/ml_project/CVAE-Opt/runs/optuna_tune_12.11.2025_18-15-47/optuna_tuning_20251112_181547.log
+[INFO] Output directory: /home/superior/vini/ml_project/CVAE-Opt/runs/optuna_tune_12.11.2025_18-15-47
+[INFO] 
+[INFO] Random seed: 1234
+[INFO] Loading model from: models/tsp_100_model_63108.pt
+[INFO] Problem: TSP100
+[INFO] Search space bound: 0.8476099932193757
+[INFO] Search space size: 100
+[INFO] Model loaded successfully
+[INFO] Loading instances from: instances/tsp/test/tsp100_1inst_w_optimal.pkl
+[INFO] Loaded 1 instances
+[INFO] Optimal solutions available: Yes
+[INFO] 
+[INFO] TUNING CONFIGURATION:
+[INFO]   Number of trials: 2
+[INFO]   Instances for tuning: 1
+[INFO]   Population size: 100
+[INFO]   Study name: code_tuning
+[INFO]   Storage: sqlite:///optuna_code.db
+[INFO] 
+[INFO] HYPERPARAMETER SEARCH SPACE:
+[INFO]   diff_padding_num: UniformInt[3, 10]
+[INFO]   replace: Categorical[True, False]
+[INFO] 
+[INFO] ================================================================================
+[INFO] 
+[INFO] Starting hyperparameter optimization...
+[INFO] 
+[INFO] ================================================================================
+[INFO] Trial 1 started
+[INFO]   Parameters: diff_padding_num=4, replace=True
+[INFO]   Using all 1 instances for tuning
+
+STDERR:
+[I 2025-11-12 18:15:48,908] A new study created in RDB with name: code_tuning
+[W 2025-11-12 18:15:50,433] Trial 0 failed with parameters: {'diff_padding_num': 4, 'replace': True} because of the following error: AttributeError("'Config' object has no attribute 'de_mutate'").
+Traceback (most recent call last):
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 205, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_code_tune.py", line 337, in <lambda>
+    lambda trial: objective(trial, objective_args),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_code_tune.py", line 127, in objective
+    objective_value, solution, convergence_history, time_history, timing_breakdown = solve_instance(
+                                                                                     ^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/search_control.py", line 270, in solve_instance
+    mutate=config.de_mutate,
+           ^^^^^^^^^^^^^^^^
+AttributeError: 'Config' object has no attribute 'de_mutate'
+[W 2025-11-12 18:15:50,434] Trial 0 failed with value None.
+Traceback (most recent call last):
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_code_tune.py", line 406, in <module>
+    main()
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_code_tune.py", line 336, in main
+    study.optimize(
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/study.py", line 490, in optimize
+    _optimize(
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 67, in _optimize
+    _optimize_sequential(
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 164, in _optimize_sequential
+    frozen_trial_id = _run_trial(study, func, catch)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 262, in _run_trial
+    raise func_err
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 205, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_code_tune.py", line 337, in <lambda>
+    lambda trial: objective(trial, objective_args),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_code_tune.py", line 127, in objective
+    objective_value, solution, convergence_history, time_history, timing_breakdown = solve_instance(
+                                                                                     ^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/search_control.py", line 270, in solve_instance
+    mutate=config.de_mutate,
+           ^^^^^^^^^^^^^^^^
+AttributeError: 'Config' object has no attribute 'de_mutate'
+
+
+🧹 Cleaning up previous test artifacts...
+
+======================================================================
+Testing: SHADE
+======================================================================
+Running: uv run python optuna_shade_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_1inst_w_optimal.pkl --n_trials 2 --tune_n_instances 1 --batch_size 100 --search_timelimit 10
+❌ SHADE FAILED - Script error
+Exit code: 1
+STDOUT:
+[INFO] ================================================================================
+[INFO] OPTUNA HYPERPARAMETER TUNING FOR EVOX SHADE
+[INFO] ================================================================================
+[INFO] Log file: /home/superior/vini/ml_project/CVAE-Opt/runs/optuna_tune_12.11.2025_18-15-55/optuna_tuning_20251112_181555.log
+[INFO] Output directory: /home/superior/vini/ml_project/CVAE-Opt/runs/optuna_tune_12.11.2025_18-15-55
+[INFO] 
+[INFO] Random seed: 1234
+[INFO] Loading model from: models/tsp_100_model_63108.pt
+[INFO] Problem: TSP100
+[INFO] Search space bound: 0.8476099932193757
+[INFO] Search space size: 100
+[INFO] Model loaded successfully
+[INFO] Loading instances from: instances/tsp/test/tsp100_1inst_w_optimal.pkl
+[INFO] Loaded 1 instances
+[INFO] Optimal solutions available: Yes
+[INFO] 
+[INFO] TUNING CONFIGURATION:
+[INFO]   Number of trials: 2
+[INFO]   Instances for tuning: 1
+[INFO]   Population size: 100
+[INFO]   Study name: shade_tuning
+[INFO]   Storage: sqlite:///optuna_shade.db
+[INFO] 
+[INFO] HYPERPARAMETER SEARCH SPACE:
+[INFO]   diff_padding_num: UniformInt[5, 15]
+[INFO] 
+[INFO] ================================================================================
+[INFO] 
+[INFO] Starting hyperparameter optimization...
+[INFO] 
+[INFO] ================================================================================
+[INFO] Trial 1 started
+[INFO]   Parameters: diff_padding_num=7
+[INFO]   Using all 1 instances for tuning
+
+STDERR:
+[I 2025-11-12 18:15:56,850] A new study created in RDB with name: shade_tuning
+[W 2025-11-12 18:15:58,376] Trial 0 failed with parameters: {'diff_padding_num': 7} because of the following error: AttributeError("'Config' object has no attribute 'de_mutate'").
+Traceback (most recent call last):
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 205, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_shade_tune.py", line 334, in <lambda>
+    lambda trial: objective(trial, objective_args),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_shade_tune.py", line 125, in objective
+    objective_value, solution, convergence_history, time_history, timing_breakdown = solve_instance(
+                                                                                     ^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/search_control.py", line 240, in solve_instance
+    mutate=config.de_mutate,
+           ^^^^^^^^^^^^^^^^
+AttributeError: 'Config' object has no attribute 'de_mutate'
+[W 2025-11-12 18:15:58,376] Trial 0 failed with value None.
+Traceback (most recent call last):
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_shade_tune.py", line 402, in <module>
+    main()
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_shade_tune.py", line 333, in main
+    study.optimize(
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/study.py", line 490, in optimize
+    _optimize(
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 67, in _optimize
+    _optimize_sequential(
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 164, in _optimize_sequential
+    frozen_trial_id = _run_trial(study, func, catch)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 262, in _run_trial
+    raise func_err
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 205, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_shade_tune.py", line 334, in <lambda>
+    lambda trial: objective(trial, objective_args),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_shade_tune.py", line 125, in objective
+    objective_value, solution, convergence_history, time_history, timing_breakdown = solve_instance(
+                                                                                     ^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/search_control.py", line 240, in solve_instance
+    mutate=config.de_mutate,
+           ^^^^^^^^^^^^^^^^
+AttributeError: 'Config' object has no attribute 'de_mutate'
+
+
+🧹 Cleaning up previous test artifacts...
+
+======================================================================
+Testing: SaDE
+======================================================================
+Running: uv run python optuna_sade_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_1inst_w_optimal.pkl --n_trials 2 --tune_n_instances 1 --batch_size 100 --search_timelimit 10
+❌ SaDE FAILED - Script error
+Exit code: 1
+STDOUT:
+[INFO] ================================================================================
+[INFO] OPTUNA HYPERPARAMETER TUNING FOR EVOX SADE
+[INFO] ================================================================================
+[INFO] Log file: /home/superior/vini/ml_project/CVAE-Opt/runs/optuna_tune_12.11.2025_18-16-03/optuna_tuning_20251112_181603.log
+[INFO] Output directory: /home/superior/vini/ml_project/CVAE-Opt/runs/optuna_tune_12.11.2025_18-16-03
+[INFO] 
+[INFO] Random seed: 1234
+[INFO] Loading model from: models/tsp_100_model_63108.pt
+[INFO] Problem: TSP100
+[INFO] Search space bound: 0.8476099932193757
+[INFO] Search space size: 100
+[INFO] Search iterations: 300
+[INFO] Model loaded successfully
+[INFO] Loading instances from: instances/tsp/test/tsp100_1inst_w_optimal.pkl
+[INFO] Loaded 1 instances
+[INFO] Optimal solutions available: Yes
+[INFO] 
+[INFO] TUNING CONFIGURATION:
+[INFO]   Number of trials: 2
+[INFO]   Instances for tuning: 1
+[INFO]   Population size: 100
+[INFO]   Study name: sade_tuning
+[INFO]   Storage: sqlite:///optuna_sade.db
+[INFO] 
+[INFO] HYPERPARAMETER SEARCH SPACE:
+[INFO]   diff_padding_num: UniformInt[5, 15]
+[INFO]   LP: UniformInt[30, 100]
+[INFO] 
+[INFO] ================================================================================
+[INFO] 
+[INFO] Starting hyperparameter optimization...
+[INFO] 
+[INFO] ================================================================================
+[INFO] Trial 1 started
+[INFO]   Parameters: diff_padding_num=7, LP=74
+[INFO]   Using all 1 instances for tuning
+
+STDERR:
+[I 2025-11-12 18:16:04,753] A new study created in RDB with name: sade_tuning
+[W 2025-11-12 18:16:06,322] Trial 0 failed with parameters: {'diff_padding_num': 7, 'LP': 74} because of the following error: AttributeError("'Config' object has no attribute 'de_mutate'").
+Traceback (most recent call last):
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 205, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_sade_tune.py", line 373, in <lambda>
+    lambda trial: objective(trial, objective_args),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_sade_tune.py", line 159, in objective
+    objective_value, solution, convergence_history, time_history, timing_breakdown = solve_instance(
+                                                                                     ^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/search_control.py", line 255, in solve_instance
+    mutate=config.de_mutate,
+           ^^^^^^^^^^^^^^^^
+AttributeError: 'Config' object has no attribute 'de_mutate'
+[W 2025-11-12 18:16:06,323] Trial 0 failed with value None.
+Traceback (most recent call last):
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_sade_tune.py", line 445, in <module>
+    main()
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_sade_tune.py", line 372, in main
+    study.optimize(
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/study.py", line 490, in optimize
+    _optimize(
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 67, in _optimize
+    _optimize_sequential(
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 164, in _optimize_sequential
+    frozen_trial_id = _run_trial(study, func, catch)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 262, in _run_trial
+    raise func_err
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 205, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_sade_tune.py", line 373, in <lambda>
+    lambda trial: objective(trial, objective_args),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_sade_tune.py", line 159, in objective
+    objective_value, solution, convergence_history, time_history, timing_breakdown = solve_instance(
+                                                                                     ^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/search_control.py", line 255, in solve_instance
+    mutate=config.de_mutate,
+           ^^^^^^^^^^^^^^^^
+AttributeError: 'Config' object has no attribute 'de_mutate'
+
+
+🧹 Cleaning up previous test artifacts...
+
+======================================================================
+Testing: IPOP-CMA-ES
+======================================================================
+Running: uv run python optuna_ipop_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_1inst_w_optimal.pkl --n_trials 2 --tune_n_instances 1 --batch_size 100 --search_timelimit 10
+❌ IPOP-CMA-ES FAILED - Script error
+Exit code: 1
+STDOUT:
+[INFO] ================================================================================
+[INFO] OPTUNA HYPERPARAMETER TUNING FOR IPOP-CMA-ES
+[INFO] ================================================================================
+[INFO] Log file: /home/superior/vini/ml_project/CVAE-Opt/runs/optuna_tune_12.11.2025_18-16-11/optuna_tuning_20251112_181611.log
+[INFO] Output directory: /home/superior/vini/ml_project/CVAE-Opt/runs/optuna_tune_12.11.2025_18-16-11
+[INFO] 
+[INFO] Random seed: 1234
+[INFO] Loading model from: models/tsp_100_model_63108.pt
+[INFO] Problem: TSP100
+[INFO] Search space bound: 0.8476099932193757
+[INFO] Search space size: 100
+[INFO] Search iterations: 300
+[INFO] Model loaded successfully
+[INFO] Loading instances from: instances/tsp/test/tsp100_1inst_w_optimal.pkl
+[INFO] Loaded 1 instances
+[INFO] Optimal solutions available: Yes
+[INFO] 
+[INFO] TUNING CONFIGURATION:
+[INFO]   Number of trials: 2
+[INFO]   Instances for tuning: 1
+[INFO]   Population size: 100
+[INFO]   Study name: ipop_tuning
+[INFO]   Storage: sqlite:///optuna_ipop.db
+[INFO] 
+[INFO] HYPERPARAMETER SEARCH SPACE:
+[INFO]   sigma0: Uniform[0.15, 1.0]
+[INFO]   CMA_rankmu: Uniform[0.5, 2.0]
+[INFO]   CMA_rankone: Uniform[0.5, 2.0]
+[INFO] 
+[INFO] ================================================================================
+[INFO] 
+[INFO] Starting hyperparameter optimization...
+[INFO] 
+[INFO] ================================================================================
+[INFO] Trial 1 started
+[INFO]   Parameters: sigma0=0.312792, CMA_rankmu=1.433163, CMA_rankone=1.156592
+[INFO]   Using all 1 instances for tuning
+
+STDERR:
+[I 2025-11-12 18:16:12,577] A new study created in RDB with name: ipop_tuning
+[W 2025-11-12 18:16:12,681] Trial 0 failed with parameters: {'sigma0': 0.3127915328220584, 'CMA_rankmu': 1.4331631565597478, 'CMA_rankone': 1.1565916085106718} because of the following error: AttributeError("'Config' object has no attribute 'cmaes_sigma0'").
+Traceback (most recent call last):
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 205, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_ipop_tune.py", line 377, in <lambda>
+    lambda trial: objective(trial, objective_args),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_ipop_tune.py", line 162, in objective
+    objective_value, solution, convergence_history, time_history, timing_breakdown = solve_instance(
+                                                                                     ^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/search_control.py", line 147, in solve_instance
+    cmaes_sigma = sigma0 if sigma0 is not None else config.cmaes_sigma0
+                                                    ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Config' object has no attribute 'cmaes_sigma0'
+[W 2025-11-12 18:16:12,682] Trial 0 failed with value None.
+Traceback (most recent call last):
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_ipop_tune.py", line 450, in <module>
+    main()
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_ipop_tune.py", line 376, in main
+    study.optimize(
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/study.py", line 490, in optimize
+    _optimize(
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 67, in _optimize
+    _optimize_sequential(
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 164, in _optimize_sequential
+    frozen_trial_id = _run_trial(study, func, catch)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 262, in _run_trial
+    raise func_err
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 205, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_ipop_tune.py", line 377, in <lambda>
+    lambda trial: objective(trial, objective_args),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_ipop_tune.py", line 162, in objective
+    objective_value, solution, convergence_history, time_history, timing_breakdown = solve_instance(
+                                                                                     ^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/search_control.py", line 147, in solve_instance
+    cmaes_sigma = sigma0 if sigma0 is not None else config.cmaes_sigma0
+                                                    ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Config' object has no attribute 'cmaes_sigma0'
+
+
+🧹 Cleaning up previous test artifacts...
+
+======================================================================
+Testing: BIPOP-CMA-ES
+======================================================================
+Running: uv run python optuna_bipop_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_1inst_w_optimal.pkl --n_trials 2 --tune_n_instances 1 --batch_size 100 --search_timelimit 10
+❌ BIPOP-CMA-ES FAILED - Script error
+Exit code: 1
+STDOUT:
+[INFO] ================================================================================
+[INFO] OPTUNA HYPERPARAMETER TUNING FOR BIPOP-CMA-ES
+[INFO] ================================================================================
+[INFO] Log file: /home/superior/vini/ml_project/CVAE-Opt/runs/optuna_tune_12.11.2025_18-16-17/optuna_tuning_20251112_181617.log
+[INFO] Output directory: /home/superior/vini/ml_project/CVAE-Opt/runs/optuna_tune_12.11.2025_18-16-17
+[INFO] 
+[INFO] Random seed: 1234
+[INFO] Loading model from: models/tsp_100_model_63108.pt
+[INFO] Problem: TSP100
+[INFO] Search space bound: 0.8476099932193757
+[INFO] Search space size: 100
+[INFO] Search iterations: 300
+[INFO] Model loaded successfully
+[INFO] Loading instances from: instances/tsp/test/tsp100_1inst_w_optimal.pkl
+[INFO] Loaded 1 instances
+[INFO] Optimal solutions available: Yes
+[INFO] 
+[INFO] TUNING CONFIGURATION:
+[INFO]   Number of trials: 2
+[INFO]   Instances for tuning: 1
+[INFO]   Population size: 100
+[INFO]   Study name: bipop_tuning
+[INFO]   Storage: sqlite:///optuna_bipop.db
+[INFO] 
+[INFO] HYPERPARAMETER SEARCH SPACE:
+[INFO]   sigma0: Uniform[0.15, 1.0]
+[INFO]   CMA_rankmu: Uniform[0.5, 2.0]
+[INFO]   CMA_rankone: Uniform[0.5, 2.0]
+[INFO] 
+[INFO] ================================================================================
+[INFO] 
+[INFO] Starting hyperparameter optimization...
+[INFO] 
+[INFO] ================================================================================
+[INFO] Trial 1 started
+[INFO]   Parameters: sigma0=0.312792, CMA_rankmu=1.433163, CMA_rankone=1.156592
+[INFO]   Using all 1 instances for tuning
+
+STDERR:
+[I 2025-11-12 18:16:18,809] A new study created in RDB with name: bipop_tuning
+[W 2025-11-12 18:16:18,912] Trial 0 failed with parameters: {'sigma0': 0.3127915328220584, 'CMA_rankmu': 1.4331631565597478, 'CMA_rankone': 1.1565916085106718} because of the following error: AttributeError("'Config' object has no attribute 'cmaes_sigma0'").
+Traceback (most recent call last):
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 205, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_bipop_tune.py", line 377, in <lambda>
+    lambda trial: objective(trial, objective_args),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_bipop_tune.py", line 162, in objective
+    objective_value, solution, convergence_history, time_history, timing_breakdown = solve_instance(
+                                                                                     ^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/search_control.py", line 166, in solve_instance
+    cmaes_sigma = sigma0 if sigma0 is not None else config.cmaes_sigma0
+                                                    ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Config' object has no attribute 'cmaes_sigma0'
+[W 2025-11-12 18:16:18,913] Trial 0 failed with value None.
+Traceback (most recent call last):
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_bipop_tune.py", line 450, in <module>
+    main()
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_bipop_tune.py", line 376, in main
+    study.optimize(
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/study.py", line 490, in optimize
+    _optimize(
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 67, in _optimize
+    _optimize_sequential(
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 164, in _optimize_sequential
+    frozen_trial_id = _run_trial(study, func, catch)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 262, in _run_trial
+    raise func_err
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 205, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_bipop_tune.py", line 377, in <lambda>
+    lambda trial: objective(trial, objective_args),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_bipop_tune.py", line 162, in objective
+    objective_value, solution, convergence_history, time_history, timing_breakdown = solve_instance(
+                                                                                     ^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/search_control.py", line 166, in solve_instance
+    cmaes_sigma = sigma0 if sigma0 is not None else config.cmaes_sigma0
+                                                    ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Config' object has no attribute 'cmaes_sigma0'
+
+
+🧹 Cleaning up previous test artifacts...
+
+======================================================================
+Testing: SciPy DE
+======================================================================
+Running: uv run python optuna_scipy_de_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_1inst_w_optimal.pkl --n_trials 2 --tune_n_instances 1 --batch_size 100 --search_timelimit 10
+❌ SciPy DE FAILED - Script error
+Exit code: 1
+STDOUT:
+[INFO] ================================================================================
+[INFO] OPTUNA HYPERPARAMETER TUNING FOR SCIPY DE
+[INFO] ================================================================================
+[INFO] Log file: /home/superior/vini/ml_project/CVAE-Opt/runs/optuna_tune_12.11.2025_18-16-23/optuna_tuning_20251112_181623.log
+[INFO] Output directory: /home/superior/vini/ml_project/CVAE-Opt/runs/optuna_tune_12.11.2025_18-16-23
+[INFO] 
+[INFO] Random seed: 1234
+[INFO] Loading model from: models/tsp_100_model_63108.pt
+[INFO] Problem: TSP100
+[INFO] Search space bound: 0.8476099932193757
+[INFO] Search space size: 100
+[INFO] Search iterations: 300
+[INFO] Model loaded successfully
+[INFO] Loading instances from: instances/tsp/test/tsp100_1inst_w_optimal.pkl
+[INFO] Loaded 1 instances
+[INFO] Optimal solutions available: Yes
+[INFO] 
+[INFO] TUNING CONFIGURATION:
+[INFO]   Number of trials: 2
+[INFO]   Instances for tuning: 1
+[INFO]   Population size: 100
+[INFO]   Study name: scipy_de_tuning
+[INFO]   Storage: sqlite:///optuna_scipy_de.db
+[INFO] 
+[INFO] HYPERPARAMETER SEARCH SPACE:
+[INFO]   strategy: Categorical['best1bin', 'rand1bin', 'randtobest1bin', 'currenttobest1bin']
+[INFO]   use_adaptive_mutation: Categorical[True, False]
+[INFO]   mutation (if adaptive): Tuple(Uniform[0.3, 0.7], Uniform[0.8, 1.5])
+[INFO]   mutation (if fixed): Uniform[0.5, 1.0]
+[INFO]   recombination: Uniform[0.7, 0.95]
+[INFO]   updating: Categorical['deferred', 'immediate']
+[INFO] 
+[INFO] ================================================================================
+[INFO] 
+[INFO] Starting hyperparameter optimization...
+[INFO] 
+[INFO] ================================================================================
+[INFO] Trial 1 started
+[INFO]   Parameters: strategy=currenttobest1bin, mutation=(0.410586, 1.361311), recombination=0.939535, updating=deferred
+[INFO]   Using all 1 instances for tuning
+
+STDERR:
+[I 2025-11-12 18:16:24,992] A new study created in RDB with name: scipy_de_tuning
+[W 2025-11-12 18:16:25,113] Trial 0 failed with parameters: {'strategy': 'currenttobest1bin', 'use_adaptive_mutation': True, 'mutation_low': 0.41058570205723866, 'mutation_high': 1.3613105242745136, 'recombination': 0.9395348384209262, 'updating': 'deferred'} because of the following error: AttributeError("'Config' object has no attribute 'de_mutate'").
+Traceback (most recent call last):
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 205, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_scipy_de_tune.py", line 399, in <lambda>
+    lambda trial: objective(trial, objective_args),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_scipy_de_tune.py", line 181, in objective
+    objective_value, solution, convergence_history, time_history, timing_breakdown = solve_instance(
+                                                                                     ^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/search_control.py", line 190, in solve_instance
+    mutate=config.de_mutate,
+           ^^^^^^^^^^^^^^^^
+AttributeError: 'Config' object has no attribute 'de_mutate'
+[W 2025-11-12 18:16:25,114] Trial 0 failed with value None.
+Traceback (most recent call last):
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_scipy_de_tune.py", line 478, in <module>
+    main()
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_scipy_de_tune.py", line 398, in main
+    study.optimize(
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/study.py", line 490, in optimize
+    _optimize(
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 67, in _optimize
+    _optimize_sequential(
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 164, in _optimize_sequential
+    frozen_trial_id = _run_trial(study, func, catch)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 262, in _run_trial
+    raise func_err
+  File "/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/optuna/study/_optimize.py", line 205, in _run_trial
+    value_or_values = func(trial)
+                      ^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_scipy_de_tune.py", line 399, in <lambda>
+    lambda trial: objective(trial, objective_args),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/optuna_scipy_de_tune.py", line 181, in objective
+    objective_value, solution, convergence_history, time_history, timing_breakdown = solve_instance(
+                                                                                     ^^^^^^^^^^^^^^^
+  File "/home/superior/vini/ml_project/CVAE-Opt/search_control.py", line 190, in solve_instance
+    mutate=config.de_mutate,
+           ^^^^^^^^^^^^^^^^
+AttributeError: 'Config' object has no attribute 'de_mutate'
+
+
+======================================================================
+TEST SUMMARY
+======================================================================
+❌ FAILED: CoDE
+❌ FAILED: SHADE
+❌ FAILED: SaDE
+❌ FAILED: IPOP-CMA-ES
+❌ FAILED: BIPOP-CMA-ES
+❌ FAILED: SciPy DE
+
+Overall: 0/6 optimizers passed
+
+⚠️  6 optimizer(s) need fixes

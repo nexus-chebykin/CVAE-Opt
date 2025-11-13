@@ -111,6 +111,14 @@ def create_config_for_trial(base_config, sigma0: float, CMA_rankmu: float, CMA_r
     config.bipop_rankmu = CMA_rankmu
     config.bipop_rankone = CMA_rankone
 
+    # Set required CMA-ES parameter (needed by search_control.py interface)
+    config.cmaes_sigma0 = sigma0  # Use the same sigma0 value
+
+    # Set BIPOP-specific parameters (not tuned, using defaults)
+    config.bipop_initial_popsize = None  # Use CMA-ES default popsize
+    config.bipop_restarts = 5  # Default number of restarts
+    config.bipop_incpopsize = 2.0  # Default population increase factor
+
     return config
 
 
