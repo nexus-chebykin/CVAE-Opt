@@ -74,53 +74,43 @@ class Encoder(nn.Module):
         eps = torch.randn_like(std)
         return mu + eps * std
 
-# --- Cyclical RoPE + MultiHeadAttention with Cyclical RoPE ---
-class CyclicalRoPE(nn.Module):
-    """
-    Cyclical RoPE: This produces wrap-around (pos 0 ~ pos N) and multi-scale frequency channels.
-    """
-    def __init__(self, head_dim: int):
+
+# --- Alternative RoPE Implementation ---
+def rotate_half(x):
+    """Rotate half the hidden dims of the input."""
+    x1, x2 = x.chunk(2, dim=-1)
+    return torch.cat((-x2, x1), dim=-1)
+
+
+def apply_rotary_pos_emb(x, cos, sin):
+    """Apply rotary positional embedding."""
+    return (x * cos) + (rotate_half(x) * sin)
+
+
+class RotaryPositionalEncoding(nn.Module):
+    """Rotary Positional Encoding (RoPE)."""
+
+    def __init__(self, dim, max_seq_len=1024):
         super().__init__()
-        if head_dim % 2 != 0:
-            raise ValueError("head_dim must be even for rotary (pairs).")
-        self.head_dim = head_dim
-        # inv_freq shape: head_dim/2
-        inv_freq = 1.0 / (10000 ** (torch.arange(0, head_dim, 2).float() / head_dim))
-        self.register_buffer("inv_freq", inv_freq)  # shape (head_dim/2,)
+        N = 10000
+        inv_freq = 1. / (N ** (torch.arange(0, dim, 2).float() / dim))
+        position = torch.arange(max_seq_len).float()
+        inv_freq = torch.cat((inv_freq, inv_freq), dim=-1)
+        sinusoid_inp = torch.outer(position, inv_freq)
+        self.register_buffer("cos", sinusoid_inp.cos())
+        self.register_buffer("sin", sinusoid_inp.sin())
 
-    def get_sin_cos(self, seq_len: int, device):
-        """
-        Return sin, cos tensors shaped for broadcasting with [B, seq_len, heads, head_dim/2]
-        sin, cos shape -> (1, seq_len, 1, head_dim/2)
-        """
-        positions = torch.arange(seq_len, dtype=torch.float32, device=device)  # (seq_len,)
-        # base circular angle per position (wraps at seq_len)
-        theta = 2.0 * math.pi * positions / float(seq_len+1)  # (seq_len,)
-        # freqs: outer(theta, inv_freq) -> (seq_len, head_dim/2)
-        freqs = torch.einsum("p,d->pd", theta, self.inv_freq.to(device))
-        sin = freqs.sin().unsqueeze(0).unsqueeze(2)  # (1, seq_len, 1, head_dim/2)
-        cos = freqs.cos().unsqueeze(0).unsqueeze(2)
-        return sin, cos
-
-    @staticmethod
-    def apply_rotary(x, sin, cos):
-        """
-        Returns x with rotary applied.
-        """
-        # split even / odd
-        x_even = x[..., ::2]  # (..., head_dim/2)
-        x_odd = x[..., 1::2]  # (..., head_dim/2)
-        x_rot_even = x_even * cos - x_odd * sin
-        x_rot_odd = x_even * sin + x_odd * cos
-        # interleave back to (..., head_dim)
-        x_rot = torch.stack((x_rot_even, x_rot_odd), dim=-1).flatten(-2)
-        return x_rot
+    def forward(self, x, seq_len=None):
+        if seq_len is None:
+            seq_len = x.size(1)
+        cos = self.cos[:seq_len].view(1, seq_len, 1, -1)
+        sin = self.sin[:seq_len].view(1, seq_len, 1, -1)
+        return apply_rotary_pos_emb(x, cos, sin)
 
 
-class MultiHeadAttentionCyclicRoPE(nn.Module):
-    """
-    Multi-head attention that applies cyclical RoPE
-    """
+class MultiHeadAttention(nn.Module):
+    """Multi-head attention with Rotary Positional Encoding."""
+
     def __init__(self, embed_dim, num_heads, dropout=0.0):
         super().__init__()
         assert embed_dim % num_heads == 0, "embed_dim must be divisible by num_heads"
@@ -135,18 +125,21 @@ class MultiHeadAttentionCyclicRoPE(nn.Module):
         self.v_proj = nn.Linear(embed_dim, embed_dim, bias=True)
         self.out_proj = nn.Linear(embed_dim, embed_dim, bias=True)
 
-        # RoPE per head
-        # We'll use same head_dim for all heads; CyclicalRoPE expects head_dim
-        self.rope = CyclicalRoPE(self.head_dim)
+        # RoPE
+        self.rope = RotaryPositionalEncoding(self.head_dim)
 
     def forward(self, query, key, value):
         """
+        Args:
+            query: (B, seq_len, embed_dim)
+            key: (B, seq_len, embed_dim)
+            value: (B, seq_len, embed_dim)
+
         Returns:
             attn_output: (B, seq_len, embed_dim)
-            attn_weights: (B, seq_len, seq_len) e
+            attn_weights: (B, seq_len, seq_len)
         """
         B, L, E = query.shape
-        device = query.device
         assert E == self.embed_dim
 
         # Linear projections
@@ -154,70 +147,39 @@ class MultiHeadAttentionCyclicRoPE(nn.Module):
         k = self.k_proj(key)
         v = self.v_proj(value)
 
-        # Reshape to (B, L, heads, head_dim)
+        # Reshape to (B, L, num_heads, head_dim)
         q = q.view(B, L, self.num_heads, self.head_dim)
         k = k.view(B, L, self.num_heads, self.head_dim)
         v = v.view(B, L, self.num_heads, self.head_dim)
 
-        # Get sin/cos for this seq length
-        sin, cos = self.rope.get_sin_cos(L, device)  # (1, L, 1, head_dim/2)
+        # Apply RoPE to q and k
+        q = self.rope(q, seq_len=L)
+        k = self.rope(k, seq_len=L)
 
-        # Apply RoPE to q and k: operate on last head_dim by pairs
-        # Convert q/k to shape compatible with even/odd split
-        q = self.rope.apply_rotary(q, sin, cos)  # (B, L, heads, head_dim)
-        k = self.rope.apply_rotary(k, sin, cos)
-
-        # Transpose to (B, heads, L, head_dim) for attention
+        # Transpose to (B, num_heads, L, head_dim) for attention
         q = q.permute(0, 2, 1, 3)
         k = k.permute(0, 2, 1, 3)
         v = v.permute(0, 2, 1, 3)
 
         # Scaled dot-product attention
         scale = 1.0 / math.sqrt(self.head_dim)
-        attn_scores = torch.matmul(q, k.transpose(-2, -1)) * scale  # (B, heads, L, L)
+        attn_scores = torch.matmul(q, k.transpose(-2, -1)) * scale  # (B, num_heads, L, L)
         attn_probs = torch.softmax(attn_scores, dim=-1)
+
         if self.training and self.dropout > 0.0:
             attn_probs = F.dropout(attn_probs, p=self.dropout)
 
-        attn_out = torch.matmul(attn_probs, v)  # (B, heads, L, head_dim)
+        attn_out = torch.matmul(attn_probs, v)  # (B, num_heads, L, head_dim)
+
         # Merge heads: (B, L, E)
         attn_out = attn_out.permute(0, 2, 1, 3).contiguous().view(B, L, E)
         out = self.out_proj(attn_out)
 
-
         return out, attn_probs.mean(dim=1)
 
 
-class PositionalEncoding(nn.Module):
-    def __init__(self, d_model: int, max_len: int):
-        super(PositionalEncoding, self).__init__()
-        self.d_model = d_model
-        self.max_len = max_len
-
-        # Create circular (sin, cos) positional encodings
-        pos_enc = torch.zeros(max_len, d_model)
-        position = torch.arange(0, max_len, dtype=torch.float32).unsqueeze(1)
-
-        div_term = torch.exp(
-            torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model)
-        )
-
-        # Map positions to angles along a circle [0, 2π)
-        theta = 2 * math.pi * position / max_len
-
-        pos_enc[:, 0::2] = torch.sin(theta * div_term)
-        pos_enc[:, 1::2] = torch.cos(theta * div_term)
-
-        pos_enc = pos_enc.unsqueeze(0)  # (1, max_len, d_model)
-        self.register_buffer('pos_enc', pos_enc)
-
-    def forward(self, embedding: torch.Tensor) -> torch.Tensor:
-        seq_len = embedding.size(1)
-        return embedding + self.pos_enc[:, :seq_len, :]
-
-
 class TransEncoder(nn.Module):
-    def __init__(self, search_space_size, max_len):
+    def __init__(self, search_space_size):
         super(TransEncoder, self).__init__()
 
         num_layers: int = 3
@@ -231,7 +193,7 @@ class TransEncoder(nn.Module):
         self.layers = nn.ModuleList()
         for i in range(num_layers):
             layer = nn.ModuleDict({
-                'mha': MultiHeadAttentionCyclicRoPE(embed_dim=model_size, num_heads=num_heads, dropout=0.0),
+                'mha': MultiHeadAttention(embed_dim=model_size, num_heads=num_heads, dropout=0.0),
                 'norm1': nn.LayerNorm(model_size),
                 'mlp': nn.Sequential(
                     nn.Linear(model_size, expand_factor * model_size),
@@ -285,6 +247,7 @@ class TransEncoder(nn.Module):
         std = torch.exp(0.5 * logvar)
         eps = torch.randn_like(std)
         return mu + eps * std
+
 
 class Attention(nn.Module):
     """Calculates attention over the input nodes given the current state."""
@@ -416,6 +379,293 @@ class Decoder(nn.Module):
 
         return None, tour_idx, tour_logp
 
+class TransformerDecoder(nn.Module):
+    """
+    Transformer decoder for TSP that produces logits for next node selection.
+
+    Args:
+        embedding_dim: Dimension of node embeddings
+        head_num: Number of attention heads
+        qkv_dim: Dimension of query/key/value in attention
+        latent_dim: Dimension of latent variable Z
+        logit_clipping: Clipping value for logits (typically 10.0)
+    """
+    def __init__(self, embedding_dim, head_num, latent_dim, logit_clipping=10.0):
+        super().__init__()
+        self.embedding_dim = embedding_dim
+        self.head_num = head_num
+        self.qkv_dim = embedding_dim//head_num
+        self.latent_dim = latent_dim
+        self.logit_clipping = logit_clipping
+        use_bias = True
+
+        # Query projections (conditioned on last node + Z)
+        self.Wq_first = nn.Linear(embedding_dim + latent_dim, head_num * self.qkv_dim, bias=use_bias)
+        self.Wq_last = nn.Linear(embedding_dim + latent_dim, head_num * self.qkv_dim, bias=use_bias)
+
+        # Key and Value projections (for all nodes)
+        self.Wk = nn.Linear(embedding_dim, head_num * self.qkv_dim, bias=use_bias)
+        self.Wv = nn.Linear(embedding_dim, head_num * self.qkv_dim, bias=use_bias)
+
+        # Multi-head combination
+        self.multi_head_combine = nn.Linear(head_num * self.qkv_dim, embedding_dim)
+
+        # Cached values
+        self.k = None
+        self.v = None
+        self.single_head_key = None
+        self.q_first = None
+
+    def forward(self, graph_emb, current_tour, Z):
+        """
+        Args:
+            graph_emb: Node embeddings [batch, problem_size, embedding_dim]
+            current_tour: Current partial tour [batch, tour_length] with node indices
+            Z: Latent variable [batch, latent_dim]
+            config: Optional config object
+
+        Returns:
+            logits: [batch, problem_size] logits for next node selection
+        """
+
+        # Set up keys and values from graph embeddings (do this once)
+        if self.k is None:
+            self.k = self._reshape_by_heads(self.Wk(graph_emb), self.head_num)
+            self.v = self._reshape_by_heads(self.Wv(graph_emb), self.head_num)
+            self.single_head_key = graph_emb.transpose(1, 2)
+
+
+            # Get embedding of first node in tour
+        first_node_idx = current_tour[:, 0:1]  # [batch, 1]
+        first_node_emb = self._get_encoding(graph_emb, first_node_idx)  # [batch, 1, embedding_dim]
+        last_node_idx = current_tour[:, -1:]  # [batch, 1]
+        last_node_emb = self._get_encoding(graph_emb, last_node_idx)  # [batch, 1, embedding_dim]
+
+        # Set q_first (query for first node + Z)
+        Z = Z.unsqueeze(1)
+
+        if self.q_first is None:
+            input_cat = torch.cat((first_node_emb, Z), dim=2)
+            self.q_first = self._reshape_by_heads(self.Wq_first(input_cat), self.head_num)
+
+
+        # Compute attention and get logits
+        logits = self._compute_logits(last_node_emb, Z)
+
+        logits = logits.squeeze(1)  # [batch, problem_size]
+
+        return logits
+
+    def reset_cached_values(self):
+        self.k = None
+        self.v = None
+        self.single_head_key = None
+        self.q_first = None
+
+
+    def _compute_logits(self, last_node_emb, Z):
+        """Compute logits using multi-head attention."""
+        head_num = self.head_num
+
+        # Concatenate last node embedding with Z
+        input_cat = torch.cat((last_node_emb, Z), dim=2)
+        # shape: (batch, 1, embedding_dim + latent_dim)
+
+        # Compute q_last
+        q_last = self._reshape_by_heads(self.Wq_last(input_cat), head_num)
+        # shape: (batch, head_num, 1, qkv_dim)
+
+        # Combine queries
+        q = self.q_first + q_last
+        # shape: (batch, head_num, 1, qkv_dim)
+
+        # Multi-head attention
+        out_concat = self._multi_head_attention(q, self.k, self.v)
+        # shape: (batch, K, head_num * qkv_dim)
+
+        mh_atten_out = self.multi_head_combine(out_concat)
+        # shape: (batch, K, embedding_dim)
+
+        # Single-head attention for probability calculation
+        score = torch.matmul(mh_atten_out, self.single_head_key)
+        # shape: (batch, 1, problem_size)
+
+
+        # Scale and clip
+        sqrt_embedding_dim = self.embedding_dim ** 0.5
+        score_scaled = score / sqrt_embedding_dim
+        logits = self.logit_clipping * torch.tanh(score_scaled)
+
+
+        return logits
+
+    def _get_encoding(self, graph_emb, node_idx):
+        """Get node embeddings by index."""
+        # graph_emb: [batch, problem_size, embedding_dim]
+        # node_idx: [batch, n]
+        batch_size = node_idx.size(0)
+        n = node_idx.size(1)
+        embedding_dim = graph_emb.size(2)
+
+        gathering_index = node_idx[:, :, None].expand(batch_size, n, embedding_dim)
+        picked_nodes = graph_emb.gather(dim=1, index=gathering_index)
+
+        return picked_nodes
+
+    def _reshape_by_heads(self, qkv, head_num):
+        """Reshape tensor for multi-head attention."""
+        batch_s = qkv.size(0)
+        n = qkv.size(1)
+
+        q_reshaped = qkv.reshape(batch_s, n, head_num, -1)
+        q_transposed = q_reshaped.transpose(1, 2)
+
+        return q_transposed
+
+    def _multi_head_attention(self, q, k, v):
+        """Compute multi-head attention."""
+        batch_s = q.size(0)
+        head_num = q.size(1)
+        n = q.size(2)
+        key_dim = q.size(3)
+
+        score = torch.matmul(q, k.transpose(2, 3))
+        # shape: (batch, head_num, n, problem_size)
+
+        score_scaled = score / torch.sqrt(torch.tensor(key_dim, dtype=torch.float))
+
+        weights = F.softmax(score_scaled, dim=3)
+        # shape: (batch, head_num, n, problem_size)
+
+        out = torch.matmul(weights, v)
+        # shape: (batch, head_num, n, key_dim)
+
+        out_transposed = out.transpose(1, 2)
+        # shape: (batch, n, head_num, key_dim)
+
+        out_concat = out_transposed.reshape(batch_s, n, head_num * key_dim)
+        # shape: (batch, n, head_num * key_dim)
+
+        return out_concat
+
+
+class TransformerBasedDecoder(nn.Module):
+    """
+    Wrapper that integrates the GraphPermutationDecoder into your existing framework.
+    Replaces the original Decoder class.
+    """
+
+    def __init__(self, instance_embedding, search_space_size, mask_fn, update_fn):
+        super().__init__()
+
+        self.instance_embedding = instance_embedding  # Keep for compatibility
+        self.mask_fn = mask_fn
+        self.update_fn = update_fn
+
+        num_layers: int = 3
+        num_heads: int = 8
+        model_size: int = 128
+        expand_factor: int = 4
+
+        self.num_layers = num_layers
+
+        # Transformer layers
+        self.layers = nn.ModuleList()
+        for i in range(num_layers):
+            layer = nn.ModuleDict({
+                'mha': nn.MultiheadAttention(embed_dim=model_size, num_heads=num_heads, dropout=0.0, batch_first=True),
+                'norm1': nn.LayerNorm(model_size),
+                'mlp': nn.Sequential(
+                    nn.Linear(model_size, expand_factor * model_size),
+                    nn.ReLU(),
+                    nn.Linear(expand_factor * model_size, model_size),
+                ),
+                'norm2': nn.LayerNorm(model_size),
+            })
+            self.layers.append(layer)
+
+
+        self.transformer_decoder = TransformerDecoder(
+            embedding_dim=model_size,
+            head_num=num_heads,
+            latent_dim=search_space_size
+        )
+
+        # cost_input_dim = model_size + search_space_size
+        # self.cost_predictor = nn.Sequential(
+        #     nn.Linear(cost_input_dim, 256),
+        #     nn.ReLU(),
+        #     nn.Linear(256, 128),
+        #     nn.ReLU(),
+        #     nn.Linear(128, 64),
+        #     nn.ReLU(),
+        #     nn.Linear(64, 1)  # Single output: predicted optimal cost
+        # )
+
+    def forward(self, instance, solution, Z, instance_hidden, config, teacher_forcing):
+        """
+        Maintains compatibility with existing interface but uses transformer internally.
+        """
+        self.transformer_decoder.reset_cached_values()
+
+        batch_size, sequence_size, input_size = instance.size()
+
+        graph_emb = instance_hidden
+
+        for layer in self.layers:
+            # Multi-head attention with residual
+            attn_out, _ = layer['mha'](graph_emb, graph_emb, graph_emb)
+            graph_emb = layer['norm1'](graph_emb + attn_out)
+
+            # Feed-forward network with residual
+            mlp_out = layer['mlp'](graph_emb)
+            graph_emb = layer['norm2'](graph_emb + mlp_out)
+
+
+        tour_idx, tour_logp, tour_prob = [solution[:, [0]]], [], []
+
+
+        # Create mask for visited cities
+        mask = torch.ones(batch_size, sequence_size, device=config.device)
+        mask[torch.arange(batch_size), solution[:, 0]] = 0
+
+
+        # Build tour step by step
+        for j in range(1, sequence_size):
+            if not mask.byte().any():
+                break
+
+            # Current partial tour
+            current_tour = torch.cat(tour_idx, dim=1)  # [batch, j]
+
+            # Get logits for next city using transformer
+            logits = self.transformer_decoder(graph_emb, current_tour, Z)
+
+            # Apply mask and get probabilities
+            probs = F.softmax(logits + mask.log(), dim=1)
+
+            if teacher_forcing:
+                # Use ground truth
+                ptr = solution[:, j].long()
+                logp = torch.log(probs[torch.arange(batch_size), ptr])
+                _, predicted_ptr = torch.max(probs, 1)
+                tour_idx.append(predicted_ptr.data.unsqueeze(1))
+            else:
+                # Greedy selection
+                prob, ptr = torch.max(probs, 1)
+                logp = prob.log()
+                tour_idx.append(ptr.data.unsqueeze(1))
+
+            # Update mask
+            if self.mask_fn is not None:
+                mask = self.mask_fn(mask, instance[:, :, 2:], ptr).detach()
+
+            tour_logp.append(logp.unsqueeze(1))
+
+        tour_idx = torch.cat(tour_idx, dim=1)
+        tour_logp = torch.cat(tour_logp, dim=1)
+
+        return None, tour_idx, tour_logp
 
 class VAE_8(nn.Module):
     def __init__(self, config):
@@ -435,11 +685,11 @@ class VAE_8(nn.Module):
         encoder_attn = Attention(hidden_size)
         rnn = nn.GRU(hidden_size, hidden_size, 1, batch_first=True, dropout=0)
 
-        # self.encoder = Encoder(self.instance_embedding, reference_embedding, encoder_attn, rnn, update_fn,
-        #                        config.search_space_size, hidden_size)
-        self.encoder  = TransEncoder( config.search_space_size, config.problem_size)
-        self.decoder = Decoder(self.instance_embedding, reference_embedding, encoder_attn, rnn, hidden_size,
-                               config.search_space_size, mask_fn, update_fn)
+        self.encoder = TransEncoder(config.search_space_size)
+        self.decoder = TransformerBasedDecoder(self.instance_embedding, config.search_space_size, mask_fn, update_fn)
+
+        # self.decoder = Decoder(self.instance_embedding, reference_embedding, encoder_attn, rnn, hidden_size,
+        #                        config.search_space_size, mask_fn, update_fn)
 
         self.instance_hidden = None
         self.dummy_solution = None
@@ -450,7 +700,7 @@ class VAE_8(nn.Module):
 
     def forward(self, instance, solution_1, solution_2, config):
         instance_hidden = self.instance_embedding(instance)
-        output_e = self.encoder( instance_hidden,solution_1)
+        output_e = self.encoder(instance_hidden, solution_1)
 
         Z, mu, log_var = output_e
 
