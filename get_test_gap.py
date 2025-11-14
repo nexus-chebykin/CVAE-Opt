@@ -1,8 +1,8 @@
 import pickle, numpy as np
 opt = pickle.load(open("./conc-optimal100.pkl", "br"))
 # lines = open("./kld_1e-2_hidden_64_final.txt", "r").readlines()
-lines = open("./tsp100_eval77_latentdim20_solved100.txt", "r").readlines()
+lines = open("./transformer_enc_450iter_36eval.txt", "r").readlines()
 b = np.array(list(map(lambda line: np.float64(line.strip()[5:]), lines)))
-opt = np.array(list(map(lambda x: x[0], opt[0])))
+opt = np.array(list(map(lambda x: x[0], opt[0])))[:len(b)]
 diff = (b / opt - 1) * 100
-print(diff.mean())
+print(diff.mean(), diff.std())

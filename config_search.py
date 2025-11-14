@@ -12,6 +12,9 @@ def get_config(args=None):
     parser.add_argument('--model_path', type=str, default='', required=True)
     parser.add_argument('--problem', type=str, default=None)
     parser.add_argument("--problem_size", type=int, default=None)
+    parser.add_argument("--hidden_size", type=int, default=128)
+    parser.add_argument("--use_transformer", type=bool, default=True)
+
     parser.add_argument('--search_batch_size', default=600, type=int)
     parser.add_argument('--instances_path', type=str, default="")
     parser.add_argument('--search_timelimit', default=600, type=int)

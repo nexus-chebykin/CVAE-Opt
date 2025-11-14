@@ -19,6 +19,7 @@ class TSPDataset(Dataset):
 
         assert len(self.instances) == len(self.solutions)
         assert len(self.instances) >= size
+        assert self.instances[0].shape[0] == config.problem_size
 
     def __len__(self):
         return self.size
