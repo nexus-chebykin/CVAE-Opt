@@ -1,0 +1,53 @@
+[21:17:20][INFO] ================================================================================
+[21:17:20][INFO] MASTER HYPERPARAMETER TUNING ORCHESTRATION
+[21:17:20][INFO] ================================================================================
+[21:17:20][INFO] Model: models/tsp_100_model_63108.pt
+[21:17:20][INFO] Instances: instances/tsp/test/tsp100_10inst_w_optimal.pkl
+[21:17:20][INFO] Trials per optimizer: 50
+[21:17:20][INFO] Tuning instances: 3
+[21:17:20][INFO] Batch size: 600
+[21:17:20][INFO] Time limit: 75.0s per instance
+[21:17:20][INFO] Seed: 1234
+[21:17:20][INFO] Resume existing studies: False
+[21:17:20][INFO] Log file: logs/master_tuning_20251112_211720.log
+[21:17:20][INFO] --------------------------------------------------------------------------------
+[21:17:20][INFO] Total optimizers to tune: 9
+[21:17:20][INFO] Optimizers: de, ode, code, shade, sade, cmaes, ipop, bipop, scipy_de
+[21:17:20][INFO] Estimated total time: 27.9 hours
+[21:17:20][INFO]   (Assuming ~3.1 hours per optimizer with 50 trials)
+[21:17:20][INFO] ================================================================================
+[21:17:20][INFO] 
+================================================================================
+[21:17:20][INFO] OPTIMIZER 1/9
+[21:17:20][INFO] ================================================================================
+
+[21:17:20][INFO] ================================================================================
+[21:17:20][INFO] STARTING TUNING: Standard DE (de)
+[21:17:20][INFO] ================================================================================
+[21:17:20][INFO] Script: optuna_de_tune.py
+[21:17:20][INFO] Tunable parameters: mutate, recombination
+[21:17:20][INFO] Command: uv run python optuna_de_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_10inst_w_optimal.pkl --n_trials 50 --tune_n_instances 3 --batch_size 600 --search_timelimit 75 --seed 1234 --load_if_exists
+[21:17:20][INFO] --------------------------------------------------------------------------------
+[21:36:17][ERROR] --------------------------------------------------------------------------------
+[21:36:17][ERROR] ✗ FAILED: Standard DE
+[21:36:17][ERROR]   Error: Process returned non-zero exit code: 1
+[21:36:17][ERROR]   Duration before failure: 1136.8 seconds
+[21:36:17][ERROR] ================================================================================
+[21:36:17][INFO] 
+Progress: 1/9 optimizers completed
+[21:36:17][INFO] Elapsed time: 0.32 hours
+[21:36:17][INFO] Estimated remaining time: 2.53 hours
+[21:36:17][INFO] Estimated total time: 2.84 hours
+
+[21:36:17][INFO] 
+================================================================================
+[21:36:17][INFO] OPTIMIZER 2/9
+[21:36:17][INFO] ================================================================================
+
+[21:36:17][INFO] ================================================================================
+[21:36:17][INFO] STARTING TUNING: EvoX ODE (ode)
+[21:36:17][INFO] ================================================================================
+[21:36:17][INFO] Script: optuna_ode_tune.py
+[21:36:17][INFO] Tunable parameters: base_vector, num_difference_vectors, differential_weight, cross_probability
+[21:36:17][INFO] Command: uv run python optuna_ode_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_10inst_w_optimal.pkl --n_trials 50 --tune_n_instances 3 --batch_size 600 --search_timelimit 75 --seed 1234 --load_if_exists
+[21:36:17][INFO] --------------------------------------------------------------------------------

@@ -12,6 +12,7 @@ dependencies = [
     "nevergrad>=1.0.12",
     "numpy>=2.3.3",
     "optuna>=4.0.0",
+    "plotly>=6.4.0",
     "pygmo~=2.19.5",
     "scipy>=1.16.2",
     "torch>=2.8.0",

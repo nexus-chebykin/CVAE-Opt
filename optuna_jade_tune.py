@@ -103,6 +103,7 @@ def create_config_for_trial(base_config, jade_c: float, jade_num_diff_vectors: i
     config.optimizer = 'evox_jade'
     config.problem = base_config.problem
     config.problem_size = base_config.problem_size
+    config.seed = base_config.seed
 
     # Set JADE-specific parameters (these are what we're tuning)
     config.jade_c = jade_c
@@ -295,6 +296,7 @@ def main():
     base_config.problem = args.problem if args.problem else model_data['problem']
     base_config.problem_size = args.problem_size if args.problem_size else model_data['problem_size']
     base_config.instances_path = args.instances_path  # Add instances_path for read_instance_pkl
+    base_config.seed = args.seed
 
     logger.info(f"Problem: {base_config.problem}{base_config.problem_size}")
     logger.info(f"Search space bound: {base_config.search_space_bound}")
@@ -359,6 +361,11 @@ def main():
         load_if_exists=args.load_if_exists,
         sampler=optuna.samplers.TPESampler(seed=args.seed)
     )
+
+    # Enqueue default parameters as trial 0
+    study.enqueue_trial({'jade_c': 0.1, 'jade_num_diff_vectors': 1})
+    logger.info("Default parameters enqueued as first trial (jade_c=0.1, jade_num_diff_vectors=1)")
+    logger.info("")
 
     # Prepare arguments for objective function
     objective_args = (
@@ -438,8 +445,7 @@ def main():
         logger.info("  - Parallel coordinate plot saved")
 
     except Exception as e:
-        logger.warning(f"Could not generate some visualizations: {e}")
-        logger.warning("Install kaleido for static image export: uv add kaleido")
+        logger.info("Visualizations skipped (requires Chrome/Chromium for image export)")
 
     logger.info("")
     logger.info("=" * 80)

@@ -127,7 +127,7 @@ def objective(trial: optuna.Trial, args) -> float:
     model, base_config, instances, solutions, cost_fn, batch_size, tune_n_instances, logger = args
 
     # Suggest hyperparameters
-    mutate = trial.suggest_float('mutate', 0.4, 1.0, log=True)
+    mutate = trial.suggest_float('mutate', 0.2, 1.0, log=True)
     recombination = trial.suggest_float('recombination', 0.7, 0.95)
 
     # Log trial start
@@ -341,7 +341,7 @@ def main():
     logger.info(f"  Storage: {args.storage}")
     logger.info("")
     logger.info("HYPERPARAMETER SEARCH SPACE:")
-    logger.info(f"  mutate (F): LogUniform[0.4, 1.0]")
+    logger.info(f"  mutate (F): LogUniform[0.2, 1.0]")
     logger.info(f"  recombination (CR): Uniform[0.7, 0.95]")
     logger.info("")
     logger.info("=" * 80)
@@ -355,6 +355,11 @@ def main():
         load_if_exists=args.load_if_exists,
         sampler=optuna.samplers.TPESampler(seed=args.seed)
     )
+
+    # Enqueue default parameters as trial 0
+    study.enqueue_trial({'mutate': 0.3, 'recombination': 0.95})
+    logger.info("Default parameters enqueued as first trial (mutate=0.3, recombination=0.95)")
+    logger.info("")
 
     # Prepare arguments for objective function
     objective_args = (
@@ -434,8 +439,7 @@ def main():
         logger.info("  - Parallel coordinate plot saved")
 
     except Exception as e:
-        logger.warning(f"Could not generate some visualizations: {e}")
-        logger.warning("Install kaleido for static image export: uv add kaleido")
+        logger.info("Visualizations skipped (requires Chrome/Chromium for image export)")
 
     logger.info("")
     logger.info("=" * 80)

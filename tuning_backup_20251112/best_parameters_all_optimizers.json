@@ -1,0 +1,99 @@
+{
+  "BIPOP": {
+    "best_value": 0.766120234413418,
+    "best_params": {
+      "sigma0": 0.6617572794009478,
+      "CMA_rankmu": 1.2876237756252213,
+      "CMA_rankone": 1.1608201893298464
+    },
+    "trial_number": 36,
+    "n_trials": 50
+  },
+  "CMAES": {
+    "best_value": 0.4847616569473671,
+    "best_params": {
+      "sigma0": 0.38499461687163217,
+      "CMA_rankmu": 1.702808266302529,
+      "CMA_rankone": 1.9372090305255578
+    },
+    "trial_number": 2,
+    "n_trials": 50
+  },
+  "CODE": {
+    "best_value": 0.8419068726008838,
+    "best_params": {
+      "diff_padding_num": 4,
+      "replace": true
+    },
+    "trial_number": 0,
+    "n_trials": 50
+  },
+  "DE": {
+    "best_value": 0.20777844834026413,
+    "best_params": {
+      "mutate": 0.40417118352522297,
+      "recombination": 0.9489339360843997
+    },
+    "trial_number": 32,
+    "n_trials": 50
+  },
+  "IPOP": {
+    "best_value": 0.43981792066181136,
+    "best_params": {
+      "sigma0": 0.3759975525832824,
+      "CMA_rankmu": 0.8776824310036532,
+      "CMA_rankone": 1.8833712632849964
+    },
+    "trial_number": 13,
+    "n_trials": 50
+  },
+  "JADE": {
+    "best_value": 0.2086541284001875,
+    "best_params": {
+      "jade_c": 0.06942387375857316,
+      "jade_num_diff_vectors": 1
+    },
+    "trial_number": 32,
+    "n_trials": 50
+  },
+  "ODE": {
+    "best_value": 0.265914146724396,
+    "best_params": {
+      "base_vector": "best",
+      "differential_weight": 0.6839199970721997,
+      "cross_probability": 0.8766356656148964
+    },
+    "trial_number": 27,
+    "n_trials": 50
+  },
+  "SADE": {
+    "best_value": 0.6391328517389772,
+    "best_params": {
+      "diff_padding_num": 7,
+      "LP": 74
+    },
+    "trial_number": 0,
+    "n_trials": 50
+  },
+  "SCIPY_DE": {
+    "best_value": 0.8608036669874789,
+    "best_params": {
+      "strategy": "currenttobest1bin",
+      "use_adaptive_mutation": true,
+      "mutation_low": 0.41058570205723866,
+      "mutation_high": 1.3613105242745136,
+      "recombination": 0.9395348384209262,
+      "updating": "deferred"
+    },
+    "trial_number": 0,
+    "n_trials": 50
+  },
+  "SHADE": {
+    "best_value": 0.5059806014958553,
+    "best_params": {
+      "diff_padding_num": 11
+    },
+    "trial_number": 1,
+    "n_trials": 50
+  }
+}

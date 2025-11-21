@@ -1,0 +1,706 @@
+nohup: ignoring input
+[INFO] ================================================================================
+[INFO] OPTUNA HYPERPARAMETER TUNING FOR STANDARD DE
+[INFO] ================================================================================
+[INFO] Log file: /home/superior/vini/ml_project/CVAE-Opt/runs/optuna_tune_14.11.2025_14-50-33/optuna_tuning_20251114_145033.log
+[INFO] Output directory: /home/superior/vini/ml_project/CVAE-Opt/runs/optuna_tune_14.11.2025_14-50-33
+[INFO] 
+[INFO] Random seed: 1234
+[INFO] Loading model from: models/tsp_100_model_63108.pt
+[INFO] Problem: TSP100
+[INFO] Search space bound: 0.8476099932193757
+[INFO] Search space size: 100
+[INFO] Search iterations: 300
+[INFO] Model loaded successfully
+[INFO] Loading instances from: instances/tsp/test/tsp100_20inst_w_optimal.pkl
+[INFO] Loaded 20 instances
+[INFO] Optimal solutions available: Yes
+[INFO] 
+[INFO] TUNING CONFIGURATION:
+[INFO]   Number of trials: 50
+[INFO]   Instances for tuning: 3
+[INFO]   Population size: 600
+[INFO]   Study name: de_tuning
+[INFO]   Storage: sqlite:///optuna_de.db
+[INFO] 
+[INFO] HYPERPARAMETER SEARCH SPACE:
+[INFO]   mutate (F): LogUniform[0.2, 1.0]
+[INFO]   recombination (CR): Uniform[0.7, 0.95]
+[INFO] 
+[INFO] ================================================================================
+[INFO] 
+[I 2025-11-14 14:50:34,133] A new study created in RDB with name: de_tuning
+[INFO] Default parameters enqueued as first trial (mutate=0.3, recombination=0.95)
+[INFO] 
+[INFO] Starting hyperparameter optimization...
+[INFO] 
+[INFO] ================================================================================
+[INFO] Trial 1 started
+[INFO]   Parameters: mutate=0.300000, recombination=0.950000
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.02%, cost=7.8064, optimal=7.8049, time=75.4s
+[INFO]   Instance 1: gap=0.08%, cost=8.1146, optimal=8.1083, time=75.5s
+[INFO]   Instance 2: gap=0.83%, cost=7.8497, optimal=7.7849, time=75.5s
+[INFO]   Trial 1 completed:
+[INFO]     Mean gap: 0.3099%
+[INFO]     Std gap: 0.3704%
+[INFO]     Total time: 226.42s
+[INFO] ================================================================================
+[I 2025-11-14 14:54:20,840] Trial 0 finished with value: 0.3099164947625595 and parameters: {'mutate': 0.3, 'recombination': 0.95}. Best is trial 0 with value: 0.3099164947625595.
+[INFO] ================================================================================
+[INFO] Trial 2 started
+[INFO]   Parameters: mutate=0.272205, recombination=0.855527
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.36%, cost=7.8333, optimal=7.8049, time=75.4s
+[INFO]   Instance 1: gap=0.08%, cost=8.1146, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=0.88%, cost=7.8538, optimal=7.7849, time=75.4s
+[INFO]   Trial 2 completed:
+[INFO]     Mean gap: 0.4421%
+[INFO]     Std gap: 0.3341%
+[INFO]     Total time: 226.15s
+[INFO] ================================================================================
+[I 2025-11-14 14:58:07,048] Trial 1 finished with value: 0.44208212453965184 and parameters: {'mutate': 0.27220515571798265, 'recombination': 0.8555271927599579}. Best is trial 0 with value: 0.3099164947625595.
+[INFO] ================================================================================
+[INFO] Trial 3 started
+[INFO]   Parameters: mutate=0.404565, recombination=0.896340
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.53%, cost=7.8459, optimal=7.8049, time=75.5s
+[INFO]   Instance 1: gap=0.19%, cost=8.1238, optimal=8.1083, time=75.4s
+[INFO]   Instance 2: gap=0.70%, cost=7.8393, optimal=7.7849, time=75.5s
+[INFO]   Trial 3 completed:
+[INFO]     Mean gap: 0.4716%
+[INFO]     Std gap: 0.2106%
+[INFO]     Total time: 226.34s
+[INFO] ================================================================================
+[I 2025-11-14 15:01:53,445] Trial 2 finished with value: 0.4716270868034167 and parameters: {'mutate': 0.4045652302900349, 'recombination': 0.8963396459284423}. Best is trial 0 with value: 0.3099164947625595.
+[INFO] ================================================================================
+[INFO] Trial 4 started
+[INFO]   Parameters: mutate=0.701794, recombination=0.768148
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.84%, cost=7.8703, optimal=7.8049, time=75.4s
+[INFO]   Instance 1: gap=0.80%, cost=8.1736, optimal=8.1083, time=75.2s
+[INFO]   Instance 2: gap=2.46%, cost=7.9763, optimal=7.7849, time=75.4s
+[INFO]   Trial 4 completed:
+[INFO]     Mean gap: 1.3671%
+[INFO]     Std gap: 0.7722%
+[INFO]     Total time: 226.00s
+[INFO] ================================================================================
+[I 2025-11-14 15:05:39,504] Trial 3 finished with value: 1.3670630298473634 and parameters: {'mutate': 0.7017940626334207, 'recombination': 0.7681481513206604}. Best is trial 0 with value: 0.3099164947625595.
+[INFO] ================================================================================
+[INFO] Trial 5 started
+[INFO]   Parameters: mutate=0.312083, recombination=0.900468
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.02%, cost=7.8064, optimal=7.8049, time=75.4s
+[INFO]   Instance 1: gap=0.03%, cost=8.1110, optimal=8.1083, time=75.5s
+[INFO]   Instance 2: gap=0.64%, cost=7.8350, optimal=7.7849, time=75.4s
+[INFO]   Trial 5 completed:
+[INFO]     Mean gap: 0.2325%
+[INFO]     Std gap: 0.2909%
+[INFO]     Total time: 226.27s
+[INFO] ================================================================================
+[I 2025-11-14 15:09:25,834] Trial 4 finished with value: 0.23245262709252015 and parameters: {'mutate': 0.31208307556661, 'recombination': 0.9004680443837547}. Best is trial 4 with value: 0.23245262709252015.
+[INFO] ================================================================================
+[INFO] Trial 6 started
+[INFO]   Parameters: mutate=0.934847, recombination=0.918983
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=1.25%, cost=7.9025, optimal=7.8049, time=75.5s
+[INFO]   Instance 1: gap=1.22%, cost=8.2075, optimal=8.1083, time=75.5s
+[INFO]   Instance 2: gap=1.84%, cost=7.9282, optimal=7.7849, time=75.4s
+[INFO]   Trial 6 completed:
+[INFO]     Mean gap: 1.4381%
+[INFO]     Std gap: 0.2851%
+[INFO]     Total time: 226.33s
+[INFO] ================================================================================
+[I 2025-11-14 15:13:12,220] Trial 5 finished with value: 1.4381220855454273 and parameters: {'mutate': 0.9348472694477524, 'recombination': 0.9189831586855236}. Best is trial 4 with value: 0.23245262709252015.
+[INFO] ================================================================================
+[INFO] Trial 7 started
+[INFO]   Parameters: mutate=0.355741, recombination=0.825249
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.38%, cost=7.8349, optimal=7.8049, time=75.4s
+[INFO]   Instance 1: gap=0.50%, cost=8.1492, optimal=8.1083, time=75.4s
+[INFO]   Instance 2: gap=1.32%, cost=7.8878, optimal=7.7849, time=75.3s
+[INFO]   Trial 7 completed:
+[INFO]     Mean gap: 0.7369%
+[INFO]     Std gap: 0.4168%
+[INFO]     Total time: 226.07s
+[INFO] ================================================================================
+[I 2025-11-14 15:16:58,345] Trial 6 finished with value: 0.7368818356192927 and parameters: {'mutate': 0.3557406828772253, 'recombination': 0.8252487813808647}. Best is trial 4 with value: 0.23245262709252015.
+[INFO] ================================================================================
+[INFO] Trial 8 started
+[INFO]   Parameters: mutate=0.600828, recombination=0.878176
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.75%, cost=7.8637, optimal=7.8049, time=75.4s
+[INFO]   Instance 1: gap=0.74%, cost=8.1682, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=1.53%, cost=7.9042, optimal=7.7849, time=75.3s
+[INFO]   Trial 8 completed:
+[INFO]     Mean gap: 1.0082%
+[INFO]     Std gap: 0.3705%
+[INFO]     Total time: 226.01s
+[INFO] ================================================================================
+[I 2025-11-14 15:20:44,416] Trial 7 finished with value: 1.0082277892232334 and parameters: {'mutate': 0.6008278932126246, 'recombination': 0.878175506745725}. Best is trial 4 with value: 0.23245262709252015.
+[INFO] ================================================================================
+[INFO] Trial 9 started
+[INFO]   Parameters: mutate=0.362931, recombination=0.840299
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.41%, cost=7.8366, optimal=7.8049, time=75.4s
+[INFO]   Instance 1: gap=0.33%, cost=8.1352, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=1.56%, cost=7.9066, optimal=7.7849, time=75.5s
+[INFO]   Trial 9 completed:
+[INFO]     Mean gap: 0.7670%
+[INFO]     Std gap: 0.5638%
+[INFO]     Total time: 226.18s
+[INFO] ================================================================================
+[I 2025-11-14 15:24:30,657] Trial 8 finished with value: 0.7670106598174353 and parameters: {'mutate': 0.3629310852390055, 'recombination': 0.8402990465164062}. Best is trial 4 with value: 0.23245262709252015.
+[INFO] ================================================================================
+[INFO] Trial 10 started
+[INFO]   Parameters: mutate=0.449438, recombination=0.703442
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.66%, cost=7.8565, optimal=7.8049, time=75.5s
+[INFO]   Instance 1: gap=0.97%, cost=8.1870, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=1.26%, cost=7.8827, optimal=7.7849, time=75.3s
+[INFO]   Trial 10 completed:
+[INFO]     Mean gap: 0.9630%
+[INFO]     Std gap: 0.2432%
+[INFO]     Total time: 226.05s
+[INFO] ================================================================================
+[I 2025-11-14 15:28:16,759] Trial 9 finished with value: 0.9629809876440169 and parameters: {'mutate': 0.4494382573203827, 'recombination': 0.7034421123976705}. Best is trial 4 with value: 0.23245262709252015.
+[INFO] ================================================================================
+[INFO] Trial 11 started
+[INFO]   Parameters: mutate=0.212657, recombination=0.776866
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.32%, cost=7.8296, optimal=7.8049, time=75.2s
+[INFO]   Instance 1: gap=0.15%, cost=8.1203, optimal=8.1083, time=75.4s
+[INFO]   Instance 2: gap=0.77%, cost=7.8450, optimal=7.7849, time=75.3s
+[INFO]   Trial 11 completed:
+[INFO]     Mean gap: 0.4122%
+[INFO]     Std gap: 0.2640%
+[INFO]     Total time: 225.92s
+[INFO] ================================================================================
+[I 2025-11-14 15:32:02,745] Trial 10 finished with value: 0.41224975426832344 and parameters: {'mutate': 0.212657475617163, 'recombination': 0.7768657158512959}. Best is trial 4 with value: 0.23245262709252015.
+[INFO] ================================================================================
+[INFO] Trial 12 started
+[INFO]   Parameters: mutate=0.258279, recombination=0.947906
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.28%, cost=7.8269, optimal=7.8049, time=75.3s
+[INFO]   Instance 1: gap=0.03%, cost=8.1110, optimal=8.1083, time=75.5s
+[INFO]   Instance 2: gap=0.55%, cost=7.8273, optimal=7.7849, time=75.4s
+[INFO]   Trial 12 completed:
+[INFO]     Mean gap: 0.2871%
+[INFO]     Std gap: 0.2088%
+[INFO]     Total time: 226.18s
+[INFO] ================================================================================
+[I 2025-11-14 15:35:48,983] Trial 11 finished with value: 0.2870867422023471 and parameters: {'mutate': 0.2582793346730386, 'recombination': 0.9479055147348532}. Best is trial 4 with value: 0.23245262709252015.
+[INFO] ================================================================================
+[INFO] Trial 13 started
+[INFO]   Parameters: mutate=0.203918, recombination=0.946098
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.02%, cost=7.8064, optimal=7.8049, time=75.5s
+[INFO]   Instance 1: gap=0.43%, cost=8.1432, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=0.37%, cost=7.8133, optimal=7.7849, time=75.3s
+[INFO]   Trial 13 completed:
+[INFO]     Mean gap: 0.2718%
+[INFO]     Std gap: 0.1802%
+[INFO]     Total time: 226.14s
+[INFO] ================================================================================
+[I 2025-11-14 15:39:35,184] Trial 12 finished with value: 0.2718464400482512 and parameters: {'mutate': 0.20391813295211308, 'recombination': 0.94609806576474}. Best is trial 4 with value: 0.23245262709252015.
+[INFO] ================================================================================
+[INFO] Trial 14 started
+[INFO]   Parameters: mutate=0.206596, recombination=0.912198
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.17%, cost=7.8182, optimal=7.8049, time=75.3s
+[INFO]   Instance 1: gap=0.03%, cost=8.1110, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=0.63%, cost=7.8336, optimal=7.7849, time=75.3s
+[INFO]   Trial 14 completed:
+[INFO]     Mean gap: 0.2764%
+[INFO]     Std gap: 0.2528%
+[INFO]     Total time: 225.95s
+[INFO] ================================================================================
+[I 2025-11-14 15:43:21,198] Trial 13 finished with value: 0.2764003799389088 and parameters: {'mutate': 0.2065960528767378, 'recombination': 0.9121975547517241}. Best is trial 4 with value: 0.23245262709252015.
+[INFO] ================================================================================
+[INFO] Trial 15 started
+[INFO]   Parameters: mutate=0.246911, recombination=0.884648
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.35%, cost=7.8322, optimal=7.8049, time=75.5s
+[INFO]   Instance 1: gap=0.02%, cost=8.1101, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=0.53%, cost=7.8263, optimal=7.7849, time=75.3s
+[INFO]   Trial 15 completed:
+[INFO]     Mean gap: 0.3013%
+[INFO]     Std gap: 0.2112%
+[INFO]     Total time: 226.04s
+[INFO] ================================================================================
+[I 2025-11-14 15:47:07,302] Trial 14 finished with value: 0.3012716786016038 and parameters: {'mutate': 0.246910765174022, 'recombination': 0.8846479842597418}. Best is trial 4 with value: 0.23245262709252015.
+[INFO] ================================================================================
+[INFO] Trial 16 started
+[INFO]   Parameters: mutate=0.330019, recombination=0.928063
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.02%, cost=7.8064, optimal=7.8049, time=75.5s
+[INFO]   Instance 1: gap=0.08%, cost=8.1146, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=0.53%, cost=7.8263, optimal=7.7849, time=75.3s
+[INFO]   Trial 16 completed:
+[INFO]     Mean gap: 0.2096%
+[INFO]     Std gap: 0.2290%
+[INFO]     Total time: 226.03s
+[INFO] ================================================================================
+[I 2025-11-14 15:50:53,401] Trial 15 finished with value: 0.20964359043196268 and parameters: {'mutate': 0.33001886063421876, 'recombination': 0.9280625593596535}. Best is trial 15 with value: 0.20964359043196268.
+[INFO] ================================================================================
+[INFO] Trial 17 started
+[INFO]   Parameters: mutate=0.500949, recombination=0.792818
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.65%, cost=7.8555, optimal=7.8049, time=75.3s
+[INFO]   Instance 1: gap=0.71%, cost=8.1661, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=1.89%, cost=7.9319, optimal=7.7849, time=75.4s
+[INFO]   Trial 17 completed:
+[INFO]     Mean gap: 1.0832%
+[INFO]     Std gap: 0.5697%
+[INFO]     Total time: 226.06s
+[INFO] ================================================================================
+[I 2025-11-14 15:54:39,523] Trial 16 finished with value: 1.0832055070739626 and parameters: {'mutate': 0.5009490077661075, 'recombination': 0.7928183047356168}. Best is trial 15 with value: 0.20964359043196268.
+[INFO] ================================================================================
+[INFO] Trial 18 started
+[INFO]   Parameters: mutate=0.316493, recombination=0.861145
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.05%, cost=7.8091, optimal=7.8049, time=75.3s
+[INFO]   Instance 1: gap=0.19%, cost=8.1238, optimal=8.1083, time=75.5s
+[INFO]   Instance 2: gap=0.59%, cost=7.8306, optimal=7.7849, time=75.5s
+[INFO]   Trial 18 completed:
+[INFO]     Mean gap: 0.2772%
+[INFO]     Std gap: 0.2257%
+[INFO]     Total time: 226.21s
+[INFO] ================================================================================
+[I 2025-11-14 15:58:25,798] Trial 17 finished with value: 0.2771913388055343 and parameters: {'mutate': 0.3164929191496269, 'recombination': 0.8611454045906726}. Best is trial 15 with value: 0.20964359043196268.
+[INFO] ================================================================================
+[INFO] Trial 19 started
+[INFO]   Parameters: mutate=0.519601, recombination=0.913624
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.59%, cost=7.8506, optimal=7.8049, time=75.4s
+[INFO]   Instance 1: gap=0.50%, cost=8.1492, optimal=8.1083, time=75.4s
+[INFO]   Instance 2: gap=1.51%, cost=7.9025, optimal=7.7849, time=75.4s
+[INFO]   Trial 19 completed:
+[INFO]     Mean gap: 0.8663%
+[INFO]     Std gap: 0.4564%
+[INFO]     Total time: 226.20s
+[INFO] ================================================================================
+[I 2025-11-14 16:02:12,058] Trial 18 finished with value: 0.8663327207773186 and parameters: {'mutate': 0.519600524299944, 'recombination': 0.9136242879159223}. Best is trial 15 with value: 0.20964359043196268.
+[INFO] ================================================================================
+[INFO] Trial 20 started
+[INFO]   Parameters: mutate=0.349819, recombination=0.709890
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.64%, cost=7.8549, optimal=7.8049, time=75.5s
+[INFO]   Instance 1: gap=0.59%, cost=8.1560, optimal=8.1083, time=75.4s
+[INFO]   Instance 2: gap=1.14%, cost=7.8740, optimal=7.7849, time=75.5s
+[INFO]   Trial 20 completed:
+[INFO]     Mean gap: 0.7913%
+[INFO]     Std gap: 0.2508%
+[INFO]     Total time: 226.32s
+[INFO] ================================================================================
+[I 2025-11-14 16:05:58,441] Trial 19 finished with value: 0.7912722649677942 and parameters: {'mutate': 0.34981884429433424, 'recombination': 0.709890329131692}. Best is trial 15 with value: 0.20964359043196268.
+[INFO] ================================================================================
+[INFO] Trial 21 started
+[INFO]   Parameters: mutate=0.423292, recombination=0.803971
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.61%, cost=7.8526, optimal=7.8049, time=75.3s
+[INFO]   Instance 1: gap=0.64%, cost=8.1606, optimal=8.1083, time=75.5s
+[INFO]   Instance 2: gap=1.14%, cost=7.8740, optimal=7.7849, time=75.3s
+[INFO]   Trial 21 completed:
+[INFO]     Mean gap: 0.7998%
+[INFO]     Std gap: 0.2440%
+[INFO]     Total time: 226.10s
+[INFO] ================================================================================
+[I 2025-11-14 16:09:44,604] Trial 20 finished with value: 0.7997604509419073 and parameters: {'mutate': 0.4232919097238336, 'recombination': 0.8039707450046698}. Best is trial 15 with value: 0.20964359043196268.
+[INFO] ================================================================================
+[INFO] Trial 22 started
+[INFO]   Parameters: mutate=0.236415, recombination=0.927790
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.02%, cost=7.8064, optimal=7.8049, time=75.3s
+[INFO]   Instance 1: gap=0.08%, cost=8.1146, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=0.49%, cost=7.8231, optimal=7.7849, time=75.3s
+[INFO]   Trial 22 completed:
+[INFO]     Mean gap: 0.1958%
+[INFO]     Std gap: 0.2096%
+[INFO]     Total time: 225.89s
+[INFO] ================================================================================
+[I 2025-11-14 16:13:30,552] Trial 21 finished with value: 0.19584361160050653 and parameters: {'mutate': 0.23641522460836564, 'recombination': 0.9277903328265157}. Best is trial 21 with value: 0.19584361160050653.
+[INFO] ================================================================================
+[INFO] Trial 23 started
+[INFO]   Parameters: mutate=0.240790, recombination=0.927533
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.01%, cost=7.8053, optimal=7.8049, time=75.4s
+[INFO]   Instance 1: gap=0.30%, cost=8.1323, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=0.48%, cost=7.8225, optimal=7.7849, time=75.3s
+[INFO]   Trial 23 completed:
+[INFO]     Mean gap: 0.2616%
+[INFO]     Std gap: 0.1962%
+[INFO]     Total time: 226.00s
+[INFO] ================================================================================
+[I 2025-11-14 16:17:16,616] Trial 22 finished with value: 0.26163376492919593 and parameters: {'mutate': 0.240790165011966, 'recombination': 0.9275332725710375}. Best is trial 21 with value: 0.19584361160050653.
+[INFO] ================================================================================
+[INFO] Trial 24 started
+[INFO]   Parameters: mutate=0.299879, recombination=0.901579
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.48%, cost=7.8421, optimal=7.8049, time=75.4s
+[INFO]   Instance 1: gap=0.08%, cost=8.1146, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=0.59%, cost=7.8306, optimal=7.7849, time=75.4s
+[INFO]   Trial 24 completed:
+[INFO]     Mean gap: 0.3803%
+[INFO]     Std gap: 0.2189%
+[INFO]     Total time: 226.16s
+[INFO] ================================================================================
+[I 2025-11-14 16:21:02,833] Trial 23 finished with value: 0.38028084496728454 and parameters: {'mutate': 0.29987943332399647, 'recombination': 0.9015787820994654}. Best is trial 21 with value: 0.19584361160050653.
+[INFO] ================================================================================
+[INFO] Trial 25 started
+[INFO]   Parameters: mutate=0.275654, recombination=0.929182
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.02%, cost=7.8064, optimal=7.8049, time=75.5s
+[INFO]   Instance 1: gap=0.08%, cost=8.1146, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=0.87%, cost=7.8526, optimal=7.7849, time=75.4s
+[INFO]   Trial 25 completed:
+[INFO]     Mean gap: 0.3221%
+[INFO]     Std gap: 0.3876%
+[INFO]     Total time: 226.10s
+[INFO] ================================================================================
+[I 2025-11-14 16:24:48,996] Trial 24 finished with value: 0.32211372416618794 and parameters: {'mutate': 0.2756540424804855, 'recombination': 0.9291824196773136}. Best is trial 21 with value: 0.19584361160050653.
+[INFO] ================================================================================
+[INFO] Trial 26 started
+[INFO]   Parameters: mutate=0.232165, recombination=0.875693
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.04%, cost=7.8080, optimal=7.8049, time=75.3s
+[INFO]   Instance 1: gap=0.02%, cost=8.1101, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=0.37%, cost=7.8133, optimal=7.7849, time=75.3s
+[INFO]   Trial 26 completed:
+[INFO]     Mean gap: 0.1422%
+[INFO]     Std gap: 0.1577%
+[INFO]     Total time: 225.93s
+[INFO] ================================================================================
+[I 2025-11-14 16:28:34,990] Trial 25 finished with value: 0.14220367209593446 and parameters: {'mutate': 0.23216518513938264, 'recombination': 0.8756931740533527}. Best is trial 25 with value: 0.14220367209593446.
+[INFO] ================================================================================
+[INFO] Trial 27 started
+[INFO]   Parameters: mutate=0.225440, recombination=0.863750
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.02%, cost=7.8064, optimal=7.8049, time=75.3s
+[INFO]   Instance 1: gap=0.03%, cost=8.1110, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=0.53%, cost=7.8263, optimal=7.7849, time=75.4s
+[INFO]   Trial 27 completed:
+[INFO]     Mean gap: 0.1951%
+[INFO]     Std gap: 0.2382%
+[INFO]     Total time: 226.00s
+[INFO] ================================================================================
+[I 2025-11-14 16:32:21,047] Trial 26 finished with value: 0.19512183659771884 and parameters: {'mutate': 0.22544026729730327, 'recombination': 0.8637499639347435}. Best is trial 25 with value: 0.14220367209593446.
+[INFO] ================================================================================
+[INFO] Trial 28 started
+[INFO]   Parameters: mutate=0.231992, recombination=0.870076
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.02%, cost=7.8064, optimal=7.8049, time=75.3s
+[INFO]   Instance 1: gap=0.08%, cost=8.1146, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=0.88%, cost=7.8538, optimal=7.7849, time=75.4s
+[INFO]   Trial 28 completed:
+[INFO]     Mean gap: 0.3272%
+[INFO]     Std gap: 0.3948%
+[INFO]     Total time: 225.96s
+[INFO] ================================================================================
+[I 2025-11-14 16:36:07,067] Trial 27 finished with value: 0.3272180217070468 and parameters: {'mutate': 0.2319924394561105, 'recombination': 0.870075891809817}. Best is trial 25 with value: 0.14220367209593446.
+[INFO] ================================================================================
+[INFO] Trial 29 started
+[INFO]   Parameters: mutate=0.223029, recombination=0.834630
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.36%, cost=7.8333, optimal=7.8049, time=75.5s
+[INFO]   Instance 1: gap=0.02%, cost=8.1101, optimal=8.1083, time=75.4s
+[INFO]   Instance 2: gap=1.36%, cost=7.8910, optimal=7.7849, time=75.5s
+[INFO]   Trial 29 completed:
+[INFO]     Mean gap: 0.5829%
+[INFO]     Std gap: 0.5688%
+[INFO]     Total time: 226.33s
+[INFO] ================================================================================
+[I 2025-11-14 16:39:53,461] Trial 28 finished with value: 0.5828759957684504 and parameters: {'mutate': 0.2230293813431926, 'recombination': 0.8346297795872649}. Best is trial 25 with value: 0.14220367209593446.
+[INFO] ================================================================================
+[INFO] Trial 30 started
+[INFO]   Parameters: mutate=0.283651, recombination=0.849019
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.30%, cost=7.8280, optimal=7.8049, time=75.3s
+[INFO]   Instance 1: gap=0.14%, cost=8.1193, optimal=8.1083, time=75.4s
+[INFO]   Instance 2: gap=1.32%, cost=7.8874, optimal=7.7849, time=75.3s
+[INFO]   Trial 30 completed:
+[INFO]     Mean gap: 0.5828%
+[INFO]     Std gap: 0.5227%
+[INFO]     Total time: 226.06s
+[INFO] ================================================================================
+[I 2025-11-14 16:43:39,586] Trial 29 finished with value: 0.5827980121192677 and parameters: {'mutate': 0.2836514280564763, 'recombination': 0.849019121539982}. Best is trial 25 with value: 0.14220367209593446.
+[INFO] ================================================================================
+[INFO] Trial 31 started
+[INFO]   Parameters: mutate=0.248442, recombination=0.885860
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.01%, cost=7.8053, optimal=7.8049, time=75.4s
+[INFO]   Instance 1: gap=0.08%, cost=8.1146, optimal=8.1083, time=75.5s
+[INFO]   Instance 2: gap=1.05%, cost=7.8665, optimal=7.7849, time=75.4s
+[INFO]   Trial 31 completed:
+[INFO]     Mean gap: 0.3769%
+[INFO]     Std gap: 0.4752%
+[INFO]     Total time: 226.22s
+[INFO] ================================================================================
+[I 2025-11-14 16:47:25,867] Trial 30 finished with value: 0.3769091572889405 and parameters: {'mutate': 0.24844225704098946, 'recombination': 0.88586033924791}. Best is trial 25 with value: 0.14220367209593446.
+[INFO] ================================================================================
+[INFO] Trial 32 started
+[INFO]   Parameters: mutate=0.228910, recombination=0.935475
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.30%, cost=7.8286, optimal=7.8049, time=75.3s
+[INFO]   Instance 1: gap=0.02%, cost=8.1101, optimal=8.1083, time=75.4s
+[INFO]   Instance 2: gap=0.59%, cost=7.8306, optimal=7.7849, time=75.4s
+[INFO]   Trial 32 completed:
+[INFO]     Mean gap: 0.3040%
+[INFO]     Std gap: 0.2306%
+[INFO]     Total time: 226.02s
+[INFO] ================================================================================
+[I 2025-11-14 16:51:11,948] Trial 31 finished with value: 0.3040105774105628 and parameters: {'mutate': 0.22891009780975038, 'recombination': 0.93547455401762}. Best is trial 25 with value: 0.14220367209593446.
+[INFO] ================================================================================
+[INFO] Trial 33 started
+[INFO]   Parameters: mutate=0.326873, recombination=0.867700
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.36%, cost=7.8333, optimal=7.8049, time=75.3s
+[INFO]   Instance 1: gap=0.39%, cost=8.1399, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=1.25%, cost=7.8823, optimal=7.7849, time=75.4s
+[INFO]   Trial 33 completed:
+[INFO]     Mean gap: 0.6685%
+[INFO]     Std gap: 0.4124%
+[INFO]     Total time: 226.06s
+[INFO] ================================================================================
+[I 2025-11-14 16:54:58,074] Trial 32 finished with value: 0.6685414643379461 and parameters: {'mutate': 0.3268729840739552, 'recombination': 0.8676999056130548}. Best is trial 25 with value: 0.14220367209593446.
+[INFO] ================================================================================
+[INFO] Trial 34 started
+[INFO]   Parameters: mutate=0.274250, recombination=0.894438
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.19%, cost=7.8199, optimal=7.8049, time=75.4s
+[INFO]   Instance 1: gap=0.02%, cost=8.1101, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=0.70%, cost=7.8393, optimal=7.7849, time=75.4s
+[INFO]   Trial 34 completed:
+[INFO]     Mean gap: 0.3040%
+[INFO]     Std gap: 0.2875%
+[INFO]     Total time: 226.01s
+[INFO] ================================================================================
+[I 2025-11-14 16:58:44,149] Trial 33 finished with value: 0.3039738215363667 and parameters: {'mutate': 0.2742499568466562, 'recombination': 0.894437582487995}. Best is trial 25 with value: 0.14220367209593446.
+[INFO] ================================================================================
+[INFO] Trial 35 started
+[INFO]   Parameters: mutate=0.380690, recombination=0.853062
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.48%, cost=7.8421, optimal=7.8049, time=75.3s
+[INFO]   Instance 1: gap=0.39%, cost=8.1399, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=1.10%, cost=7.8707, optimal=7.7849, time=75.2s
+[INFO]   Trial 35 completed:
+[INFO]     Mean gap: 0.6564%
+[INFO]     Std gap: 0.3175%
+[INFO]     Total time: 225.86s
+[INFO] ================================================================================
+[I 2025-11-14 17:02:30,073] Trial 34 finished with value: 0.6564478759374529 and parameters: {'mutate': 0.3806896801692644, 'recombination': 0.8530615866017317}. Best is trial 25 with value: 0.14220367209593446.
+[INFO] ================================================================================
+[INFO] Trial 36 started
+[INFO]   Parameters: mutate=0.202504, recombination=0.814651
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.22%, cost=7.8220, optimal=7.8049, time=75.5s
+[INFO]   Instance 1: gap=0.21%, cost=8.1256, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=0.70%, cost=7.8393, optimal=7.7849, time=75.4s
+[INFO]   Trial 36 completed:
+[INFO]     Mean gap: 0.3765%
+[INFO]     Std gap: 0.2275%
+[INFO]     Total time: 226.21s
+[INFO] ================================================================================
+[I 2025-11-14 17:06:16,339] Trial 35 finished with value: 0.3765482468252479 and parameters: {'mutate': 0.20250394631873486, 'recombination': 0.8146510211644296}. Best is trial 25 with value: 0.14220367209593446.
+[INFO] ================================================================================
+[INFO] Trial 37 started
+[INFO]   Parameters: mutate=0.295264, recombination=0.905308
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.02%, cost=7.8064, optimal=7.8049, time=75.3s
+[INFO]   Instance 1: gap=0.03%, cost=8.1110, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=1.03%, cost=7.8651, optimal=7.7849, time=75.5s
+[INFO]   Trial 37 completed:
+[INFO]     Mean gap: 0.3611%
+[INFO]     Std gap: 0.4729%
+[INFO]     Total time: 226.07s
+[INFO] ================================================================================
+[I 2025-11-14 17:10:02,471] Trial 36 finished with value: 0.36114217669257115 and parameters: {'mutate': 0.2952636215075666, 'recombination': 0.9053083078383278}. Best is trial 25 with value: 0.14220367209593446.
+[INFO] ================================================================================
+[INFO] Trial 38 started
+[INFO]   Parameters: mutate=0.948639, recombination=0.928115
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=1.03%, cost=7.8850, optimal=7.8049, time=75.3s
+[INFO]   Instance 1: gap=1.76%, cost=8.2509, optimal=8.1083, time=75.5s
+[INFO]   Instance 2: gap=2.13%, cost=7.9509, optimal=7.7849, time=75.3s
+[INFO]   Trial 38 completed:
+[INFO]     Mean gap: 1.6390%
+[INFO]     Std gap: 0.4593%
+[INFO]     Total time: 226.07s
+[INFO] ================================================================================
+[I 2025-11-14 17:13:48,606] Trial 37 finished with value: 1.6390402997575733 and parameters: {'mutate': 0.9486389200253885, 'recombination': 0.9281150570052447}. Best is trial 25 with value: 0.14220367209593446.
+[INFO] ================================================================================
+[INFO] Trial 39 started
+[INFO]   Parameters: mutate=0.262321, recombination=0.726615
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.61%, cost=7.8526, optimal=7.8049, time=75.5s
+[INFO]   Instance 1: gap=0.35%, cost=8.1367, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=1.60%, cost=7.9091, optimal=7.7849, time=75.4s
+[INFO]   Trial 39 completed:
+[INFO]     Mean gap: 0.8522%
+[INFO]     Std gap: 0.5361%
+[INFO]     Total time: 226.15s
+[INFO] ================================================================================
+[I 2025-11-14 17:17:34,812] Trial 38 finished with value: 0.8521670947061984 and parameters: {'mutate': 0.2623214659461116, 'recombination': 0.726615082304271}. Best is trial 25 with value: 0.14220367209593446.
+[INFO] ================================================================================
+[INFO] Trial 40 started
+[INFO]   Parameters: mutate=0.328793, recombination=0.876920
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.34%, cost=7.8313, optimal=7.8049, time=75.3s
+[INFO]   Instance 1: gap=0.22%, cost=8.1263, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=0.96%, cost=7.8597, optimal=7.7849, time=75.5s
+[INFO]   Trial 40 completed:
+[INFO]     Mean gap: 0.5072%
+[INFO]     Std gap: 0.3247%
+[INFO]     Total time: 226.06s
+[INFO] ================================================================================
+[I 2025-11-14 17:21:20,934] Trial 39 finished with value: 0.5071550372787689 and parameters: {'mutate': 0.3287933859719091, 'recombination': 0.8769195348621782}. Best is trial 25 with value: 0.14220367209593446.
+[INFO] ================================================================================
+[INFO] Trial 41 started
+[INFO]   Parameters: mutate=0.805098, recombination=0.891534
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.78%, cost=7.8654, optimal=7.8049, time=75.5s
+[INFO]   Instance 1: gap=1.32%, cost=8.2157, optimal=8.1083, time=75.5s
+[INFO]   Instance 2: gap=1.62%, cost=7.9110, optimal=7.7849, time=75.4s
+[INFO]   Trial 41 completed:
+[INFO]     Mean gap: 1.2399%
+[INFO]     Std gap: 0.3500%
+[INFO]     Total time: 226.40s
+[INFO] ================================================================================
+[I 2025-11-14 17:25:07,401] Trial 40 finished with value: 1.2398688126530333 and parameters: {'mutate': 0.8050978723446925, 'recombination': 0.8915338402667642}. Best is trial 25 with value: 0.14220367209593446.
+[INFO] ================================================================================
+[INFO] Trial 42 started
+[INFO]   Parameters: mutate=0.224417, recombination=0.908429
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.01%, cost=7.8053, optimal=7.8049, time=75.3s
+[INFO]   Instance 1: gap=0.02%, cost=8.1101, optimal=8.1083, time=75.4s
+[INFO]   Instance 2: gap=0.50%, cost=7.8241, optimal=7.7849, time=75.2s
+[INFO]   Trial 42 completed:
+[INFO]     Mean gap: 0.1770%
+[INFO]     Std gap: 0.2311%
+[INFO]     Total time: 225.93s
+[INFO] ================================================================================
+[I 2025-11-14 17:28:53,390] Trial 41 finished with value: 0.1770299603269354 and parameters: {'mutate': 0.22441672590269346, 'recombination': 0.9084288340292336}. Best is trial 25 with value: 0.14220367209593446.
+[INFO] ================================================================================
+[INFO] Trial 43 started
+[INFO]   Parameters: mutate=0.219817, recombination=0.919517
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.64%, cost=7.8550, optimal=7.8049, time=75.4s
+[INFO]   Instance 1: gap=0.02%, cost=8.1101, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=0.59%, cost=7.8306, optimal=7.7849, time=75.2s
+[INFO]   Trial 43 completed:
+[INFO]     Mean gap: 0.4166%
+[INFO]     Std gap: 0.2802%
+[INFO]     Total time: 225.90s
+[INFO] ================================================================================
+[I 2025-11-14 17:32:39,356] Trial 42 finished with value: 0.41659788526831054 and parameters: {'mutate': 0.2198172265229688, 'recombination': 0.9195166378702827}. Best is trial 25 with value: 0.14220367209593446.
+[INFO] ================================================================================
+[INFO] Trial 44 started
+[INFO]   Parameters: mutate=0.261138, recombination=0.941774
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.01%, cost=7.8053, optimal=7.8049, time=75.2s
+[INFO]   Instance 1: gap=0.02%, cost=8.1101, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=0.59%, cost=7.8306, optimal=7.7849, time=75.3s
+[INFO]   Trial 44 completed:
+[INFO]     Mean gap: 0.2046%
+[INFO]     Std gap: 0.2701%
+[INFO]     Total time: 225.88s
+[INFO] ================================================================================
+[I 2025-11-14 17:36:25,300] Trial 43 finished with value: 0.2046237928327995 and parameters: {'mutate': 0.2611379040408898, 'recombination': 0.9417737666597872}. Best is trial 25 with value: 0.14220367209593446.
+[INFO] ================================================================================
+[INFO] Trial 45 started
+[INFO]   Parameters: mutate=0.236793, recombination=0.943943
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.30%, cost=7.8280, optimal=7.8049, time=75.3s
+[INFO]   Instance 1: gap=0.85%, cost=8.1773, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=1.52%, cost=7.9031, optimal=7.7849, time=75.5s
+[INFO]   Trial 45 completed:
+[INFO]     Mean gap: 0.8886%
+[INFO]     Std gap: 0.4996%
+[INFO]     Total time: 226.07s
+[INFO] ================================================================================
+[I 2025-11-14 17:40:11,436] Trial 44 finished with value: 0.8885535122054478 and parameters: {'mutate': 0.23679264001305217, 'recombination': 0.9439431202910357}. Best is trial 25 with value: 0.14220367209593446.
+[INFO] ================================================================================
+[INFO] Trial 46 started
+[INFO]   Parameters: mutate=0.261801, recombination=0.907946
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.01%, cost=7.8053, optimal=7.8049, time=75.5s
+[INFO]   Instance 1: gap=0.02%, cost=8.1101, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=0.55%, cost=7.8273, optimal=7.7849, time=75.5s
+[INFO]   Trial 46 completed:
+[INFO]     Mean gap: 0.1908%
+[INFO]     Std gap: 0.2506%
+[INFO]     Total time: 226.21s
+[INFO] ================================================================================
+[I 2025-11-14 17:43:57,704] Trial 45 finished with value: 0.19082177228232725 and parameters: {'mutate': 0.2618013701443556, 'recombination': 0.9079461316001118}. Best is trial 25 with value: 0.14220367209593446.
+[INFO] ================================================================================
+[INFO] Trial 47 started
+[INFO]   Parameters: mutate=0.213381, recombination=0.906422
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.02%, cost=7.8064, optimal=7.8049, time=75.3s
+[INFO]   Instance 1: gap=0.21%, cost=8.1256, optimal=8.1083, time=75.4s
+[INFO]   Instance 2: gap=0.55%, cost=7.8273, optimal=7.7849, time=75.4s
+[INFO]   Trial 47 completed:
+[INFO]     Mean gap: 0.2592%
+[INFO]     Std gap: 0.2169%
+[INFO]     Total time: 226.10s
+[INFO] ================================================================================
+[I 2025-11-14 17:47:43,859] Trial 46 finished with value: 0.25919911352396685 and parameters: {'mutate': 0.21338069579797128, 'recombination': 0.9064219406581231}. Best is trial 25 with value: 0.14220367209593446.
+[INFO] ================================================================================
+[INFO] Trial 48 started
+[INFO]   Parameters: mutate=0.252566, recombination=0.878044
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.33%, cost=7.8307, optimal=7.8049, time=75.4s
+[INFO]   Instance 1: gap=0.02%, cost=8.1101, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=0.64%, cost=7.8350, optimal=7.7849, time=75.4s
+[INFO]   Trial 48 completed:
+[INFO]     Mean gap: 0.3321%
+[INFO]     Std gap: 0.2540%
+[INFO]     Total time: 226.13s
+[INFO] ================================================================================
+[I 2025-11-14 17:51:30,044] Trial 47 finished with value: 0.3320551561767582 and parameters: {'mutate': 0.252565732494595, 'recombination': 0.878044428984503}. Best is trial 25 with value: 0.14220367209593446.
+[INFO] ================================================================================
+[INFO] Trial 49 started
+[INFO]   Parameters: mutate=0.202361, recombination=0.843043
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.32%, cost=7.8296, optimal=7.8049, time=75.3s
+[INFO]   Instance 1: gap=0.15%, cost=8.1203, optimal=8.1083, time=75.4s
+[INFO]   Instance 2: gap=0.45%, cost=7.8198, optimal=7.7849, time=75.4s
+[INFO]   Trial 49 completed:
+[INFO]     Mean gap: 0.3042%
+[INFO]     Std gap: 0.1232%
+[INFO]     Total time: 226.18s
+[INFO] ================================================================================
+[I 2025-11-14 17:55:16,280] Trial 48 finished with value: 0.30423873486578046 and parameters: {'mutate': 0.20236053934948534, 'recombination': 0.8430434455969059}. Best is trial 25 with value: 0.14220367209593446.
+[INFO] ================================================================================
+[INFO] Trial 50 started
+[INFO]   Parameters: mutate=0.224044, recombination=0.895918
+[INFO]   Using first 3 instances for tuning
+[INFO]   Instance 0: gap=0.01%, cost=7.8053, optimal=7.8049, time=75.3s
+[INFO]   Instance 1: gap=0.03%, cost=8.1110, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=0.59%, cost=7.8306, optimal=7.7849, time=75.4s
+[INFO]   Trial 50 completed:
+[INFO]     Mean gap: 0.2087%
+[INFO]     Std gap: 0.2674%
+[INFO]     Total time: 225.95s
+[INFO] ================================================================================
+[I 2025-11-14 17:59:02,294] Trial 49 finished with value: 0.2086541284001875 and parameters: {'mutate': 0.22404441355701618, 'recombination': 0.8959178679617675}. Best is trial 25 with value: 0.14220367209593446.
+[INFO] 
+[INFO] ================================================================================
+[INFO] OPTIMIZATION COMPLETED
+[INFO] ================================================================================
+[INFO] Total time: 11308.14s (188.5 minutes)
+[INFO] Trials completed: 50
+[INFO] 
+[INFO] BEST PARAMETERS:
+[INFO]   mutate (F): 0.232165
+[INFO]   recombination (CR): 0.875693
+[INFO]   Best mean gap: 0.1422%
+[INFO] 
+[INFO] Best parameters saved to: /home/superior/vini/ml_project/CVAE-Opt/runs/optuna_tune_14.11.2025_14-50-33/best_de_params.json
+[INFO] 
+[INFO] Generating optimization visualizations...
+[INFO] Visualizations skipped (requires Chrome/Chromium for image export)
+[INFO] 
+[INFO] ================================================================================
+bash: line 2: --tune_n_instances: command not found
+bash: line 3: instances/tsp/test/tsp100_20inst_w_optimal.pkl: Permission denied

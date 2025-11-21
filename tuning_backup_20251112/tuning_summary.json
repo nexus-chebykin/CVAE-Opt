@@ -1,0 +1,113 @@
+{
+  "total_optimizers": 10,
+  "successful": 10,
+  "failed": 0,
+  "total_duration_seconds": 113122.06902623177,
+  "total_duration_minutes": 1885.3678171038628,
+  "total_duration_hours": 31.422796951731048,
+  "start_time": "2025-11-12T21:56:57.032309",
+  "end_time": "2025-11-14T05:22:19.101363",
+  "configuration": {
+    "model_path": "models/tsp_100_model_63108.pt",
+    "instances_path": "instances/tsp/test/tsp100_10inst_w_optimal.pkl",
+    "n_trials": 50,
+    "tune_n_instances": 3,
+    "batch_size": 600,
+    "time_limit": 75.0,
+    "seed": 1234,
+    "resume": false
+  },
+  "log_file": "logs/master_tuning_20251112_215657.log",
+  "results": [
+    {
+      "optimizer": "Standard DE",
+      "key": "de",
+      "script": "optuna_de_tune.py",
+      "start_time": "2025-11-12T21:56:57.032815",
+      "success": true,
+      "duration": 11312.996621131897,
+      "end_time": "2025-11-13T01:05:30.029442"
+    },
+    {
+      "optimizer": "EvoX ODE",
+      "key": "ode",
+      "script": "optuna_ode_tune.py",
+      "start_time": "2025-11-13T01:05:30.030314",
+      "success": true,
+      "duration": 11314.6662068367,
+      "end_time": "2025-11-13T04:14:04.696527"
+    },
+    {
+      "optimizer": "EvoX CoDE",
+      "key": "code",
+      "script": "optuna_code_tune.py",
+      "start_time": "2025-11-13T04:14:04.697450",
+      "success": true,
+      "duration": 11329.145790815353,
+      "end_time": "2025-11-13T07:22:53.843248"
+    },
+    {
+      "optimizer": "EvoX SHADE",
+      "key": "shade",
+      "script": "optuna_shade_tune.py",
+      "start_time": "2025-11-13T07:22:53.844977",
+      "success": true,
+      "duration": 11341.116017103195,
+      "end_time": "2025-11-13T10:31:54.960999"
+    },
+    {
+      "optimizer": "EvoX SaDE",
+      "key": "sade",
+      "script": "optuna_sade_tune.py",
+      "start_time": "2025-11-13T10:31:54.962781",
+      "success": true,
+      "duration": 11345.251128911972,
+      "end_time": "2025-11-13T13:41:00.213916"
+    },
+    {
+      "optimizer": "Standard CMA-ES",
+      "key": "cmaes",
+      "script": "optuna_cmaes_tune.py",
+      "start_time": "2025-11-13T13:41:00.215554",
+      "success": true,
+      "duration": 11323.709660768509,
+      "end_time": "2025-11-13T16:49:43.925220"
+    },
+    {
+      "optimizer": "IPOP-CMA-ES",
+      "key": "ipop",
+      "script": "optuna_ipop_tune.py",
+      "start_time": "2025-11-13T16:49:43.927018",
+      "success": true,
+      "duration": 11310.409226417542,
+      "end_time": "2025-11-13T19:58:14.336250"
+    },
+    {
+      "optimizer": "BIPOP-CMA-ES",
+      "key": "bipop",
+      "script": "optuna_bipop_tune.py",
+      "start_time": "2025-11-13T19:58:14.338091",
+      "success": true,
+      "duration": 11310.166682958603,
+      "end_time": "2025-11-13T23:06:44.504780"
+    },
+    {
+      "optimizer": "SciPy DE",
+      "key": "scipy_de",
+      "script": "optuna_scipy_de_tune.py",
+      "start_time": "2025-11-13T23:06:44.506619",
+      "success": true,
+      "duration": 11334.288607120514,
+      "end_time": "2025-11-14T02:15:38.795231"
+    },
+    {
+      "optimizer": "EvoX JADE",
+      "key": "jade",
+      "script": "optuna_jade_tune.py",
+      "start_time": "2025-11-14T02:15:38.796938",
+      "success": true,
+      "duration": 11200.303406000137,
+      "end_time": "2025-11-14T05:22:19.100349"
+    }
+  ]
+}

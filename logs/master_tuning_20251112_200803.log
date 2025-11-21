@@ -1,0 +1,30 @@
+[20:08:03][INFO] ================================================================================
+[20:08:03][INFO] MASTER HYPERPARAMETER TUNING ORCHESTRATION
+[20:08:03][INFO] ================================================================================
+[20:08:03][INFO] Model: models/tsp_100_model_63108.pt
+[20:08:03][INFO] Instances: instances/tsp/test/tsp100_10inst_w_optimal.pkl
+[20:08:03][INFO] Trials per optimizer: 50
+[20:08:03][INFO] Tuning instances: 3
+[20:08:03][INFO] Batch size: 300
+[20:08:03][INFO] Time limit: 75.0s per instance
+[20:08:03][INFO] Seed: 1234
+[20:08:03][INFO] Resume existing studies: False
+[20:08:03][INFO] Log file: logs/master_tuning_20251112_200803.log
+[20:08:03][INFO] --------------------------------------------------------------------------------
+[20:08:03][INFO] Total optimizers to tune: 9
+[20:08:03][INFO] Optimizers: de, ode, code, shade, sade, cmaes, ipop, bipop, scipy_de
+[20:08:03][INFO] Estimated total time: 27.9 hours
+[20:08:03][INFO]   (Assuming ~3.1 hours per optimizer with 50 trials)
+[20:08:03][INFO] ================================================================================
+[20:08:03][INFO] 
+================================================================================
+[20:08:03][INFO] OPTIMIZER 1/9
+[20:08:03][INFO] ================================================================================
+
+[20:08:03][INFO] ================================================================================
+[20:08:03][INFO] STARTING TUNING: Standard DE (de)
+[20:08:03][INFO] ================================================================================
+[20:08:03][INFO] Script: optuna_de_tune.py
+[20:08:03][INFO] Tunable parameters: mutate, recombination
+[20:08:03][INFO] Command: uv run python optuna_de_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_10inst_w_optimal.pkl --n_trials 50 --tune_n_instances 3 --batch_size 300 --time_limit 75.0 --seed 1234
+[20:08:03][INFO] --------------------------------------------------------------------------------

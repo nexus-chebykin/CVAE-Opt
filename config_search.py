@@ -55,6 +55,18 @@ def get_config(args=None):
     parser.add_argument('--de_recombine', default=0.95, type=float,
                         help='Crossover rate CR for DE (default: 0.95)')
 
+    # Scipy DE parameters
+    parser.add_argument('--scipy_strategy', default='best1bin', type=str,
+                        help='Mutation strategy for Scipy DE (default: best1bin, e.g., best1bin, currenttobest1bin, rand1bin)')
+    parser.add_argument('--scipy_use_adaptive_mutation', default=False, action='store_true',
+                        help='Use adaptive mutation (dithering) for Scipy DE (default: False)')
+    parser.add_argument('--scipy_mutation_low', default=0.5, type=float,
+                        help='Lower bound for mutation factor in Scipy DE adaptive mode (default: 0.5)')
+    parser.add_argument('--scipy_mutation_high', default=1.0, type=float,
+                        help='Upper bound for mutation factor in Scipy DE adaptive mode (default: 1.0)')
+    parser.add_argument('--scipy_updating', default='immediate', type=str, choices=['immediate', 'deferred'],
+                        help='Update strategy for Scipy DE: immediate or deferred (default: immediate)')
+
     # JADE (EvoX) parameters
     parser.add_argument('--jade_c', default=0.1, type=float,
                         help='Learning rate for JADE adaptive parameters (default: 0.1, range: 0.01-0.5)')
@@ -65,9 +77,23 @@ def get_config(args=None):
     parser.add_argument('--jade_stdev', default=None, type=float,
                         help='Standard deviation for JADE population initialization (default: None, uniform initialization)')
 
+    # ODE (EvoX) parameters
+    parser.add_argument('--ode_base_vector', default='rand', type=str, choices=['rand', 'best'],
+                        help='Base vector strategy for ODE mutation (default: rand, choices: rand or best)')
+    parser.add_argument('--ode_num_difference_vectors', default=1, type=int,
+                        help='Number of difference vectors for ODE mutation (default: 1)')
+    parser.add_argument('--ode_differential_weight', default=0.5, type=float,
+                        help='Mutation scaling factor F for ODE (default: 0.5)')
+    parser.add_argument('--ode_cross_probability', default=0.9, type=float,
+                        help='Crossover probability CR for ODE (default: 0.9)')
+
     # CMA-ES parameters
     parser.add_argument('--cmaes_sigma0', default=0.5, type=float,
                         help='Initial step size for CMA-ES (default: 0.5, typically 0.2-0.5 of search range)')
+    parser.add_argument('--cmaes_rankmu', default=1.0, type=float,
+                        help='Learning rate for rank-mu update in CMA-ES (default: 1.0)')
+    parser.add_argument('--cmaes_rankone', default=1.0, type=float,
+                        help='Learning rate for rank-one update in CMA-ES (default: 1.0)')
     parser.add_argument('--cmaes_sigma_sweep', nargs='+', type=float, default=None,
                         help='List of sigma values to test for CMA-ES comparison (e.g., --cmaes_sigma_sweep 0.3 0.5 1.0 1.5). '
                              'When provided, runs CMA-ES with each sigma value using a single fixed batch size.')
@@ -79,6 +105,12 @@ def get_config(args=None):
                         help='Population size multiplier for IPOP-CMA-ES restarts (default: 2.0)')
     parser.add_argument('--ipop_initial_popsize', default=None, type=int,
                         help='Initial population size for IPOP-CMA-ES (default: None, uses CMA-ES library default based on problem dimension)')
+    parser.add_argument('--ipop_sigma0', default=None, type=float,
+                        help='Initial step size for IPOP-CMA-ES (default: None, uses cmaes_sigma0)')
+    parser.add_argument('--ipop_rankmu', default=None, type=float,
+                        help='Learning rate for rank-mu update in IPOP-CMA-ES (default: None, uses cmaes_rankmu)')
+    parser.add_argument('--ipop_rankone', default=None, type=float,
+                        help='Learning rate for rank-one update in IPOP-CMA-ES (default: None, uses cmaes_rankone)')
 
     # BIPOP-CMA-ES parameters
     parser.add_argument('--bipop_restarts', default=5, type=int,
@@ -87,6 +119,28 @@ def get_config(args=None):
                         help='Population size multiplier for BIPOP-CMA-ES restarts (default: 2.0)')
     parser.add_argument('--bipop_initial_popsize', default=None, type=int,
                         help='Initial population size for BIPOP-CMA-ES (default: None, uses CMA-ES library default based on problem dimension)')
+    parser.add_argument('--bipop_sigma0', default=None, type=float,
+                        help='Initial step size for BIPOP-CMA-ES (default: None, uses cmaes_sigma0)')
+    parser.add_argument('--bipop_rankmu', default=None, type=float,
+                        help='Learning rate for rank-mu update in BIPOP-CMA-ES (default: None, uses cmaes_rankmu)')
+    parser.add_argument('--bipop_rankone', default=None, type=float,
+                        help='Learning rate for rank-one update in BIPOP-CMA-ES (default: None, uses cmaes_rankone)')
+
+    # SaDE (EvoX) parameters
+    parser.add_argument('--sade_diff_padding_num', default=7, type=int,
+                        help='Number of padding difference vectors for SaDE (default: 7)')
+    parser.add_argument('--sade_lp', default=50, type=int,
+                        help='Learning period for SaDE strategy adaptation (default: 50)')
+
+    # SHADE (EvoX) parameters
+    parser.add_argument('--shade_diff_padding_num', default=7, type=int,
+                        help='Number of padding difference vectors for SHADE (default: 7)')
+
+    # CoDE (EvoX) parameters
+    parser.add_argument('--code_diff_padding_num', default=7, type=int,
+                        help='Number of padding difference vectors for CoDE (default: 7)')
+    parser.add_argument('--code_replace', default=True, action='store_true',
+                        help='Enable replace mode for CoDE (default: True)')
 
     # Optimizer comparison
     parser.add_argument('--compare_optimizers', default=False, action='store_true',
