@@ -1,0 +1,54 @@
+[20:29:14][INFO] ================================================================================
+[20:29:14][INFO] MASTER HYPERPARAMETER TUNING ORCHESTRATION
+[20:29:14][INFO] ================================================================================
+[20:29:14][INFO] Model: models/tsp_100_model_63108.pt
+[20:29:14][INFO] Instances: instances/tsp/test/tsp100_10inst_w_optimal.pkl
+[20:29:14][INFO] Trials per optimizer: 1
+[20:29:14][INFO] Tuning instances: 1
+[20:29:14][INFO] Batch size: 300
+[20:29:14][INFO] Time limit: 75.0s per instance
+[20:29:14][INFO] Seed: 1234
+[20:29:14][INFO] Resume existing studies: False
+[20:29:14][INFO] Log file: logs/master_tuning_20251112_202914.log
+[20:29:14][INFO] --------------------------------------------------------------------------------
+[20:29:14][INFO] Total optimizers to tune: 1
+[20:29:14][INFO] Optimizers: de
+[20:29:14][INFO] Estimated total time: 3.1 hours
+[20:29:14][INFO]   (Assuming ~3.1 hours per optimizer with 50 trials)
+[20:29:14][INFO] ================================================================================
+[20:29:14][INFO] 
+================================================================================
+[20:29:14][INFO] OPTIMIZER 1/1
+[20:29:14][INFO] ================================================================================
+
+[20:29:14][INFO] ================================================================================
+[20:29:14][INFO] STARTING TUNING: Standard DE (de)
+[20:29:14][INFO] ================================================================================
+[20:29:14][INFO] Script: optuna_de_tune.py
+[20:29:14][INFO] Tunable parameters: mutate, recombination
+[20:29:14][INFO] Command: uv run python optuna_de_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_10inst_w_optimal.pkl --n_trials 1 --tune_n_instances 1 --batch_size 300 --search_timelimit 75 --seed 1234
+[20:29:14][INFO] --------------------------------------------------------------------------------
+[20:30:35][INFO] --------------------------------------------------------------------------------
+[20:30:35][INFO] ✓ COMPLETED: Standard DE
+[20:30:35][INFO]   Duration: 81.1 seconds (1.4 minutes)
+[20:30:35][INFO] ================================================================================
+[20:30:35][INFO] 
+Progress: 1/1 optimizers completed
+[20:30:35][INFO] Elapsed time: 0.02 hours
+[20:30:35][INFO] Estimated remaining time: 0.00 hours
+[20:30:35][INFO] Estimated total time: 0.02 hours
+
+[20:30:35][INFO] ================================================================================
+[20:30:35][INFO] MASTER TUNING SUMMARY
+[20:30:35][INFO] ================================================================================
+[20:30:35][INFO] Total optimizers: 1
+[20:30:35][INFO] Successful: 1
+[20:30:35][INFO] Failed: 0
+[20:30:35][INFO] Total duration: 0.02 hours (1.4 minutes)
+[20:30:35][INFO] Summary saved to: tuning_summary.json
+[20:30:35][INFO] ================================================================================
+[20:30:35][INFO] 
+Successful tunings:
+[20:30:35][INFO]   ✓ Standard DE (de) - 1.4 min
+[20:30:35][INFO] 
+✓ All optimizers tuned successfully!

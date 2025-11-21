@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------+
 # Master Orchestration Script for Hyperparameter Tuning
 #
-# This script runs hyperparameter tuning for all 9 optimizers in sequence.
+# This script runs hyperparameter tuning for all 10 optimizers in sequence.
 #
 # Usage:
 #   uv run python run_all_tuning.py \
@@ -31,6 +31,7 @@
 #   7. ipop       - IPOP-CMA-ES
 #   8. bipop      - BIPOP-CMA-ES
 #   9. scipy_de   - SciPy DE
+#   10. jade      - EvoX JADE
 #
 # Outputs:
 #   - Individual tuning results for each optimizer
@@ -94,6 +95,11 @@ OPTIMIZERS = {
         'script': 'optuna_scipy_de_tune.py',
         'name': 'SciPy DE',
         'params': ['strategy', 'mutation', 'recombination_scipy', 'updating']
+    },
+    'jade': {
+        'script': 'optuna_jade_tune.py',
+        'name': 'EvoX JADE',
+        'params': ['jade_c', 'jade_num_diff_vectors']
     }
 }
 
@@ -150,12 +156,10 @@ def run_optimizer_tuning(optimizer_key, args):
         '--n_trials', str(args.n_trials),
         '--tune_n_instances', str(args.tune_n_instances),
         '--batch_size', str(args.batch_size),
-        '--time_limit', str(args.time_limit),
-        '--seed', str(args.seed)
+        '--search_timelimit', str(int(args.time_limit)),
+        '--seed', str(args.seed),
+        '--load_if_exists'  # Always allow resuming/loading existing studies
     ]
-
-    if args.resume:
-        cmd.append('--load_if_exists')
 
     logging.info(f"Command: {' '.join(cmd)}")
     logging.info("-" * 80)
@@ -306,7 +310,7 @@ Examples:
     --n_trials 100 \\
     --resume
 
-Available optimizers: de, ode, code, shade, sade, cmaes, ipop, bipop, scipy_de
+Available optimizers: de, ode, code, shade, sade, jade, cmaes, ipop, bipop, scipy_de
         """
     )
 

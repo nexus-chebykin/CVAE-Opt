@@ -139,48 +139,63 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             maxtime=maxtime,
             maxevaluations=maxevaluations,
             use_lhs=True,  # CMA-ES always uses LHS for better initialization
+            CMA_rankmu=config.cmaes_rankmu,
+            CMA_rankone=config.cmaes_rankone,
             seed=config.seed
         )
     elif config.optimizer == 'ipop_cmaes':
         from ipop_cmaes import minimize
-        # Use provided sigma0 or fall back to config value
-        cmaes_sigma = sigma0 if sigma0 is not None else config.cmaes_sigma0
+        # Use IPOP-specific parameters if provided, otherwise fall back to CMA-ES defaults
+        ipop_sigma = sigma0 if sigma0 is not None else (config.ipop_sigma0 if config.ipop_sigma0 is not None else config.cmaes_sigma0)
+        ipop_rankmu = config.ipop_rankmu if config.ipop_rankmu is not None else config.cmaes_rankmu
+        ipop_rankone = config.ipop_rankone if config.ipop_rankone is not None else config.cmaes_rankone
         result_cost, result_tour, convergence_history, time_history, timing_breakdown = minimize(
             decode,
             (model, config, instance, cost_fn),
             config.search_space_bound,
             config.search_space_size,
             popsize=config.ipop_initial_popsize,  # Can be None (uses CMA-ES default)
-            sigma0=cmaes_sigma,
+            sigma0=ipop_sigma,
             maxiter=maxiter,
             maxtime=maxtime,
             maxevaluations=maxevaluations,
             restarts=config.ipop_restarts,
             incpopsize=config.ipop_incpopsize,
             use_lhs=True,  # IPOP-CMA-ES always uses LHS for better initialization
+            CMA_rankmu=ipop_rankmu,
+            CMA_rankone=ipop_rankone,
             seed=config.seed
         )
     elif config.optimizer == 'bipop_cmaes':
         from bipop_cmaes import minimize
-        # Use provided sigma0 or fall back to config value
-        cmaes_sigma = sigma0 if sigma0 is not None else config.cmaes_sigma0
+        # Use BIPOP-specific parameters if provided, otherwise fall back to CMA-ES defaults
+        bipop_sigma = sigma0 if sigma0 is not None else (config.bipop_sigma0 if config.bipop_sigma0 is not None else config.cmaes_sigma0)
+        bipop_rankmu = config.bipop_rankmu if config.bipop_rankmu is not None else config.cmaes_rankmu
+        bipop_rankone = config.bipop_rankone if config.bipop_rankone is not None else config.cmaes_rankone
         result_cost, result_tour, convergence_history, time_history, timing_breakdown = minimize(
             decode,
             (model, config, instance, cost_fn),
             config.search_space_bound,
             config.search_space_size,
             popsize=config.bipop_initial_popsize,  # Can be None (uses CMA-ES default)
-            sigma0=cmaes_sigma,
+            sigma0=bipop_sigma,
             maxiter=maxiter,
             maxtime=maxtime,
             maxevaluations=maxevaluations,
             restarts=config.bipop_restarts,
             incpopsize=config.bipop_incpopsize,
             use_lhs=True,  # BIPOP-CMA-ES always uses LHS for better initialization
+            CMA_rankmu=bipop_rankmu,
+            CMA_rankone=bipop_rankone,
             seed=config.seed
         )
     elif config.optimizer == 'scipy_de':
         from scipy_de import minimize
+        # Prepare mutation parameter: if adaptive, use (low, high) tuple, otherwise use single value
+        if config.scipy_use_adaptive_mutation:
+            mutation_param = (config.scipy_mutation_low, config.scipy_mutation_high)
+        else:
+            mutation_param = config.de_mutate  # Fall back to standard DE mutation
         result_cost, result_tour, convergence_history, time_history, timing_breakdown = minimize(
             decode,
             (model, config, instance, cost_fn),
@@ -192,6 +207,10 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             maxiter=maxiter,
             maxtime=maxtime,
             maxevaluations=maxevaluations,
+            strategy=config.scipy_strategy,
+            mutation=mutation_param,
+            recombination_scipy=config.de_recombine,  # Use de_recombine for scipy's recombination
+            updating=config.scipy_updating,
             seed=config.seed
         )
     elif config.optimizer == 'evox_jade':
@@ -242,6 +261,7 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             maxiter=maxiter,
             maxtime=maxtime,
             maxevaluations=maxevaluations,
+            diff_padding_num=config.shade_diff_padding_num,
             seed=config.seed
         )
     elif config.optimizer == 'evox_sade':
@@ -257,6 +277,8 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             maxiter=maxiter,
             maxtime=maxtime,
             maxevaluations=maxevaluations,
+            diff_padding_num=config.sade_diff_padding_num,
+            LP=config.sade_lp,
             seed=config.seed
         )
     elif config.optimizer == 'evox_code':
@@ -272,6 +294,8 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             maxiter=maxiter,
             maxtime=maxtime,
             maxevaluations=maxevaluations,
+            diff_padding_num=config.code_diff_padding_num,
+            replace=config.code_replace,
             seed=config.seed
         )
     elif config.optimizer == 'evox_ode':
@@ -282,8 +306,8 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             config.search_space_bound,
             config.search_space_size,
             popsize=batch_size,
-            mutate=config.de_mutate,
-            recombination=config.de_recombine,
+            mutate=config.de_mutate,  # Not used by ODE, but required by interface
+            recombination=config.de_recombine,  # Not used by ODE, but required by interface
             maxiter=maxiter,
             maxtime=maxtime,
             maxevaluations=maxevaluations,

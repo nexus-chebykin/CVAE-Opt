@@ -1,0 +1,55 @@
+[21:30:19][INFO] ================================================================================
+[21:30:19][INFO] MASTER HYPERPARAMETER TUNING ORCHESTRATION
+[21:30:19][INFO] ================================================================================
+[21:30:19][INFO] Model: models/tsp_100_model_63108.pt
+[21:30:19][INFO] Instances: instances/tsp/test/tsp100_10inst_w_optimal.pkl
+[21:30:19][INFO] Trials per optimizer: 1
+[21:30:19][INFO] Tuning instances: 1
+[21:30:19][INFO] Batch size: 300
+[21:30:19][INFO] Time limit: 75.0s per instance
+[21:30:19][INFO] Seed: 1234
+[21:30:19][INFO] Resume existing studies: False
+[21:30:19][INFO] Log file: logs/master_tuning_20251112_213019.log
+[21:30:19][INFO] --------------------------------------------------------------------------------
+[21:30:19][INFO] Total optimizers to tune: 1
+[21:30:19][INFO] Optimizers: jade
+[21:30:19][INFO] Estimated total time: 3.1 hours
+[21:30:19][INFO]   (Assuming ~3.1 hours per optimizer with 50 trials)
+[21:30:19][INFO] ================================================================================
+[21:30:19][INFO] 
+================================================================================
+[21:30:19][INFO] OPTIMIZER 1/1
+[21:30:19][INFO] ================================================================================
+
+[21:30:19][INFO] ================================================================================
+[21:30:19][INFO] STARTING TUNING: EvoX JADE (jade)
+[21:30:19][INFO] ================================================================================
+[21:30:19][INFO] Script: optuna_jade_tune.py
+[21:30:19][INFO] Tunable parameters: jade_c, jade_num_diff_vectors
+[21:30:19][INFO] Command: uv run python optuna_jade_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_10inst_w_optimal.pkl --n_trials 1 --tune_n_instances 1 --batch_size 300 --search_timelimit 75 --seed 1234 --load_if_exists
+[21:30:19][INFO] --------------------------------------------------------------------------------
+[21:30:27][ERROR] --------------------------------------------------------------------------------
+[21:30:27][ERROR] ✗ FAILED: EvoX JADE
+[21:30:27][ERROR]   Error: Process returned non-zero exit code: 1
+[21:30:27][ERROR]   Duration before failure: 7.2 seconds
+[21:30:27][ERROR] ================================================================================
+[21:30:27][INFO] 
+Progress: 1/1 optimizers completed
+[21:30:27][INFO] Elapsed time: 0.00 hours
+[21:30:27][INFO] Estimated remaining time: 0.00 hours
+[21:30:27][INFO] Estimated total time: 0.00 hours
+
+[21:30:27][INFO] ================================================================================
+[21:30:27][INFO] MASTER TUNING SUMMARY
+[21:30:27][INFO] ================================================================================
+[21:30:27][INFO] Total optimizers: 1
+[21:30:27][INFO] Successful: 0
+[21:30:27][INFO] Failed: 1
+[21:30:27][INFO] Total duration: 0.00 hours (0.1 minutes)
+[21:30:27][INFO] Summary saved to: tuning_summary.json
+[21:30:27][INFO] ================================================================================
+[21:30:27][INFO] 
+Failed tunings:
+[21:30:27][INFO]   ✗ EvoX JADE (jade) - Process returned non-zero exit code: 1
+[21:30:27][WARNING] 
+1 optimizer(s) failed. Check logs for details.

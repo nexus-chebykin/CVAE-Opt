@@ -399,8 +399,7 @@ def main():
         logger.info("  - Parallel coordinate plot saved")
 
     except Exception as e:
-        logger.warning(f"Could not generate some visualizations: {e}")
-        logger.warning("Install kaleido: uv add kaleido")
+        logger.info("Visualizations skipped (requires Chrome/Chromium for image export)")
 
     logger.info("")
     logger.info("=" * 80)

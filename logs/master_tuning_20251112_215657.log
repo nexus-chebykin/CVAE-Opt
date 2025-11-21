@@ -1,0 +1,261 @@
+[21:56:57][INFO] ================================================================================
+[21:56:57][INFO] MASTER HYPERPARAMETER TUNING ORCHESTRATION
+[21:56:57][INFO] ================================================================================
+[21:56:57][INFO] Model: models/tsp_100_model_63108.pt
+[21:56:57][INFO] Instances: instances/tsp/test/tsp100_10inst_w_optimal.pkl
+[21:56:57][INFO] Trials per optimizer: 50
+[21:56:57][INFO] Tuning instances: 3
+[21:56:57][INFO] Batch size: 600
+[21:56:57][INFO] Time limit: 75.0s per instance
+[21:56:57][INFO] Seed: 1234
+[21:56:57][INFO] Resume existing studies: False
+[21:56:57][INFO] Log file: logs/master_tuning_20251112_215657.log
+[21:56:57][INFO] --------------------------------------------------------------------------------
+[21:56:57][INFO] Total optimizers to tune: 10
+[21:56:57][INFO] Optimizers: de, ode, code, shade, sade, cmaes, ipop, bipop, scipy_de, jade
+[21:56:57][INFO] Estimated total time: 31.0 hours
+[21:56:57][INFO]   (Assuming ~3.1 hours per optimizer with 50 trials)
+[21:56:57][INFO] ================================================================================
+[21:56:57][INFO] 
+================================================================================
+[21:56:57][INFO] OPTIMIZER 1/10
+[21:56:57][INFO] ================================================================================
+
+[21:56:57][INFO] ================================================================================
+[21:56:57][INFO] STARTING TUNING: Standard DE (de)
+[21:56:57][INFO] ================================================================================
+[21:56:57][INFO] Script: optuna_de_tune.py
+[21:56:57][INFO] Tunable parameters: mutate, recombination
+[21:56:57][INFO] Command: uv run python optuna_de_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_10inst_w_optimal.pkl --n_trials 50 --tune_n_instances 3 --batch_size 600 --search_timelimit 75 --seed 1234 --load_if_exists
+[21:56:57][INFO] --------------------------------------------------------------------------------
+[01:05:30][INFO] --------------------------------------------------------------------------------
+[01:05:30][INFO] ✓ COMPLETED: Standard DE
+[01:05:30][INFO]   Duration: 11313.0 seconds (188.5 minutes)
+[01:05:30][INFO] ================================================================================
+[01:05:30][INFO] 
+Progress: 1/10 optimizers completed
+[01:05:30][INFO] Elapsed time: 3.14 hours
+[01:05:30][INFO] Estimated remaining time: 28.28 hours
+[01:05:30][INFO] Estimated total time: 31.42 hours
+
+[01:05:30][INFO] 
+================================================================================
+[01:05:30][INFO] OPTIMIZER 2/10
+[01:05:30][INFO] ================================================================================
+
+[01:05:30][INFO] ================================================================================
+[01:05:30][INFO] STARTING TUNING: EvoX ODE (ode)
+[01:05:30][INFO] ================================================================================
+[01:05:30][INFO] Script: optuna_ode_tune.py
+[01:05:30][INFO] Tunable parameters: base_vector, num_difference_vectors, differential_weight, cross_probability
+[01:05:30][INFO] Command: uv run python optuna_ode_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_10inst_w_optimal.pkl --n_trials 50 --tune_n_instances 3 --batch_size 600 --search_timelimit 75 --seed 1234 --load_if_exists
+[01:05:30][INFO] --------------------------------------------------------------------------------
+[04:14:04][INFO] --------------------------------------------------------------------------------
+[04:14:04][INFO] ✓ COMPLETED: EvoX ODE
+[04:14:04][INFO]   Duration: 11314.7 seconds (188.6 minutes)
+[04:14:04][INFO] ================================================================================
+[04:14:04][INFO] 
+Progress: 2/10 optimizers completed
+[04:14:04][INFO] Elapsed time: 6.29 hours
+[04:14:04][INFO] Estimated remaining time: 25.14 hours
+[04:14:04][INFO] Estimated total time: 31.43 hours
+
+[04:14:04][INFO] 
+================================================================================
+[04:14:04][INFO] OPTIMIZER 3/10
+[04:14:04][INFO] ================================================================================
+
+[04:14:04][INFO] ================================================================================
+[04:14:04][INFO] STARTING TUNING: EvoX CoDE (code)
+[04:14:04][INFO] ================================================================================
+[04:14:04][INFO] Script: optuna_code_tune.py
+[04:14:04][INFO] Tunable parameters: diff_padding_num, replace
+[04:14:04][INFO] Command: uv run python optuna_code_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_10inst_w_optimal.pkl --n_trials 50 --tune_n_instances 3 --batch_size 600 --search_timelimit 75 --seed 1234 --load_if_exists
+[04:14:04][INFO] --------------------------------------------------------------------------------
+[07:22:53][INFO] --------------------------------------------------------------------------------
+[07:22:53][INFO] ✓ COMPLETED: EvoX CoDE
+[07:22:53][INFO]   Duration: 11329.1 seconds (188.8 minutes)
+[07:22:53][INFO] ================================================================================
+[07:22:53][INFO] 
+Progress: 3/10 optimizers completed
+[07:22:53][INFO] Elapsed time: 9.43 hours
+[07:22:53][INFO] Estimated remaining time: 22.01 hours
+[07:22:53][INFO] Estimated total time: 31.44 hours
+
+[07:22:53][INFO] 
+================================================================================
+[07:22:53][INFO] OPTIMIZER 4/10
+[07:22:53][INFO] ================================================================================
+
+[07:22:53][INFO] ================================================================================
+[07:22:53][INFO] STARTING TUNING: EvoX SHADE (shade)
+[07:22:53][INFO] ================================================================================
+[07:22:53][INFO] Script: optuna_shade_tune.py
+[07:22:53][INFO] Tunable parameters: diff_padding_num
+[07:22:53][INFO] Command: uv run python optuna_shade_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_10inst_w_optimal.pkl --n_trials 50 --tune_n_instances 3 --batch_size 600 --search_timelimit 75 --seed 1234 --load_if_exists
+[07:22:53][INFO] --------------------------------------------------------------------------------
+[10:31:54][INFO] --------------------------------------------------------------------------------
+[10:31:54][INFO] ✓ COMPLETED: EvoX SHADE
+[10:31:54][INFO]   Duration: 11341.1 seconds (189.0 minutes)
+[10:31:54][INFO] ================================================================================
+[10:31:54][INFO] 
+Progress: 4/10 optimizers completed
+[10:31:54][INFO] Elapsed time: 12.58 hours
+[10:31:54][INFO] Estimated remaining time: 18.87 hours
+[10:31:54][INFO] Estimated total time: 31.46 hours
+
+[10:31:54][INFO] 
+================================================================================
+[10:31:54][INFO] OPTIMIZER 5/10
+[10:31:54][INFO] ================================================================================
+
+[10:31:54][INFO] ================================================================================
+[10:31:54][INFO] STARTING TUNING: EvoX SaDE (sade)
+[10:31:54][INFO] ================================================================================
+[10:31:54][INFO] Script: optuna_sade_tune.py
+[10:31:54][INFO] Tunable parameters: diff_padding_num, LP
+[10:31:54][INFO] Command: uv run python optuna_sade_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_10inst_w_optimal.pkl --n_trials 50 --tune_n_instances 3 --batch_size 600 --search_timelimit 75 --seed 1234 --load_if_exists
+[10:31:54][INFO] --------------------------------------------------------------------------------
+[13:41:00][INFO] --------------------------------------------------------------------------------
+[13:41:00][INFO] ✓ COMPLETED: EvoX SaDE
+[13:41:00][INFO]   Duration: 11345.3 seconds (189.1 minutes)
+[13:41:00][INFO] ================================================================================
+[13:41:00][INFO] 
+Progress: 5/10 optimizers completed
+[13:41:00][INFO] Elapsed time: 15.73 hours
+[13:41:00][INFO] Estimated remaining time: 15.73 hours
+[13:41:00][INFO] Estimated total time: 31.47 hours
+
+[13:41:00][INFO] 
+================================================================================
+[13:41:00][INFO] OPTIMIZER 6/10
+[13:41:00][INFO] ================================================================================
+
+[13:41:00][INFO] ================================================================================
+[13:41:00][INFO] STARTING TUNING: Standard CMA-ES (cmaes)
+[13:41:00][INFO] ================================================================================
+[13:41:00][INFO] Script: optuna_cmaes_tune.py
+[13:41:00][INFO] Tunable parameters: sigma0, CMA_rankmu, CMA_rankone
+[13:41:00][INFO] Command: uv run python optuna_cmaes_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_10inst_w_optimal.pkl --n_trials 50 --tune_n_instances 3 --batch_size 600 --search_timelimit 75 --seed 1234 --load_if_exists
+[13:41:00][INFO] --------------------------------------------------------------------------------
+[16:49:43][INFO] --------------------------------------------------------------------------------
+[16:49:43][INFO] ✓ COMPLETED: Standard CMA-ES
+[16:49:43][INFO]   Duration: 11323.7 seconds (188.7 minutes)
+[16:49:43][INFO] ================================================================================
+[16:49:43][INFO] 
+Progress: 6/10 optimizers completed
+[16:49:43][INFO] Elapsed time: 18.88 hours
+[16:49:43][INFO] Estimated remaining time: 12.59 hours
+[16:49:43][INFO] Estimated total time: 31.47 hours
+
+[16:49:43][INFO] 
+================================================================================
+[16:49:43][INFO] OPTIMIZER 7/10
+[16:49:43][INFO] ================================================================================
+
+[16:49:43][INFO] ================================================================================
+[16:49:43][INFO] STARTING TUNING: IPOP-CMA-ES (ipop)
+[16:49:43][INFO] ================================================================================
+[16:49:43][INFO] Script: optuna_ipop_tune.py
+[16:49:43][INFO] Tunable parameters: sigma0, CMA_rankmu, CMA_rankone
+[16:49:43][INFO] Command: uv run python optuna_ipop_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_10inst_w_optimal.pkl --n_trials 50 --tune_n_instances 3 --batch_size 600 --search_timelimit 75 --seed 1234 --load_if_exists
+[16:49:43][INFO] --------------------------------------------------------------------------------
+[19:58:14][INFO] --------------------------------------------------------------------------------
+[19:58:14][INFO] ✓ COMPLETED: IPOP-CMA-ES
+[19:58:14][INFO]   Duration: 11310.4 seconds (188.5 minutes)
+[19:58:14][INFO] ================================================================================
+[19:58:14][INFO] 
+Progress: 7/10 optimizers completed
+[19:58:14][INFO] Elapsed time: 22.02 hours
+[19:58:14][INFO] Estimated remaining time: 9.44 hours
+[19:58:14][INFO] Estimated total time: 31.46 hours
+
+[19:58:14][INFO] 
+================================================================================
+[19:58:14][INFO] OPTIMIZER 8/10
+[19:58:14][INFO] ================================================================================
+
+[19:58:14][INFO] ================================================================================
+[19:58:14][INFO] STARTING TUNING: BIPOP-CMA-ES (bipop)
+[19:58:14][INFO] ================================================================================
+[19:58:14][INFO] Script: optuna_bipop_tune.py
+[19:58:14][INFO] Tunable parameters: sigma0, CMA_rankmu, CMA_rankone
+[19:58:14][INFO] Command: uv run python optuna_bipop_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_10inst_w_optimal.pkl --n_trials 50 --tune_n_instances 3 --batch_size 600 --search_timelimit 75 --seed 1234 --load_if_exists
+[19:58:14][INFO] --------------------------------------------------------------------------------
+[23:06:44][INFO] --------------------------------------------------------------------------------
+[23:06:44][INFO] ✓ COMPLETED: BIPOP-CMA-ES
+[23:06:44][INFO]   Duration: 11310.2 seconds (188.5 minutes)
+[23:06:44][INFO] ================================================================================
+[23:06:44][INFO] 
+Progress: 8/10 optimizers completed
+[23:06:44][INFO] Elapsed time: 25.16 hours
+[23:06:44][INFO] Estimated remaining time: 6.29 hours
+[23:06:44][INFO] Estimated total time: 31.45 hours
+
+[23:06:44][INFO] 
+================================================================================
+[23:06:44][INFO] OPTIMIZER 9/10
+[23:06:44][INFO] ================================================================================
+
+[23:06:44][INFO] ================================================================================
+[23:06:44][INFO] STARTING TUNING: SciPy DE (scipy_de)
+[23:06:44][INFO] ================================================================================
+[23:06:44][INFO] Script: optuna_scipy_de_tune.py
+[23:06:44][INFO] Tunable parameters: strategy, mutation, recombination_scipy, updating
+[23:06:44][INFO] Command: uv run python optuna_scipy_de_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_10inst_w_optimal.pkl --n_trials 50 --tune_n_instances 3 --batch_size 600 --search_timelimit 75 --seed 1234 --load_if_exists
+[23:06:44][INFO] --------------------------------------------------------------------------------
+[02:15:38][INFO] --------------------------------------------------------------------------------
+[02:15:38][INFO] ✓ COMPLETED: SciPy DE
+[02:15:38][INFO]   Duration: 11334.3 seconds (188.9 minutes)
+[02:15:38][INFO] ================================================================================
+[02:15:38][INFO] 
+Progress: 9/10 optimizers completed
+[02:15:38][INFO] Elapsed time: 28.31 hours
+[02:15:38][INFO] Estimated remaining time: 3.15 hours
+[02:15:38][INFO] Estimated total time: 31.46 hours
+
+[02:15:38][INFO] 
+================================================================================
+[02:15:38][INFO] OPTIMIZER 10/10
+[02:15:38][INFO] ================================================================================
+
+[02:15:38][INFO] ================================================================================
+[02:15:38][INFO] STARTING TUNING: EvoX JADE (jade)
+[02:15:38][INFO] ================================================================================
+[02:15:38][INFO] Script: optuna_jade_tune.py
+[02:15:38][INFO] Tunable parameters: jade_c, jade_num_diff_vectors
+[02:15:38][INFO] Command: uv run python optuna_jade_tune.py --model_path models/tsp_100_model_63108.pt --instances_path instances/tsp/test/tsp100_10inst_w_optimal.pkl --n_trials 50 --tune_n_instances 3 --batch_size 600 --search_timelimit 75 --seed 1234 --load_if_exists
+[02:15:38][INFO] --------------------------------------------------------------------------------
+[05:22:19][INFO] --------------------------------------------------------------------------------
+[05:22:19][INFO] ✓ COMPLETED: EvoX JADE
+[05:22:19][INFO]   Duration: 11200.3 seconds (186.7 minutes)
+[05:22:19][INFO] ================================================================================
+[05:22:19][INFO] 
+Progress: 10/10 optimizers completed
+[05:22:19][INFO] Elapsed time: 31.42 hours
+[05:22:19][INFO] Estimated remaining time: 0.00 hours
+[05:22:19][INFO] Estimated total time: 31.42 hours
+
+[05:22:19][INFO] ================================================================================
+[05:22:19][INFO] MASTER TUNING SUMMARY
+[05:22:19][INFO] ================================================================================
+[05:22:19][INFO] Total optimizers: 10
+[05:22:19][INFO] Successful: 10
+[05:22:19][INFO] Failed: 0
+[05:22:19][INFO] Total duration: 31.42 hours (1885.4 minutes)
+[05:22:19][INFO] Summary saved to: tuning_summary.json
+[05:22:19][INFO] ================================================================================
+[05:22:19][INFO] 
+Successful tunings:
+[05:22:19][INFO]   ✓ Standard DE (de) - 188.5 min
+[05:22:19][INFO]   ✓ EvoX ODE (ode) - 188.6 min
+[05:22:19][INFO]   ✓ EvoX CoDE (code) - 188.8 min
+[05:22:19][INFO]   ✓ EvoX SHADE (shade) - 189.0 min
+[05:22:19][INFO]   ✓ EvoX SaDE (sade) - 189.1 min
+[05:22:19][INFO]   ✓ Standard CMA-ES (cmaes) - 188.7 min
+[05:22:19][INFO]   ✓ IPOP-CMA-ES (ipop) - 188.5 min
+[05:22:19][INFO]   ✓ BIPOP-CMA-ES (bipop) - 188.5 min
+[05:22:19][INFO]   ✓ SciPy DE (scipy_de) - 188.9 min
+[05:22:19][INFO]   ✓ EvoX JADE (jade) - 186.7 min
+[05:22:19][INFO] 
+✓ All optimizers tuned successfully!

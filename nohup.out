@@ -1,50 +1,1568 @@
-Traceback (most recent call last):
-  File "/home/superior/vini/ml_project/CVAE-Opt/search.py", line 66, in <module>
-    _, avg_runtime, costs = search_control.solve_instance_set(model, config, instances, solutions)
-                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/superior/vini/ml_project/CVAE-Opt/search_control.py", line 555, in solve_instance_set
-    averaged_data = compute_averaged_convergence(all_instances_data, ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES', 'Scipy-DE', 'EvoX-JADE'], optimal_values)
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/superior/vini/ml_project/CVAE-Opt/plotting.py", line 973, in compute_averaged_convergence
-    raise ValueError(
-ValueError: Optimal values required for gap-based plots. Provide instances with corresponding optimal solutions.
-/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
-  warnings.warn(
-/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
-  warnings.warn(
-/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
-  warnings.warn(
-/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
-  warnings.warn(
-/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
-  warnings.warn(
-/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
-  warnings.warn(
-/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
-  warnings.warn(
-/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
-  warnings.warn(
-/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
-  warnings.warn(
-/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
-  warnings.warn(
-/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
-  warnings.warn(
-/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
-  warnings.warn(
-/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
-  warnings.warn(
-/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
-  warnings.warn(
-/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
-  warnings.warn(
-/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
-  warnings.warn(
-/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
-  warnings.warn(
-/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
-  warnings.warn(
-/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
-  warnings.warn(
-/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/nevergrad/parametrization/_datalayers.py:107: NevergradRuntimeWarning: Bounds are 1.6952199864387514 sigma away from each other at the closest, you should aim for at least 3 for better quality.
-  warnings.warn(
+/home/superior/.local/bin/uv: /home/superior/.local/bin/uv: cannot execute binary file
+/home/superior/.local/bin/uv: /home/superior/.local/bin/uv: cannot execute binary file
+[INFO] ================================================================================
+[INFO] OPTUNA HYPERPARAMETER TUNING FOR EVOX JADE
+[INFO] ================================================================================
+[INFO] Log file: /home/superior/vini/ml_project/CVAE-Opt/runs/optuna_tune_16.11.2025_19-39-24/optuna_tuning_20251116_193924.log
+[INFO] Output directory: /home/superior/vini/ml_project/CVAE-Opt/runs/optuna_tune_16.11.2025_19-39-24
+[INFO] 
+[INFO] Random seed: 1234
+[INFO] Loading model from: models/tsp_100_model_63108.pt
+[INFO] Problem: TSP100
+[INFO] Search space bound: 0.8476099932193757
+[INFO] Search space size: 100
+[INFO] Search iterations: 300
+[INFO] Model loaded successfully
+[INFO] Loading instances from: instances/tsp/test/tsp100_20inst_w_optimal.pkl
+[INFO] Loaded 20 instances
+[INFO] Optimal solutions available: Yes
+[INFO] 
+[INFO] TUNING CONFIGURATION:
+[INFO]   Number of trials: 50
+[INFO]   Instances for tuning: 20
+[INFO]   Population size: 600
+[INFO]   Study name: jade_tuning
+[INFO]   Storage: sqlite:///optuna_jade.db
+[INFO] 
+[INFO] HYPERPARAMETER SEARCH SPACE:
+[INFO]   jade_c: LogUniform[0.01, 0.5]
+[INFO]   jade_num_diff_vectors: Categorical[1, 2]
+[INFO] 
+[INFO] ================================================================================
+[INFO] 
+[I 2025-11-16 19:39:25,491] A new study created in RDB with name: jade_tuning
+[INFO] Default parameters enqueued as first trial (jade_c=0.1, jade_num_diff_vectors=1)
+[INFO] 
+[INFO] Starting hyperparameter optimization...
+[INFO] 
+[INFO] ================================================================================
+[INFO] Trial 1 started
+[INFO]   Parameters: jade_c=0.100000, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.01%, cost=7.8053, optimal=7.8049, time=75.1s
+[INFO]   Instance 1: gap=0.03%, cost=8.1110, optimal=8.1083, time=73.7s
+[INFO]   Instance 2: gap=0.59%, cost=7.8306, optimal=7.7849, time=73.9s
+[INFO]   Instance 3: gap=0.51%, cost=7.8497, optimal=7.8098, time=73.9s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=73.9s
+[INFO]   Instance 5: gap=0.18%, cost=8.0467, optimal=8.0319, time=74.3s
+[INFO]   Instance 6: gap=0.21%, cost=7.7278, optimal=7.7118, time=75.2s
+[INFO]   Instance 7: gap=0.63%, cost=8.0422, optimal=7.9915, time=75.2s
+[INFO]   Instance 8: gap=1.08%, cost=7.9092, optimal=7.8250, time=75.1s
+[INFO]   Instance 9: gap=0.09%, cost=7.8568, optimal=7.8495, time=75.0s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=75.1s
+[INFO]   Instance 11: gap=0.49%, cost=7.9490, optimal=7.9105, time=74.4s
+[INFO]   Instance 12: gap=0.00%, cost=7.5982, optimal=7.5979, time=74.0s
+[INFO]   Instance 13: gap=0.46%, cost=7.8311, optimal=7.7950, time=74.0s
+[INFO]   Instance 14: gap=0.60%, cost=7.8341, optimal=7.7877, time=74.1s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=75.2s
+[INFO]   Instance 16: gap=0.36%, cost=7.9669, optimal=7.9384, time=75.2s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=75.2s
+[INFO]   Instance 18: gap=0.55%, cost=7.4459, optimal=7.4052, time=74.7s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=75.1s
+[INFO]   Trial 1 completed:
+[INFO]     Mean gap: 0.3711%
+[INFO]     Std gap: 0.3014%
+[INFO]     Total time: 1492.08s
+[INFO] ================================================================================
+[I 2025-11-16 20:04:17,666] Trial 0 finished with value: 0.3711215336824314 and parameters: {'jade_c': 0.1, 'jade_num_diff_vectors': 1}. Best is trial 0 with value: 0.3711215336824314.
+[INFO] ================================================================================
+[INFO] Trial 2 started
+[INFO]   Parameters: jade_c=0.021154, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.30%, cost=7.8280, optimal=7.8049, time=73.9s
+[INFO]   Instance 1: gap=0.03%, cost=8.1110, optimal=8.1083, time=73.9s
+[INFO]   Instance 2: gap=0.70%, cost=7.8393, optimal=7.7849, time=74.1s
+[INFO]   Instance 3: gap=0.57%, cost=7.8543, optimal=7.8098, time=75.2s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=75.2s
+[INFO]   Instance 5: gap=0.21%, cost=8.0490, optimal=8.0319, time=74.1s
+[INFO]   Instance 6: gap=0.18%, cost=7.7257, optimal=7.7118, time=74.0s
+[INFO]   Instance 7: gap=0.67%, cost=8.0454, optimal=7.9915, time=74.0s
+[INFO]   Instance 8: gap=1.45%, cost=7.9389, optimal=7.8250, time=74.5s
+[INFO]   Instance 9: gap=0.09%, cost=7.8568, optimal=7.8495, time=74.3s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=74.0s
+[INFO]   Instance 11: gap=0.34%, cost=7.9371, optimal=7.9105, time=74.0s
+[INFO]   Instance 12: gap=0.08%, cost=7.6036, optimal=7.5979, time=73.9s
+[INFO]   Instance 13: gap=0.55%, cost=7.8376, optimal=7.7950, time=75.0s
+[INFO]   Instance 14: gap=0.16%, cost=7.8003, optimal=7.7877, time=75.2s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=75.2s
+[INFO]   Instance 16: gap=0.59%, cost=7.9854, optimal=7.9384, time=75.2s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=75.2s
+[INFO]   Instance 18: gap=1.10%, cost=7.4864, optimal=7.4052, time=75.2s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=75.2s
+[INFO]   Trial 2 completed:
+[INFO]     Mean gap: 0.4327%
+[INFO]     Std gap: 0.3805%
+[INFO]     Total time: 1491.24s
+[INFO] ================================================================================
+[I 2025-11-16 20:29:08,970] Trial 1 finished with value: 0.43268806225402523 and parameters: {'jade_c': 0.021153673722318383, 'jade_num_diff_vectors': 1}. Best is trial 0 with value: 0.3711215336824314.
+[INFO] ================================================================================
+[INFO] Trial 3 started
+[INFO]   Parameters: jade_c=0.215924, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.35%, cost=7.8322, optimal=7.8049, time=75.1s
+[INFO]   Instance 1: gap=0.03%, cost=8.1110, optimal=8.1083, time=74.9s
+[INFO]   Instance 2: gap=0.59%, cost=7.8306, optimal=7.7849, time=73.9s
+[INFO]   Instance 3: gap=0.51%, cost=7.8497, optimal=7.8098, time=73.9s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=73.9s
+[INFO]   Instance 5: gap=0.21%, cost=8.0490, optimal=8.0319, time=74.5s
+[INFO]   Instance 6: gap=0.18%, cost=7.7257, optimal=7.7118, time=75.2s
+[INFO]   Instance 7: gap=0.55%, cost=8.0356, optimal=7.9915, time=75.2s
+[INFO]   Instance 8: gap=0.88%, cost=7.8939, optimal=7.8250, time=75.2s
+[INFO]   Instance 9: gap=0.09%, cost=7.8568, optimal=7.8495, time=75.2s
+[INFO]   Instance 10: gap=0.52%, cost=7.6837, optimal=7.6443, time=75.2s
+[INFO]   Instance 11: gap=0.33%, cost=7.9367, optimal=7.9105, time=75.2s
+[INFO]   Instance 12: gap=0.01%, cost=7.5990, optimal=7.5979, time=75.0s
+[INFO]   Instance 13: gap=0.39%, cost=7.8257, optimal=7.7950, time=74.7s
+[INFO]   Instance 14: gap=0.27%, cost=7.8089, optimal=7.7877, time=75.2s
+[INFO]   Instance 15: gap=0.14%, cost=7.6911, optimal=7.6803, time=75.2s
+[INFO]   Instance 16: gap=0.34%, cost=7.9654, optimal=7.9384, time=75.1s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=75.2s
+[INFO]   Instance 18: gap=1.05%, cost=7.4828, optimal=7.4052, time=75.2s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=74.2s
+[INFO]   Trial 3 completed:
+[INFO]     Mean gap: 0.3671%
+[INFO]     Std gap: 0.2798%
+[INFO]     Total time: 1497.23s
+[INFO] ================================================================================
+[I 2025-11-16 20:54:06,264] Trial 2 finished with value: 0.3670780905673521 and parameters: {'jade_c': 0.21592388039429916, 'jade_num_diff_vectors': 1}. Best is trial 2 with value: 0.3670780905673521.
+[INFO] ================================================================================
+[INFO] Trial 4 started
+[INFO]   Parameters: jade_c=0.029492, jade_num_diff_vectors=2
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.64%, cost=7.8549, optimal=7.8049, time=75.2s
+[INFO]   Instance 1: gap=0.44%, cost=8.1439, optimal=8.1083, time=75.2s
+[INFO]   Instance 2: gap=0.88%, cost=7.8538, optimal=7.7849, time=75.2s
+[INFO]   Instance 3: gap=0.60%, cost=7.8566, optimal=7.8098, time=75.2s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=74.4s
+[INFO]   Instance 5: gap=0.34%, cost=8.0591, optimal=8.0319, time=74.1s
+[INFO]   Instance 6: gap=0.21%, cost=7.7278, optimal=7.7118, time=73.9s
+[INFO]   Instance 7: gap=0.67%, cost=8.0454, optimal=7.9915, time=74.0s
+[INFO]   Instance 8: gap=1.40%, cost=7.9349, optimal=7.8250, time=74.0s
+[INFO]   Instance 9: gap=0.09%, cost=7.8569, optimal=7.8495, time=74.0s
+[INFO]   Instance 10: gap=0.76%, cost=7.7021, optimal=7.6443, time=74.0s
+[INFO]   Instance 11: gap=0.56%, cost=7.9548, optimal=7.9105, time=73.9s
+[INFO]   Instance 12: gap=0.08%, cost=7.6036, optimal=7.5979, time=73.9s
+[INFO]   Instance 13: gap=0.37%, cost=7.8239, optimal=7.7950, time=74.0s
+[INFO]   Instance 14: gap=0.74%, cost=7.8455, optimal=7.7877, time=74.0s
+[INFO]   Instance 15: gap=0.01%, cost=7.6807, optimal=7.6803, time=74.0s
+[INFO]   Instance 16: gap=0.61%, cost=7.9869, optimal=7.9384, time=74.4s
+[INFO]   Instance 17: gap=0.92%, cost=8.0482, optimal=7.9748, time=75.2s
+[INFO]   Instance 18: gap=1.14%, cost=7.4895, optimal=7.4052, time=75.2s
+[INFO]   Instance 19: gap=0.59%, cost=7.5708, optimal=7.5263, time=74.6s
+[INFO]   Trial 4 completed:
+[INFO]     Mean gap: 0.5620%
+[INFO]     Std gap: 0.3538%
+[INFO]     Total time: 1488.36s
+[INFO] ================================================================================
+[I 2025-11-16 21:18:54,686] Trial 3 finished with value: 0.5619694009359888 and parameters: {'jade_c': 0.02949201708073891, 'jade_num_diff_vectors': 2}. Best is trial 2 with value: 0.3670780905673521.
+[INFO] ================================================================================
+[INFO] Trial 5 started
+[INFO]   Parameters: jade_c=0.307740, jade_num_diff_vectors=2
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.35%, cost=7.8322, optimal=7.8049, time=74.0s
+[INFO]   Instance 1: gap=0.66%, cost=8.1614, optimal=8.1083, time=74.0s
+[INFO]   Instance 2: gap=0.77%, cost=7.8450, optimal=7.7849, time=74.0s
+[INFO]   Instance 3: gap=0.69%, cost=7.8636, optimal=7.8098, time=74.6s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=74.7s
+[INFO]   Instance 5: gap=0.57%, cost=8.0775, optimal=8.0319, time=74.0s
+[INFO]   Instance 6: gap=0.21%, cost=7.7278, optimal=7.7118, time=74.0s
+[INFO]   Instance 7: gap=0.81%, cost=8.0564, optimal=7.9915, time=74.0s
+[INFO]   Instance 8: gap=1.11%, cost=7.9117, optimal=7.8250, time=75.2s
+[INFO]   Instance 9: gap=0.16%, cost=7.8619, optimal=7.8495, time=74.2s
+[INFO]   Instance 10: gap=0.01%, cost=7.6453, optimal=7.6443, time=74.9s
+[INFO]   Instance 11: gap=0.56%, cost=7.9548, optimal=7.9105, time=75.3s
+[INFO]   Instance 12: gap=0.09%, cost=7.6044, optimal=7.5979, time=75.3s
+[INFO]   Instance 13: gap=0.11%, cost=7.8034, optimal=7.7950, time=74.8s
+[INFO]   Instance 14: gap=0.74%, cost=7.8457, optimal=7.7877, time=74.0s
+[INFO]   Instance 15: gap=0.01%, cost=7.6807, optimal=7.6803, time=74.0s
+[INFO]   Instance 16: gap=1.11%, cost=8.0266, optimal=7.9384, time=74.0s
+[INFO]   Instance 17: gap=1.03%, cost=8.0570, optimal=7.9748, time=74.0s
+[INFO]   Instance 18: gap=1.57%, cost=7.5212, optimal=7.4052, time=74.2s
+[INFO]   Instance 19: gap=0.88%, cost=7.5922, optimal=7.5263, time=74.0s
+[INFO]   Trial 5 completed:
+[INFO]     Mean gap: 0.5803%
+[INFO]     Std gap: 0.4245%
+[INFO]     Total time: 1487.06s
+[INFO] ================================================================================
+[I 2025-11-16 21:43:41,807] Trial 4 finished with value: 0.5802819152818872 and parameters: {'jade_c': 0.30773952013559963, 'jade_num_diff_vectors': 2}. Best is trial 2 with value: 0.3670780905673521.
+[INFO] ================================================================================
+[INFO] Trial 6 started
+[INFO]   Parameters: jade_c=0.144938, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.35%, cost=7.8322, optimal=7.8049, time=74.7s
+[INFO]   Instance 1: gap=0.11%, cost=8.1175, optimal=8.1083, time=73.9s
+[INFO]   Instance 2: gap=0.59%, cost=7.8306, optimal=7.7849, time=74.0s
+[INFO]   Instance 3: gap=0.38%, cost=7.8394, optimal=7.8098, time=74.9s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=73.9s
+[INFO]   Instance 5: gap=0.21%, cost=8.0490, optimal=8.0319, time=74.3s
+[INFO]   Instance 6: gap=0.02%, cost=7.7131, optimal=7.7118, time=75.2s
+[INFO]   Instance 7: gap=0.63%, cost=8.0422, optimal=7.9915, time=74.7s
+[INFO]   Instance 8: gap=1.08%, cost=7.9092, optimal=7.8250, time=74.0s
+[INFO]   Instance 9: gap=0.09%, cost=7.8568, optimal=7.8495, time=75.2s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=75.0s
+[INFO]   Instance 11: gap=0.34%, cost=7.9371, optimal=7.9105, time=75.1s
+[INFO]   Instance 12: gap=0.00%, cost=7.5982, optimal=7.5979, time=74.9s
+[INFO]   Instance 13: gap=0.48%, cost=7.8324, optimal=7.7950, time=75.2s
+[INFO]   Instance 14: gap=0.27%, cost=7.8089, optimal=7.7877, time=75.2s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=75.2s
+[INFO]   Instance 16: gap=0.59%, cost=7.9854, optimal=7.9384, time=75.2s
+[INFO]   Instance 17: gap=0.55%, cost=8.0189, optimal=7.9748, time=74.3s
+[INFO]   Instance 18: gap=0.53%, cost=7.4441, optimal=7.4052, time=74.4s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=74.7s
+[INFO]   Trial 6 completed:
+[INFO]     Mean gap: 0.3577%
+[INFO]     Std gap: 0.2844%
+[INFO]     Total time: 1493.98s
+[INFO] ================================================================================
+[I 2025-11-16 22:08:35,848] Trial 5 finished with value: 0.3577008473643173 and parameters: {'jade_c': 0.1449382542174543, 'jade_num_diff_vectors': 1}. Best is trial 5 with value: 0.3577008473643173.
+[INFO] ================================================================================
+[INFO] Trial 7 started
+[INFO]   Parameters: jade_c=0.089837, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.28%, cost=7.8269, optimal=7.8049, time=73.9s
+[INFO]   Instance 1: gap=0.08%, cost=8.1146, optimal=8.1083, time=74.8s
+[INFO]   Instance 2: gap=0.59%, cost=7.8306, optimal=7.7849, time=75.2s
+[INFO]   Instance 3: gap=0.83%, cost=7.8749, optimal=7.8098, time=75.1s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=74.0s
+[INFO]   Instance 5: gap=0.21%, cost=8.0490, optimal=8.0319, time=73.9s
+[INFO]   Instance 6: gap=0.18%, cost=7.7257, optimal=7.7118, time=73.9s
+[INFO]   Instance 7: gap=0.67%, cost=8.0454, optimal=7.9915, time=73.9s
+[INFO]   Instance 8: gap=0.95%, cost=7.8991, optimal=7.8250, time=74.0s
+[INFO]   Instance 9: gap=0.09%, cost=7.8568, optimal=7.8495, time=73.9s
+[INFO]   Instance 10: gap=0.71%, cost=7.6988, optimal=7.6443, time=73.9s
+[INFO]   Instance 11: gap=0.34%, cost=7.9371, optimal=7.9105, time=73.9s
+[INFO]   Instance 12: gap=0.09%, cost=7.6044, optimal=7.5979, time=73.9s
+[INFO]   Instance 13: gap=0.34%, cost=7.8214, optimal=7.7950, time=73.9s
+[INFO]   Instance 14: gap=0.09%, cost=7.7944, optimal=7.7877, time=73.9s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=74.0s
+[INFO]   Instance 16: gap=0.59%, cost=7.9854, optimal=7.9384, time=73.9s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=73.9s
+[INFO]   Instance 18: gap=1.68%, cost=7.5299, optimal=7.4052, time=74.5s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=75.1s
+[INFO]   Trial 7 completed:
+[INFO]     Mean gap: 0.4304%
+[INFO]     Std gap: 0.4075%
+[INFO]     Total time: 1483.35s
+[INFO] ================================================================================
+[I 2025-11-16 22:33:19,252] Trial 6 finished with value: 0.43043490308388055 and parameters: {'jade_c': 0.08983705087172453, 'jade_num_diff_vectors': 1}. Best is trial 5 with value: 0.3577008473643173.
+[INFO] ================================================================================
+[INFO] Trial 8 started
+[INFO]   Parameters: jade_c=0.205593, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.30%, cost=7.8280, optimal=7.8049, time=75.1s
+[INFO]   Instance 1: gap=0.08%, cost=8.1146, optimal=8.1083, time=75.1s
+[INFO]   Instance 2: gap=0.96%, cost=7.8597, optimal=7.7849, time=74.3s
+[INFO]   Instance 3: gap=0.51%, cost=7.8497, optimal=7.8098, time=73.8s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=73.9s
+[INFO]   Instance 5: gap=0.31%, cost=8.0572, optimal=8.0319, time=74.6s
+[INFO]   Instance 6: gap=0.16%, cost=7.7244, optimal=7.7118, time=75.1s
+[INFO]   Instance 7: gap=0.67%, cost=8.0454, optimal=7.9915, time=75.1s
+[INFO]   Instance 8: gap=0.88%, cost=7.8939, optimal=7.8250, time=75.1s
+[INFO]   Instance 9: gap=0.08%, cost=7.8556, optimal=7.8495, time=74.1s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=73.9s
+[INFO]   Instance 11: gap=0.29%, cost=7.9333, optimal=7.9105, time=73.9s
+[INFO]   Instance 12: gap=0.00%, cost=7.5982, optimal=7.5979, time=74.8s
+[INFO]   Instance 13: gap=0.34%, cost=7.8214, optimal=7.7950, time=75.2s
+[INFO]   Instance 14: gap=0.27%, cost=7.8089, optimal=7.7877, time=75.2s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=75.1s
+[INFO]   Instance 16: gap=0.34%, cost=7.9654, optimal=7.9384, time=75.1s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=75.1s
+[INFO]   Instance 18: gap=1.00%, cost=7.4790, optimal=7.4052, time=75.1s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=75.1s
+[INFO]   Trial 8 completed:
+[INFO]     Mean gap: 0.3914%
+[INFO]     Std gap: 0.3195%
+[INFO]     Total time: 1494.80s
+[INFO] ================================================================================
+[I 2025-11-16 22:58:14,109] Trial 7 finished with value: 0.39143954469862074 and parameters: {'jade_c': 0.20559343783957656, 'jade_num_diff_vectors': 1}. Best is trial 5 with value: 0.3577008473643173.
+[INFO] ================================================================================
+[INFO] Trial 9 started
+[INFO]   Parameters: jade_c=0.111055, jade_num_diff_vectors=2
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.63%, cost=7.8538, optimal=7.8049, time=73.9s
+[INFO]   Instance 1: gap=0.40%, cost=8.1405, optimal=8.1083, time=73.9s
+[INFO]   Instance 2: gap=0.83%, cost=7.8494, optimal=7.7849, time=74.2s
+[INFO]   Instance 3: gap=0.51%, cost=7.8497, optimal=7.8098, time=73.9s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=73.9s
+[INFO]   Instance 5: gap=1.07%, cost=8.1178, optimal=8.0319, time=73.9s
+[INFO]   Instance 6: gap=0.34%, cost=7.7384, optimal=7.7118, time=75.2s
+[INFO]   Instance 7: gap=0.55%, cost=8.0356, optimal=7.9915, time=74.5s
+[INFO]   Instance 8: gap=0.95%, cost=7.8991, optimal=7.8250, time=73.9s
+[INFO]   Instance 9: gap=0.16%, cost=7.8619, optimal=7.8495, time=73.9s
+[INFO]   Instance 10: gap=0.56%, cost=7.6873, optimal=7.6443, time=73.9s
+[INFO]   Instance 11: gap=0.56%, cost=7.9548, optimal=7.9105, time=73.9s
+[INFO]   Instance 12: gap=0.01%, cost=7.5990, optimal=7.5979, time=73.9s
+[INFO]   Instance 13: gap=0.48%, cost=7.8325, optimal=7.7950, time=73.9s
+[INFO]   Instance 14: gap=0.51%, cost=7.8276, optimal=7.7877, time=73.9s
+[INFO]   Instance 15: gap=0.02%, cost=7.6817, optimal=7.6803, time=73.9s
+[INFO]   Instance 16: gap=0.74%, cost=7.9973, optimal=7.9384, time=74.7s
+[INFO]   Instance 17: gap=0.92%, cost=8.0482, optimal=7.9748, time=75.2s
+[INFO]   Instance 18: gap=1.04%, cost=7.4819, optimal=7.4052, time=75.2s
+[INFO]   Instance 19: gap=0.29%, cost=7.5483, optimal=7.5263, time=75.2s
+[INFO]   Trial 9 completed:
+[INFO]     Mean gap: 0.5378%
+[INFO]     Std gap: 0.3094%
+[INFO]     Total time: 1485.12s
+[INFO] ================================================================================
+[I 2025-11-16 23:22:59,287] Trial 8 finished with value: 0.5377873510558574 and parameters: {'jade_c': 0.11105539162370598, 'jade_num_diff_vectors': 2}. Best is trial 5 with value: 0.3577008473643173.
+[INFO] ================================================================================
+[INFO] Trial 10 started
+[INFO]   Parameters: jade_c=0.384926, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.35%, cost=7.8322, optimal=7.8049, time=75.2s
+[INFO]   Instance 1: gap=0.34%, cost=8.1356, optimal=8.1083, time=73.9s
+[INFO]   Instance 2: gap=0.70%, cost=7.8393, optimal=7.7849, time=74.0s
+[INFO]   Instance 3: gap=0.32%, cost=7.8348, optimal=7.8098, time=74.9s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=75.2s
+[INFO]   Instance 5: gap=0.36%, cost=8.0607, optimal=8.0319, time=75.1s
+[INFO]   Instance 6: gap=0.16%, cost=7.7244, optimal=7.7118, time=73.9s
+[INFO]   Instance 7: gap=0.52%, cost=8.0334, optimal=7.9915, time=73.8s
+[INFO]   Instance 8: gap=0.99%, cost=7.9028, optimal=7.8250, time=73.9s
+[INFO]   Instance 9: gap=0.00%, cost=7.8496, optimal=7.8495, time=73.9s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=74.5s
+[INFO]   Instance 11: gap=0.29%, cost=7.9337, optimal=7.9105, time=75.1s
+[INFO]   Instance 12: gap=0.00%, cost=7.5982, optimal=7.5979, time=75.1s
+[INFO]   Instance 13: gap=0.56%, cost=7.8390, optimal=7.7950, time=74.5s
+[INFO]   Instance 14: gap=0.27%, cost=7.8089, optimal=7.7877, time=73.9s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=73.9s
+[INFO]   Instance 16: gap=0.49%, cost=7.9777, optimal=7.9384, time=74.3s
+[INFO]   Instance 17: gap=0.74%, cost=8.0338, optimal=7.9748, time=75.0s
+[INFO]   Instance 18: gap=0.58%, cost=7.4478, optimal=7.4052, time=75.1s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=75.1s
+[INFO]   Trial 10 completed:
+[INFO]     Mean gap: 0.3811%
+[INFO]     Std gap: 0.2770%
+[INFO]     Total time: 1490.33s
+[INFO] ================================================================================
+[I 2025-11-16 23:47:49,676] Trial 9 finished with value: 0.3811180579714035 and parameters: {'jade_c': 0.38492581955287114, 'jade_num_diff_vectors': 1}. Best is trial 5 with value: 0.3577008473643173.
+[INFO] ================================================================================
+[INFO] Trial 11 started
+[INFO]   Parameters: jade_c=0.041592, jade_num_diff_vectors=2
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.33%, cost=7.8307, optimal=7.8049, time=75.2s
+[INFO]   Instance 1: gap=0.14%, cost=8.1193, optimal=8.1083, time=75.2s
+[INFO]   Instance 2: gap=0.70%, cost=7.8393, optimal=7.7849, time=75.2s
+[INFO]   Instance 3: gap=0.63%, cost=7.8586, optimal=7.8098, time=75.2s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=75.2s
+[INFO]   Instance 5: gap=0.36%, cost=8.0607, optimal=8.0319, time=75.2s
+[INFO]   Instance 6: gap=0.21%, cost=7.7278, optimal=7.7118, time=75.2s
+[INFO]   Instance 7: gap=0.67%, cost=8.0454, optimal=7.9915, time=75.2s
+[INFO]   Instance 8: gap=1.31%, cost=7.9277, optimal=7.8250, time=75.2s
+[INFO]   Instance 9: gap=0.09%, cost=7.8569, optimal=7.8495, time=75.2s
+[INFO]   Instance 10: gap=0.97%, cost=7.7181, optimal=7.6443, time=75.2s
+[INFO]   Instance 11: gap=0.40%, cost=7.9420, optimal=7.9105, time=75.2s
+[INFO]   Instance 12: gap=0.09%, cost=7.6044, optimal=7.5979, time=75.2s
+[INFO]   Instance 13: gap=0.56%, cost=7.8388, optimal=7.7950, time=75.2s
+[INFO]   Instance 14: gap=0.68%, cost=7.8410, optimal=7.7877, time=74.0s
+[INFO]   Instance 15: gap=0.01%, cost=7.6807, optimal=7.6803, time=74.0s
+[INFO]   Instance 16: gap=0.74%, cost=7.9973, optimal=7.9384, time=74.0s
+[INFO]   Instance 17: gap=0.92%, cost=8.0482, optimal=7.9748, time=74.0s
+[INFO]   Instance 18: gap=1.47%, cost=7.5137, optimal=7.4052, time=74.0s
+[INFO]   Instance 19: gap=0.45%, cost=7.5603, optimal=7.5263, time=74.0s
+[INFO]   Trial 11 completed:
+[INFO]     Mean gap: 0.5451%
+[INFO]     Std gap: 0.3928%
+[INFO]     Total time: 1496.88s
+[INFO] ================================================================================
+[I 2025-11-17 00:12:46,620] Trial 10 finished with value: 0.545099499813978 and parameters: {'jade_c': 0.04159181675985483, 'jade_num_diff_vectors': 2}. Best is trial 5 with value: 0.3577008473643173.
+[INFO] ================================================================================
+[INFO] Trial 12 started
+[INFO]   Parameters: jade_c=0.181553, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.01%, cost=7.8053, optimal=7.8049, time=75.1s
+[INFO]   Instance 1: gap=0.03%, cost=8.1110, optimal=8.1083, time=75.0s
+[INFO]   Instance 2: gap=0.70%, cost=7.8393, optimal=7.7849, time=74.6s
+[INFO]   Instance 3: gap=0.51%, cost=7.8497, optimal=7.8098, time=73.9s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=73.9s
+[INFO]   Instance 5: gap=0.63%, cost=8.0829, optimal=8.0319, time=74.6s
+[INFO]   Instance 6: gap=0.02%, cost=7.7131, optimal=7.7118, time=75.2s
+[INFO]   Instance 7: gap=0.63%, cost=8.0422, optimal=7.9915, time=75.2s
+[INFO]   Instance 8: gap=1.31%, cost=7.9277, optimal=7.8250, time=75.2s
+[INFO]   Instance 9: gap=0.09%, cost=7.8568, optimal=7.8495, time=75.2s
+[INFO]   Instance 10: gap=0.33%, cost=7.6698, optimal=7.6443, time=75.2s
+[INFO]   Instance 11: gap=0.29%, cost=7.9333, optimal=7.9105, time=75.2s
+[INFO]   Instance 12: gap=0.00%, cost=7.5982, optimal=7.5979, time=75.2s
+[INFO]   Instance 13: gap=0.29%, cost=7.8178, optimal=7.7950, time=75.1s
+[INFO]   Instance 14: gap=0.27%, cost=7.8089, optimal=7.7877, time=73.9s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=73.9s
+[INFO]   Instance 16: gap=0.59%, cost=7.9854, optimal=7.9384, time=73.9s
+[INFO]   Instance 17: gap=0.50%, cost=8.0145, optimal=7.9748, time=73.9s
+[INFO]   Instance 18: gap=1.14%, cost=7.4898, optimal=7.4052, time=73.9s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=73.9s
+[INFO]   Trial 12 completed:
+[INFO]     Mean gap: 0.3773%
+[INFO]     Std gap: 0.3694%
+[INFO]     Total time: 1492.14s
+[INFO] ================================================================================
+[I 2025-11-17 00:37:38,821] Trial 11 finished with value: 0.37726786427235925 and parameters: {'jade_c': 0.18155328606911647, 'jade_num_diff_vectors': 1}. Best is trial 5 with value: 0.3577008473643173.
+[INFO] ================================================================================
+[INFO] Trial 13 started
+[INFO]   Parameters: jade_c=0.052262, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.48%, cost=7.8421, optimal=7.8049, time=73.9s
+[INFO]   Instance 1: gap=0.08%, cost=8.1146, optimal=8.1083, time=73.9s
+[INFO]   Instance 2: gap=0.59%, cost=7.8306, optimal=7.7849, time=74.0s
+[INFO]   Instance 3: gap=0.51%, cost=7.8497, optimal=7.8098, time=74.0s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=74.0s
+[INFO]   Instance 5: gap=0.31%, cost=8.0572, optimal=8.0319, time=74.0s
+[INFO]   Instance 6: gap=0.18%, cost=7.7257, optimal=7.7118, time=74.0s
+[INFO]   Instance 7: gap=0.55%, cost=8.0356, optimal=7.9915, time=74.0s
+[INFO]   Instance 8: gap=1.08%, cost=7.9092, optimal=7.8250, time=74.0s
+[INFO]   Instance 9: gap=0.09%, cost=7.8568, optimal=7.8495, time=74.0s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=74.0s
+[INFO]   Instance 11: gap=0.34%, cost=7.9371, optimal=7.9105, time=74.0s
+[INFO]   Instance 12: gap=0.00%, cost=7.5982, optimal=7.5979, time=74.0s
+[INFO]   Instance 13: gap=0.43%, cost=7.8282, optimal=7.7950, time=74.0s
+[INFO]   Instance 14: gap=0.60%, cost=7.8341, optimal=7.7877, time=74.0s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=74.0s
+[INFO]   Instance 16: gap=0.49%, cost=7.9777, optimal=7.9384, time=74.0s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=74.0s
+[INFO]   Instance 18: gap=0.76%, cost=7.4614, optimal=7.4052, time=74.3s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=74.7s
+[INFO]   Trial 13 completed:
+[INFO]     Mean gap: 0.4057%
+[INFO]     Std gap: 0.2917%
+[INFO]     Total time: 1481.00s
+[INFO] ================================================================================
+[I 2025-11-17 01:02:19,886] Trial 12 finished with value: 0.4056795616102537 and parameters: {'jade_c': 0.052261575134532855, 'jade_num_diff_vectors': 1}. Best is trial 5 with value: 0.3577008473643173.
+[INFO] ================================================================================
+[INFO] Trial 14 started
+[INFO]   Parameters: jade_c=0.012453, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.63%, cost=7.8538, optimal=7.8049, time=74.0s
+[INFO]   Instance 1: gap=0.08%, cost=8.1146, optimal=8.1083, time=74.0s
+[INFO]   Instance 2: gap=0.59%, cost=7.8306, optimal=7.7849, time=74.9s
+[INFO]   Instance 3: gap=0.51%, cost=7.8497, optimal=7.8098, time=75.2s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=75.2s
+[INFO]   Instance 5: gap=0.30%, cost=8.0562, optimal=8.0319, time=74.7s
+[INFO]   Instance 6: gap=0.18%, cost=7.7257, optimal=7.7118, time=74.3s
+[INFO]   Instance 7: gap=0.67%, cost=8.0454, optimal=7.9915, time=75.2s
+[INFO]   Instance 8: gap=1.18%, cost=7.9173, optimal=7.8250, time=74.6s
+[INFO]   Instance 9: gap=0.09%, cost=7.8568, optimal=7.8495, time=75.1s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=75.2s
+[INFO]   Instance 11: gap=0.34%, cost=7.9371, optimal=7.9105, time=75.2s
+[INFO]   Instance 12: gap=0.09%, cost=7.6044, optimal=7.5979, time=75.2s
+[INFO]   Instance 13: gap=0.34%, cost=7.8214, optimal=7.7950, time=75.2s
+[INFO]   Instance 14: gap=0.60%, cost=7.8341, optimal=7.7877, time=75.1s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=74.6s
+[INFO]   Instance 16: gap=0.51%, cost=7.9792, optimal=7.9384, time=75.2s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=73.9s
+[INFO]   Instance 18: gap=1.01%, cost=7.4797, optimal=7.4052, time=74.0s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=73.9s
+[INFO]   Trial 14 completed:
+[INFO]     Mean gap: 0.4370%
+[INFO]     Std gap: 0.3252%
+[INFO]     Total time: 1494.66s
+[INFO] ================================================================================
+[I 2025-11-17 01:27:14,607] Trial 13 finished with value: 0.4370356385703311 and parameters: {'jade_c': 0.012453316435383378, 'jade_num_diff_vectors': 1}. Best is trial 5 with value: 0.3577008473643173.
+[INFO] ================================================================================
+[INFO] Trial 15 started
+[INFO]   Parameters: jade_c=0.175404, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.35%, cost=7.8322, optimal=7.8049, time=74.0s
+[INFO]   Instance 1: gap=0.14%, cost=8.1193, optimal=8.1083, time=74.7s
+[INFO]   Instance 2: gap=0.70%, cost=7.8393, optimal=7.7849, time=74.9s
+[INFO]   Instance 3: gap=0.38%, cost=7.8394, optimal=7.8098, time=73.9s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=73.9s
+[INFO]   Instance 5: gap=0.94%, cost=8.1076, optimal=8.0319, time=73.9s
+[INFO]   Instance 6: gap=0.18%, cost=7.7257, optimal=7.7118, time=74.0s
+[INFO]   Instance 7: gap=0.67%, cost=8.0454, optimal=7.9915, time=74.0s
+[INFO]   Instance 8: gap=0.88%, cost=7.8939, optimal=7.8250, time=74.0s
+[INFO]   Instance 9: gap=0.09%, cost=7.8568, optimal=7.8495, time=74.0s
+[INFO]   Instance 10: gap=0.71%, cost=7.6985, optimal=7.6443, time=74.0s
+[INFO]   Instance 11: gap=0.29%, cost=7.9333, optimal=7.9105, time=73.9s
+[INFO]   Instance 12: gap=0.00%, cost=7.5982, optimal=7.5979, time=74.0s
+[INFO]   Instance 13: gap=0.39%, cost=7.8257, optimal=7.7950, time=73.9s
+[INFO]   Instance 14: gap=0.04%, cost=7.7905, optimal=7.7877, time=74.0s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=73.9s
+[INFO]   Instance 16: gap=0.49%, cost=7.9777, optimal=7.9384, time=74.0s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=73.9s
+[INFO]   Instance 18: gap=1.25%, cost=7.4978, optimal=7.4052, time=74.0s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=74.0s
+[INFO]   Trial 15 completed:
+[INFO]     Mean gap: 0.4197%
+[INFO]     Std gap: 0.3525%
+[INFO]     Total time: 1480.83s
+[INFO] ================================================================================
+[I 2025-11-17 01:51:55,496] Trial 14 finished with value: 0.4197315666099078 and parameters: {'jade_c': 0.17540445083377204, 'jade_num_diff_vectors': 1}. Best is trial 5 with value: 0.3577008473643173.
+[INFO] ================================================================================
+[INFO] Trial 16 started
+[INFO]   Parameters: jade_c=0.435652, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.52%, cost=7.8451, optimal=7.8049, time=75.1s
+[INFO]   Instance 1: gap=0.02%, cost=8.1101, optimal=8.1083, time=75.2s
+[INFO]   Instance 2: gap=0.89%, cost=7.8541, optimal=7.7849, time=74.8s
+[INFO]   Instance 3: gap=0.51%, cost=7.8497, optimal=7.8098, time=73.9s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=74.0s
+[INFO]   Instance 5: gap=0.18%, cost=8.0467, optimal=8.0319, time=74.1s
+[INFO]   Instance 6: gap=0.02%, cost=7.7131, optimal=7.7118, time=75.2s
+[INFO]   Instance 7: gap=0.67%, cost=8.0454, optimal=7.9915, time=75.2s
+[INFO]   Instance 8: gap=1.31%, cost=7.9277, optimal=7.8250, time=75.2s
+[INFO]   Instance 9: gap=0.16%, cost=7.8619, optimal=7.8495, time=75.2s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=75.3s
+[INFO]   Instance 11: gap=0.19%, cost=7.9254, optimal=7.9105, time=74.5s
+[INFO]   Instance 12: gap=0.00%, cost=7.5982, optimal=7.5979, time=74.0s
+[INFO]   Instance 13: gap=0.55%, cost=7.8379, optimal=7.7950, time=74.0s
+[INFO]   Instance 14: gap=0.64%, cost=7.8373, optimal=7.7877, time=74.0s
+[INFO]   Instance 15: gap=0.28%, cost=7.7016, optimal=7.6803, time=74.0s
+[INFO]   Instance 16: gap=0.34%, cost=7.9654, optimal=7.9384, time=74.0s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=74.9s
+[INFO]   Instance 18: gap=1.50%, cost=7.5163, optimal=7.4052, time=75.3s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=75.2s
+[INFO]   Trial 16 completed:
+[INFO]     Mean gap: 0.4706%
+[INFO]     Std gap: 0.4122%
+[INFO]     Total time: 1493.02s
+[INFO] ================================================================================
+[I 2025-11-17 02:16:48,579] Trial 15 finished with value: 0.4706437229397342 and parameters: {'jade_c': 0.435651714494662, 'jade_num_diff_vectors': 1}. Best is trial 5 with value: 0.3577008473643173.
+[INFO] ================================================================================
+[INFO] Trial 17 started
+[INFO]   Parameters: jade_c=0.250255, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.02%, cost=7.8064, optimal=7.8049, time=74.4s
+[INFO]   Instance 1: gap=0.03%, cost=8.1110, optimal=8.1083, time=75.1s
+[INFO]   Instance 2: gap=0.70%, cost=7.8393, optimal=7.7849, time=74.0s
+[INFO]   Instance 3: gap=0.51%, cost=7.8497, optimal=7.8098, time=74.0s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=74.0s
+[INFO]   Instance 5: gap=0.33%, cost=8.0585, optimal=8.0319, time=74.0s
+[INFO]   Instance 6: gap=0.19%, cost=7.7266, optimal=7.7118, time=74.0s
+[INFO]   Instance 7: gap=0.63%, cost=8.0422, optimal=7.9915, time=75.0s
+[INFO]   Instance 8: gap=0.88%, cost=7.8939, optimal=7.8250, time=75.2s
+[INFO]   Instance 9: gap=0.09%, cost=7.8568, optimal=7.8495, time=75.2s
+[INFO]   Instance 10: gap=0.24%, cost=7.6623, optimal=7.6443, time=75.0s
+[INFO]   Instance 11: gap=0.56%, cost=7.9548, optimal=7.9105, time=74.0s
+[INFO]   Instance 12: gap=0.00%, cost=7.5982, optimal=7.5979, time=74.0s
+[INFO]   Instance 13: gap=0.34%, cost=7.8214, optimal=7.7950, time=74.0s
+[INFO]   Instance 14: gap=0.04%, cost=7.7905, optimal=7.7877, time=74.0s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=74.0s
+[INFO]   Instance 16: gap=0.49%, cost=7.9777, optimal=7.9384, time=74.0s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=74.0s
+[INFO]   Instance 18: gap=1.12%, cost=7.4883, optimal=7.4052, time=74.0s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=74.0s
+[INFO]   Trial 17 completed:
+[INFO]     Mean gap: 0.3535%
+[INFO]     Std gap: 0.3240%
+[INFO]     Total time: 1485.88s
+[INFO] ================================================================================
+[I 2025-11-17 02:41:34,519] Trial 16 finished with value: 0.3534657449953771 and parameters: {'jade_c': 0.2502553524845819, 'jade_num_diff_vectors': 1}. Best is trial 16 with value: 0.3534657449953771.
+[INFO] ================================================================================
+[INFO] Trial 18 started
+[INFO]   Parameters: jade_c=0.138161, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.13%, cost=7.8152, optimal=7.8049, time=75.2s
+[INFO]   Instance 1: gap=0.08%, cost=8.1146, optimal=8.1083, time=74.9s
+[INFO]   Instance 2: gap=0.59%, cost=7.8306, optimal=7.7849, time=75.2s
+[INFO]   Instance 3: gap=0.51%, cost=7.8497, optimal=7.8098, time=75.2s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=75.2s
+[INFO]   Instance 5: gap=0.33%, cost=8.0584, optimal=8.0319, time=75.2s
+[INFO]   Instance 6: gap=0.18%, cost=7.7257, optimal=7.7118, time=75.2s
+[INFO]   Instance 7: gap=0.63%, cost=8.0422, optimal=7.9915, time=75.2s
+[INFO]   Instance 8: gap=1.13%, cost=7.9134, optimal=7.8250, time=75.2s
+[INFO]   Instance 9: gap=0.09%, cost=7.8568, optimal=7.8495, time=75.2s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=75.2s
+[INFO]   Instance 11: gap=0.34%, cost=7.9371, optimal=7.9105, time=75.2s
+[INFO]   Instance 12: gap=0.09%, cost=7.6044, optimal=7.5979, time=75.2s
+[INFO]   Instance 13: gap=0.39%, cost=7.8257, optimal=7.7950, time=75.2s
+[INFO]   Instance 14: gap=0.27%, cost=7.8089, optimal=7.7877, time=75.2s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=75.2s
+[INFO]   Instance 16: gap=0.49%, cost=7.9777, optimal=7.9384, time=75.2s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=75.2s
+[INFO]   Instance 18: gap=1.92%, cost=7.5475, optimal=7.4052, time=75.2s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=74.4s
+[INFO]   Trial 18 completed:
+[INFO]     Mean gap: 0.4405%
+[INFO]     Std gap: 0.4443%
+[INFO]     Total time: 1503.22s
+[INFO] ================================================================================
+[I 2025-11-17 03:06:37,803] Trial 17 finished with value: 0.44053969984522157 and parameters: {'jade_c': 0.13816055803588898, 'jade_num_diff_vectors': 1}. Best is trial 16 with value: 0.3534657449953771.
+[INFO] ================================================================================
+[INFO] Trial 19 started
+[INFO]   Parameters: jade_c=0.063893, jade_num_diff_vectors=2
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.51%, cost=7.8448, optimal=7.8049, time=75.1s
+[INFO]   Instance 1: gap=0.31%, cost=8.1331, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=0.88%, cost=7.8538, optimal=7.7849, time=74.7s
+[INFO]   Instance 3: gap=0.38%, cost=7.8396, optimal=7.8098, time=74.0s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=74.0s
+[INFO]   Instance 5: gap=0.36%, cost=8.0607, optimal=8.0319, time=74.0s
+[INFO]   Instance 6: gap=0.21%, cost=7.7278, optimal=7.7118, time=74.1s
+[INFO]   Instance 7: gap=0.53%, cost=8.0338, optimal=7.9915, time=74.1s
+[INFO]   Instance 8: gap=0.95%, cost=7.8991, optimal=7.8250, time=74.0s
+[INFO]   Instance 9: gap=0.09%, cost=7.8569, optimal=7.8495, time=74.0s
+[INFO]   Instance 10: gap=0.71%, cost=7.6985, optimal=7.6443, time=74.1s
+[INFO]   Instance 11: gap=0.50%, cost=7.9499, optimal=7.9105, time=74.1s
+[INFO]   Instance 12: gap=0.00%, cost=7.5982, optimal=7.5979, time=74.0s
+[INFO]   Instance 13: gap=0.64%, cost=7.8448, optimal=7.7950, time=74.0s
+[INFO]   Instance 14: gap=0.38%, cost=7.8170, optimal=7.7877, time=74.2s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=75.3s
+[INFO]   Instance 16: gap=0.61%, cost=7.9869, optimal=7.9384, time=75.3s
+[INFO]   Instance 17: gap=0.92%, cost=8.0482, optimal=7.9748, time=75.3s
+[INFO]   Instance 18: gap=1.68%, cost=7.5297, optimal=7.4052, time=75.3s
+[INFO]   Instance 19: gap=0.77%, cost=7.5842, optimal=7.5263, time=74.5s
+[INFO]   Trial 19 completed:
+[INFO]     Mean gap: 0.5306%
+[INFO]     Std gap: 0.3863%
+[INFO]     Total time: 1489.47s
+[INFO] ================================================================================
+[I 2025-11-17 03:31:27,332] Trial 18 finished with value: 0.5305771323182296 and parameters: {'jade_c': 0.06389316977979459, 'jade_num_diff_vectors': 2}. Best is trial 16 with value: 0.3534657449953771.
+[INFO] ================================================================================
+[INFO] Trial 20 started
+[INFO]   Parameters: jade_c=0.269561, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.01%, cost=7.8053, optimal=7.8049, time=74.0s
+[INFO]   Instance 1: gap=0.14%, cost=8.1193, optimal=8.1083, time=74.0s
+[INFO]   Instance 2: gap=0.77%, cost=7.8450, optimal=7.7849, time=74.0s
+[INFO]   Instance 3: gap=0.57%, cost=7.8543, optimal=7.8098, time=74.0s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=74.0s
+[INFO]   Instance 5: gap=0.18%, cost=8.0467, optimal=8.0319, time=74.0s
+[INFO]   Instance 6: gap=0.16%, cost=7.7244, optimal=7.7118, time=74.0s
+[INFO]   Instance 7: gap=0.67%, cost=8.0454, optimal=7.9915, time=74.0s
+[INFO]   Instance 8: gap=0.95%, cost=7.8991, optimal=7.8250, time=74.0s
+[INFO]   Instance 9: gap=0.09%, cost=7.8569, optimal=7.8495, time=74.0s
+[INFO]   Instance 10: gap=0.52%, cost=7.6837, optimal=7.6443, time=74.0s
+[INFO]   Instance 11: gap=0.34%, cost=7.9371, optimal=7.9105, time=74.0s
+[INFO]   Instance 12: gap=0.01%, cost=7.5990, optimal=7.5979, time=74.0s
+[INFO]   Instance 13: gap=0.48%, cost=7.8325, optimal=7.7950, time=74.0s
+[INFO]   Instance 14: gap=0.27%, cost=7.8089, optimal=7.7877, time=74.0s
+[INFO]   Instance 15: gap=0.51%, cost=7.7197, optimal=7.6803, time=75.1s
+[INFO]   Instance 16: gap=0.34%, cost=7.9654, optimal=7.9384, time=74.1s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=74.0s
+[INFO]   Instance 18: gap=1.02%, cost=7.4809, optimal=7.4052, time=74.0s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=73.9s
+[INFO]   Trial 20 completed:
+[INFO]     Mean gap: 0.3964%
+[INFO]     Std gap: 0.3045%
+[INFO]     Total time: 1481.23s
+[INFO] ================================================================================
+[I 2025-11-17 03:56:08,619] Trial 19 finished with value: 0.3964034564021002 and parameters: {'jade_c': 0.2695614868674694, 'jade_num_diff_vectors': 1}. Best is trial 16 with value: 0.3534657449953771.
+[INFO] ================================================================================
+[INFO] Trial 21 started
+[INFO]   Parameters: jade_c=0.490064, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.28%, cost=7.8265, optimal=7.8049, time=74.0s
+[INFO]   Instance 1: gap=0.33%, cost=8.1348, optimal=8.1083, time=74.0s
+[INFO]   Instance 2: gap=0.64%, cost=7.8350, optimal=7.7849, time=74.1s
+[INFO]   Instance 3: gap=0.20%, cost=7.8258, optimal=7.8098, time=74.1s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=74.1s
+[INFO]   Instance 5: gap=0.21%, cost=8.0490, optimal=8.0319, time=74.1s
+[INFO]   Instance 6: gap=0.16%, cost=7.7244, optimal=7.7118, time=74.1s
+[INFO]   Instance 7: gap=0.67%, cost=8.0454, optimal=7.9915, time=74.0s
+[INFO]   Instance 8: gap=1.45%, cost=7.9385, optimal=7.8250, time=74.1s
+[INFO]   Instance 9: gap=0.16%, cost=7.8619, optimal=7.8495, time=74.0s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=74.1s
+[INFO]   Instance 11: gap=0.29%, cost=7.9333, optimal=7.9105, time=74.1s
+[INFO]   Instance 12: gap=0.00%, cost=7.5982, optimal=7.5979, time=74.1s
+[INFO]   Instance 13: gap=0.58%, cost=7.8401, optimal=7.7950, time=74.7s
+[INFO]   Instance 14: gap=0.27%, cost=7.8089, optimal=7.7877, time=75.3s
+[INFO]   Instance 15: gap=0.29%, cost=7.7029, optimal=7.6803, time=75.3s
+[INFO]   Instance 16: gap=0.61%, cost=7.9869, optimal=7.9384, time=75.2s
+[INFO]   Instance 17: gap=0.21%, cost=7.9913, optimal=7.9748, time=74.0s
+[INFO]   Instance 18: gap=0.59%, cost=7.4486, optimal=7.4052, time=74.0s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=74.1s
+[INFO]   Trial 21 completed:
+[INFO]     Mean gap: 0.3941%
+[INFO]     Std gap: 0.3253%
+[INFO]     Total time: 1485.29s
+[INFO] ================================================================================
+[I 2025-11-17 04:20:53,971] Trial 20 finished with value: 0.3940787995394024 and parameters: {'jade_c': 0.4900637195987309, 'jade_num_diff_vectors': 1}. Best is trial 16 with value: 0.3534657449953771.
+[INFO] ================================================================================
+[INFO] Trial 22 started
+[INFO]   Parameters: jade_c=0.247063, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.01%, cost=7.8053, optimal=7.8049, time=74.0s
+[INFO]   Instance 1: gap=0.43%, cost=8.1434, optimal=8.1083, time=74.1s
+[INFO]   Instance 2: gap=1.00%, cost=7.8630, optimal=7.7849, time=74.0s
+[INFO]   Instance 3: gap=0.38%, cost=7.8394, optimal=7.8098, time=74.2s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=75.3s
+[INFO]   Instance 5: gap=0.33%, cost=8.0584, optimal=8.0319, time=74.8s
+[INFO]   Instance 6: gap=0.19%, cost=7.7266, optimal=7.7118, time=74.0s
+[INFO]   Instance 7: gap=0.67%, cost=8.0454, optimal=7.9915, time=74.0s
+[INFO]   Instance 8: gap=1.13%, cost=7.9134, optimal=7.8250, time=74.0s
+[INFO]   Instance 9: gap=0.09%, cost=7.8568, optimal=7.8495, time=74.0s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=74.0s
+[INFO]   Instance 11: gap=0.29%, cost=7.9333, optimal=7.9105, time=74.0s
+[INFO]   Instance 12: gap=0.00%, cost=7.5982, optimal=7.5979, time=74.0s
+[INFO]   Instance 13: gap=0.40%, cost=7.8261, optimal=7.7950, time=74.0s
+[INFO]   Instance 14: gap=0.32%, cost=7.8129, optimal=7.7877, time=74.0s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=74.9s
+[INFO]   Instance 16: gap=0.49%, cost=7.9777, optimal=7.9384, time=75.3s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=75.2s
+[INFO]   Instance 18: gap=0.98%, cost=7.4780, optimal=7.4052, time=75.3s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=75.3s
+[INFO]   Trial 22 completed:
+[INFO]     Mean gap: 0.4182%
+[INFO]     Std gap: 0.3439%
+[INFO]     Total time: 1488.40s
+[INFO] ================================================================================
+[I 2025-11-17 04:45:42,427] Trial 21 finished with value: 0.4181604044656284 and parameters: {'jade_c': 0.2470634028143043, 'jade_num_diff_vectors': 1}. Best is trial 16 with value: 0.3534657449953771.
+[INFO] ================================================================================
+[INFO] Trial 23 started
+[INFO]   Parameters: jade_c=0.143696, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.18%, cost=7.8193, optimal=7.8049, time=74.0s
+[INFO]   Instance 1: gap=0.08%, cost=8.1146, optimal=8.1083, time=73.9s
+[INFO]   Instance 2: gap=0.59%, cost=7.8306, optimal=7.7849, time=74.0s
+[INFO]   Instance 3: gap=0.57%, cost=7.8543, optimal=7.8098, time=74.0s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=74.6s
+[INFO]   Instance 5: gap=0.36%, cost=8.0607, optimal=8.0319, time=75.2s
+[INFO]   Instance 6: gap=0.02%, cost=7.7131, optimal=7.7118, time=75.2s
+[INFO]   Instance 7: gap=0.63%, cost=8.0422, optimal=7.9915, time=75.2s
+[INFO]   Instance 8: gap=0.88%, cost=7.8939, optimal=7.8250, time=75.2s
+[INFO]   Instance 9: gap=0.09%, cost=7.8568, optimal=7.8495, time=75.2s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=75.2s
+[INFO]   Instance 11: gap=0.29%, cost=7.9333, optimal=7.9105, time=75.2s
+[INFO]   Instance 12: gap=0.00%, cost=7.5982, optimal=7.5979, time=75.2s
+[INFO]   Instance 13: gap=0.49%, cost=7.8334, optimal=7.7950, time=75.2s
+[INFO]   Instance 14: gap=0.27%, cost=7.8089, optimal=7.7877, time=75.2s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=75.2s
+[INFO]   Instance 16: gap=0.49%, cost=7.9777, optimal=7.9384, time=75.2s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=75.2s
+[INFO]   Instance 18: gap=0.26%, cost=7.4247, optimal=7.4052, time=74.1s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=74.0s
+[INFO]   Trial 23 completed:
+[INFO]     Mean gap: 0.3424%
+[INFO]     Std gap: 0.2717%
+[INFO]     Total time: 1496.29s
+[INFO] ================================================================================
+[I 2025-11-17 05:10:38,787] Trial 22 finished with value: 0.342355037955413 and parameters: {'jade_c': 0.14369567306394845, 'jade_num_diff_vectors': 1}. Best is trial 22 with value: 0.342355037955413.
+[INFO] ================================================================================
+[INFO] Trial 24 started
+[INFO]   Parameters: jade_c=0.154219, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.01%, cost=7.8053, optimal=7.8049, time=74.5s
+[INFO]   Instance 1: gap=0.15%, cost=8.1203, optimal=8.1083, time=74.6s
+[INFO]   Instance 2: gap=0.59%, cost=7.8306, optimal=7.7849, time=75.2s
+[INFO]   Instance 3: gap=0.51%, cost=7.8497, optimal=7.8098, time=75.2s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=75.2s
+[INFO]   Instance 5: gap=0.21%, cost=8.0490, optimal=8.0319, time=73.9s
+[INFO]   Instance 6: gap=0.21%, cost=7.7278, optimal=7.7118, time=74.2s
+[INFO]   Instance 7: gap=0.63%, cost=8.0422, optimal=7.9915, time=74.0s
+[INFO]   Instance 8: gap=1.02%, cost=7.9052, optimal=7.8250, time=74.0s
+[INFO]   Instance 9: gap=0.09%, cost=7.8568, optimal=7.8495, time=74.0s
+[INFO]   Instance 10: gap=0.71%, cost=7.6985, optimal=7.6443, time=74.0s
+[INFO]   Instance 11: gap=0.34%, cost=7.9371, optimal=7.9105, time=74.0s
+[INFO]   Instance 12: gap=0.08%, cost=7.6036, optimal=7.5979, time=74.0s
+[INFO]   Instance 13: gap=0.39%, cost=7.8257, optimal=7.7950, time=74.0s
+[INFO]   Instance 14: gap=0.60%, cost=7.8341, optimal=7.7877, time=74.0s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=74.0s
+[INFO]   Instance 16: gap=0.59%, cost=7.9854, optimal=7.9384, time=74.0s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=74.0s
+[INFO]   Instance 18: gap=1.39%, cost=7.5084, optimal=7.4052, time=74.3s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=75.2s
+[INFO]   Trial 24 completed:
+[INFO]     Mean gap: 0.4202%
+[INFO]     Std gap: 0.3603%
+[INFO]     Total time: 1486.32s
+[INFO] ================================================================================
+[I 2025-11-17 05:35:25,179] Trial 23 finished with value: 0.4202237903899341 and parameters: {'jade_c': 0.15421900172907774, 'jade_num_diff_vectors': 1}. Best is trial 22 with value: 0.342355037955413.
+[INFO] ================================================================================
+[INFO] Trial 25 started
+[INFO]   Parameters: jade_c=0.077560, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.28%, cost=7.8269, optimal=7.8049, time=75.2s
+[INFO]   Instance 1: gap=0.03%, cost=8.1110, optimal=8.1083, time=74.6s
+[INFO]   Instance 2: gap=0.59%, cost=7.8306, optimal=7.7849, time=74.0s
+[INFO]   Instance 3: gap=0.57%, cost=7.8543, optimal=7.8098, time=74.7s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=75.2s
+[INFO]   Instance 5: gap=0.18%, cost=8.0467, optimal=8.0319, time=74.7s
+[INFO]   Instance 6: gap=0.19%, cost=7.7266, optimal=7.7118, time=74.0s
+[INFO]   Instance 7: gap=0.67%, cost=8.0454, optimal=7.9915, time=74.0s
+[INFO]   Instance 8: gap=0.95%, cost=7.8991, optimal=7.8250, time=74.4s
+[INFO]   Instance 9: gap=0.09%, cost=7.8568, optimal=7.8495, time=75.2s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=75.2s
+[INFO]   Instance 11: gap=0.34%, cost=7.9371, optimal=7.9105, time=75.2s
+[INFO]   Instance 12: gap=0.00%, cost=7.5982, optimal=7.5979, time=74.7s
+[INFO]   Instance 13: gap=0.46%, cost=7.8311, optimal=7.7950, time=75.2s
+[INFO]   Instance 14: gap=0.04%, cost=7.7905, optimal=7.7877, time=74.6s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=74.1s
+[INFO]   Instance 16: gap=0.59%, cost=7.9854, optimal=7.9384, time=75.2s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=75.2s
+[INFO]   Instance 18: gap=1.31%, cost=7.5025, optimal=7.4052, time=75.3s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=75.2s
+[INFO]   Trial 25 completed:
+[INFO]     Mean gap: 0.3970%
+[INFO]     Std gap: 0.3549%
+[INFO]     Total time: 1496.36s
+[INFO] ================================================================================
+[I 2025-11-17 06:00:21,595] Trial 24 finished with value: 0.39704668535778587 and parameters: {'jade_c': 0.07755956888316023, 'jade_num_diff_vectors': 1}. Best is trial 22 with value: 0.342355037955413.
+[INFO] ================================================================================
+[INFO] Trial 26 started
+[INFO]   Parameters: jade_c=0.132845, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.17%, cost=7.8182, optimal=7.8049, time=74.5s
+[INFO]   Instance 1: gap=0.03%, cost=8.1110, optimal=8.1083, time=74.0s
+[INFO]   Instance 2: gap=0.59%, cost=7.8306, optimal=7.7849, time=74.0s
+[INFO]   Instance 3: gap=0.50%, cost=7.8487, optimal=7.8098, time=74.0s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=74.0s
+[INFO]   Instance 5: gap=0.18%, cost=8.0467, optimal=8.0319, time=74.0s
+[INFO]   Instance 6: gap=0.18%, cost=7.7257, optimal=7.7118, time=75.0s
+[INFO]   Instance 7: gap=0.67%, cost=8.0454, optimal=7.9915, time=75.3s
+[INFO]   Instance 8: gap=1.56%, cost=7.9472, optimal=7.8250, time=74.0s
+[INFO]   Instance 9: gap=0.09%, cost=7.8568, optimal=7.8495, time=74.0s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=74.0s
+[INFO]   Instance 11: gap=0.34%, cost=7.9371, optimal=7.9105, time=74.0s
+[INFO]   Instance 12: gap=0.00%, cost=7.5982, optimal=7.5979, time=74.0s
+[INFO]   Instance 13: gap=0.39%, cost=7.8257, optimal=7.7950, time=73.9s
+[INFO]   Instance 14: gap=0.60%, cost=7.8341, optimal=7.7877, time=74.2s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=74.0s
+[INFO]   Instance 16: gap=0.49%, cost=7.9777, optimal=7.9384, time=74.9s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=74.8s
+[INFO]   Instance 18: gap=1.31%, cost=7.5024, optimal=7.4052, time=74.0s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=73.9s
+[INFO]   Trial 26 completed:
+[INFO]     Mean gap: 0.4375%
+[INFO]     Std gap: 0.4144%
+[INFO]     Total time: 1484.52s
+[INFO] ================================================================================
+[I 2025-11-17 06:25:06,182] Trial 25 finished with value: 0.43751035323543963 and parameters: {'jade_c': 0.13284455921258292, 'jade_num_diff_vectors': 1}. Best is trial 22 with value: 0.342355037955413.
+[INFO] ================================================================================
+[INFO] Trial 27 started
+[INFO]   Parameters: jade_c=0.306791, jade_num_diff_vectors=2
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.65%, cost=7.8555, optimal=7.8049, time=74.1s
+[INFO]   Instance 1: gap=0.33%, cost=8.1353, optimal=8.1083, time=74.4s
+[INFO]   Instance 2: gap=1.14%, cost=7.8738, optimal=7.7849, time=74.1s
+[INFO]   Instance 3: gap=0.75%, cost=7.8683, optimal=7.8098, time=74.1s
+[INFO]   Instance 4: gap=0.23%, cost=7.4405, optimal=7.4232, time=74.6s
+[INFO]   Instance 5: gap=1.12%, cost=8.1220, optimal=8.0319, time=75.3s
+[INFO]   Instance 6: gap=0.21%, cost=7.7278, optimal=7.7118, time=75.3s
+[INFO]   Instance 7: gap=1.28%, cost=8.0936, optimal=7.9915, time=75.3s
+[INFO]   Instance 8: gap=1.35%, cost=7.9303, optimal=7.8250, time=75.3s
+[INFO]   Instance 9: gap=0.19%, cost=7.8648, optimal=7.8495, time=75.3s
+[INFO]   Instance 10: gap=0.49%, cost=7.6818, optimal=7.6443, time=75.3s
+[INFO]   Instance 11: gap=0.58%, cost=7.9564, optimal=7.9105, time=75.3s
+[INFO]   Instance 12: gap=0.01%, cost=7.5990, optimal=7.5979, time=75.3s
+[INFO]   Instance 13: gap=0.11%, cost=7.8034, optimal=7.7950, time=75.3s
+[INFO]   Instance 14: gap=0.65%, cost=7.8384, optimal=7.7877, time=75.2s
+[INFO]   Instance 15: gap=0.26%, cost=7.7003, optimal=7.6803, time=74.1s
+[INFO]   Instance 16: gap=1.26%, cost=8.0385, optimal=7.9384, time=74.0s
+[INFO]   Instance 17: gap=1.38%, cost=8.0845, optimal=7.9748, time=75.2s
+[INFO]   Instance 18: gap=0.98%, cost=7.4780, optimal=7.4052, time=75.3s
+[INFO]   Instance 19: gap=0.91%, cost=7.5949, optimal=7.5263, time=75.3s
+[INFO]   Trial 27 completed:
+[INFO]     Mean gap: 0.6944%
+[INFO]     Std gap: 0.4443%
+[INFO]     Total time: 1497.87s
+[INFO] ================================================================================
+[I 2025-11-17 06:50:04,118] Trial 26 finished with value: 0.694385303914944 and parameters: {'jade_c': 0.3067907289288115, 'jade_num_diff_vectors': 2}. Best is trial 22 with value: 0.342355037955413.
+[INFO] ================================================================================
+[INFO] Trial 28 started
+[INFO]   Parameters: jade_c=0.112727, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.06%, cost=7.8097, optimal=7.8049, time=74.6s
+[INFO]   Instance 1: gap=0.03%, cost=8.1110, optimal=8.1083, time=75.2s
+[INFO]   Instance 2: gap=0.59%, cost=7.8306, optimal=7.7849, time=74.2s
+[INFO]   Instance 3: gap=0.38%, cost=7.8394, optimal=7.8098, time=74.0s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=74.0s
+[INFO]   Instance 5: gap=0.18%, cost=8.0467, optimal=8.0319, time=74.0s
+[INFO]   Instance 6: gap=0.18%, cost=7.7257, optimal=7.7118, time=74.0s
+[INFO]   Instance 7: gap=0.55%, cost=8.0356, optimal=7.9915, time=74.0s
+[INFO]   Instance 8: gap=0.77%, cost=7.8856, optimal=7.8250, time=74.0s
+[INFO]   Instance 9: gap=0.09%, cost=7.8568, optimal=7.8495, time=74.0s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=74.2s
+[INFO]   Instance 11: gap=0.34%, cost=7.9371, optimal=7.9105, time=75.2s
+[INFO]   Instance 12: gap=0.00%, cost=7.5982, optimal=7.5979, time=75.2s
+[INFO]   Instance 13: gap=0.39%, cost=7.8257, optimal=7.7950, time=75.2s
+[INFO]   Instance 14: gap=0.27%, cost=7.8089, optimal=7.7877, time=75.3s
+[INFO]   Instance 15: gap=0.01%, cost=7.6807, optimal=7.6803, time=75.1s
+[INFO]   Instance 16: gap=0.59%, cost=7.9854, optimal=7.9384, time=74.0s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=74.4s
+[INFO]   Instance 18: gap=0.32%, cost=7.4291, optimal=7.4052, time=75.2s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=74.4s
+[INFO]   Trial 28 completed:
+[INFO]     Mean gap: 0.3201%
+[INFO]     Std gap: 0.2552%
+[INFO]     Total time: 1490.32s
+[INFO] ================================================================================
+[I 2025-11-17 07:14:54,498] Trial 27 finished with value: 0.320113095431398 and parameters: {'jade_c': 0.1127273823460006, 'jade_num_diff_vectors': 1}. Best is trial 27 with value: 0.320113095431398.
+[INFO] ================================================================================
+[INFO] Trial 29 started
+[INFO]   Parameters: jade_c=0.060238, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.33%, cost=7.8307, optimal=7.8049, time=75.3s
+[INFO]   Instance 1: gap=0.08%, cost=8.1146, optimal=8.1083, time=75.2s
+[INFO]   Instance 2: gap=1.11%, cost=7.8714, optimal=7.7849, time=74.5s
+[INFO]   Instance 3: gap=0.50%, cost=7.8487, optimal=7.8098, time=74.0s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=74.0s
+[INFO]   Instance 5: gap=0.18%, cost=8.0467, optimal=8.0319, time=74.0s
+[INFO]   Instance 6: gap=0.19%, cost=7.7266, optimal=7.7118, time=74.0s
+[INFO]   Instance 7: gap=0.67%, cost=8.0454, optimal=7.9915, time=74.0s
+[INFO]   Instance 8: gap=0.88%, cost=7.8939, optimal=7.8250, time=75.3s
+[INFO]   Instance 9: gap=0.08%, cost=7.8556, optimal=7.8495, time=75.2s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=74.0s
+[INFO]   Instance 11: gap=0.34%, cost=7.9371, optimal=7.9105, time=74.0s
+[INFO]   Instance 12: gap=0.09%, cost=7.6044, optimal=7.5979, time=74.0s
+[INFO]   Instance 13: gap=0.43%, cost=7.8282, optimal=7.7950, time=74.0s
+[INFO]   Instance 14: gap=0.04%, cost=7.7905, optimal=7.7877, time=74.0s
+[INFO]   Instance 15: gap=0.01%, cost=7.6807, optimal=7.6803, time=74.0s
+[INFO]   Instance 16: gap=0.41%, cost=7.9707, optimal=7.9384, time=74.0s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=74.0s
+[INFO]   Instance 18: gap=1.26%, cost=7.4984, optimal=7.4052, time=74.0s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=74.0s
+[INFO]   Trial 29 completed:
+[INFO]     Mean gap: 0.4106%
+[INFO]     Std gap: 0.3653%
+[INFO]     Total time: 1485.38s
+[INFO] ================================================================================
+[I 2025-11-17 07:39:39,935] Trial 28 finished with value: 0.41064192697386376 and parameters: {'jade_c': 0.06023759961936231, 'jade_num_diff_vectors': 1}. Best is trial 27 with value: 0.320113095431398.
+[INFO] ================================================================================
+[INFO] Trial 30 started
+[INFO]   Parameters: jade_c=0.100438, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.05%, cost=7.8091, optimal=7.8049, time=74.0s
+[INFO]   Instance 1: gap=0.08%, cost=8.1146, optimal=8.1083, time=74.3s
+[INFO]   Instance 2: gap=0.59%, cost=7.8306, optimal=7.7849, time=75.3s
+[INFO]   Instance 3: gap=0.51%, cost=7.8497, optimal=7.8098, time=75.3s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=75.3s
+[INFO]   Instance 5: gap=0.18%, cost=8.0467, optimal=8.0319, time=74.3s
+[INFO]   Instance 6: gap=0.02%, cost=7.7131, optimal=7.7118, time=74.1s
+[INFO]   Instance 7: gap=0.67%, cost=8.0454, optimal=7.9915, time=74.5s
+[INFO]   Instance 8: gap=0.88%, cost=7.8939, optimal=7.8250, time=74.8s
+[INFO]   Instance 9: gap=0.09%, cost=7.8568, optimal=7.8495, time=74.0s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=74.1s
+[INFO]   Instance 11: gap=0.51%, cost=7.9509, optimal=7.9105, time=74.0s
+[INFO]   Instance 12: gap=0.01%, cost=7.5990, optimal=7.5979, time=74.1s
+[INFO]   Instance 13: gap=0.39%, cost=7.8257, optimal=7.7950, time=74.0s
+[INFO]   Instance 14: gap=0.27%, cost=7.8089, optimal=7.7877, time=74.1s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=74.0s
+[INFO]   Instance 16: gap=0.49%, cost=7.9777, optimal=7.9384, time=74.0s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=74.0s
+[INFO]   Instance 18: gap=1.29%, cost=7.5007, optimal=7.4052, time=74.1s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=74.0s
+[INFO]   Trial 30 completed:
+[INFO]     Mean gap: 0.3843%
+[INFO]     Std gap: 0.3476%
+[INFO]     Total time: 1486.33s
+[INFO] ================================================================================
+[I 2025-11-17 08:04:26,328] Trial 29 finished with value: 0.3842749769539111 and parameters: {'jade_c': 0.10043756459327038, 'jade_num_diff_vectors': 1}. Best is trial 27 with value: 0.320113095431398.
+[INFO] ================================================================================
+[INFO] Trial 31 started
+[INFO]   Parameters: jade_c=0.109616, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.01%, cost=7.8053, optimal=7.8049, time=74.0s
+[INFO]   Instance 1: gap=0.08%, cost=8.1146, optimal=8.1083, time=74.0s
+[INFO]   Instance 2: gap=0.59%, cost=7.8306, optimal=7.7849, time=74.0s
+[INFO]   Instance 3: gap=0.51%, cost=7.8497, optimal=7.8098, time=74.0s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=74.0s
+[INFO]   Instance 5: gap=0.36%, cost=8.0607, optimal=8.0319, time=74.0s
+[INFO]   Instance 6: gap=0.18%, cost=7.7257, optimal=7.7118, time=74.0s
+[INFO]   Instance 7: gap=0.67%, cost=8.0454, optimal=7.9915, time=74.0s
+[INFO]   Instance 8: gap=0.88%, cost=7.8939, optimal=7.8250, time=74.0s
+[INFO]   Instance 9: gap=0.09%, cost=7.8569, optimal=7.8495, time=74.8s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=75.2s
+[INFO]   Instance 11: gap=0.56%, cost=7.9548, optimal=7.9105, time=75.3s
+[INFO]   Instance 12: gap=0.01%, cost=7.5990, optimal=7.5979, time=74.5s
+[INFO]   Instance 13: gap=0.39%, cost=7.8257, optimal=7.7950, time=75.3s
+[INFO]   Instance 14: gap=0.27%, cost=7.8089, optimal=7.7877, time=75.0s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=75.3s
+[INFO]   Instance 16: gap=0.49%, cost=7.9777, optimal=7.9384, time=75.2s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=75.3s
+[INFO]   Instance 18: gap=1.29%, cost=7.5006, optimal=7.4052, time=75.3s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=74.8s
+[INFO]   Trial 31 completed:
+[INFO]     Mean gap: 0.4012%
+[INFO]     Std gap: 0.3409%
+[INFO]     Total time: 1492.04s
+[INFO] ================================================================================
+[I 2025-11-17 08:29:18,522] Trial 30 finished with value: 0.4012003968106093 and parameters: {'jade_c': 0.10961559294181902, 'jade_num_diff_vectors': 1}. Best is trial 27 with value: 0.320113095431398.
+[INFO] ================================================================================
+[INFO] Trial 32 started
+[INFO]   Parameters: jade_c=0.139087, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.28%, cost=7.8269, optimal=7.8049, time=74.1s
+[INFO]   Instance 1: gap=0.08%, cost=8.1146, optimal=8.1083, time=74.1s
+[INFO]   Instance 2: gap=0.59%, cost=7.8306, optimal=7.7849, time=74.1s
+[INFO]   Instance 3: gap=0.50%, cost=7.8487, optimal=7.8098, time=74.1s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=74.1s
+[INFO]   Instance 5: gap=0.34%, cost=8.0594, optimal=8.0319, time=74.1s
+[INFO]   Instance 6: gap=0.16%, cost=7.7244, optimal=7.7118, time=74.1s
+[INFO]   Instance 7: gap=0.67%, cost=8.0454, optimal=7.9915, time=74.1s
+[INFO]   Instance 8: gap=1.56%, cost=7.9472, optimal=7.8250, time=74.1s
+[INFO]   Instance 9: gap=0.09%, cost=7.8569, optimal=7.8495, time=74.0s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=74.1s
+[INFO]   Instance 11: gap=0.34%, cost=7.9371, optimal=7.9105, time=74.2s
+[INFO]   Instance 12: gap=0.00%, cost=7.5982, optimal=7.5979, time=74.2s
+[INFO]   Instance 13: gap=0.39%, cost=7.8257, optimal=7.7950, time=75.2s
+[INFO]   Instance 14: gap=0.60%, cost=7.8341, optimal=7.7877, time=75.4s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=74.4s
+[INFO]   Instance 16: gap=0.34%, cost=7.9654, optimal=7.9384, time=74.2s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=74.5s
+[INFO]   Instance 18: gap=1.53%, cost=7.5185, optimal=7.4052, time=75.4s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=75.4s
+[INFO]   Trial 32 completed:
+[INFO]     Mean gap: 0.4556%
+[INFO]     Std gap: 0.4321%
+[INFO]     Total time: 1487.75s
+[INFO] ================================================================================
+[I 2025-11-17 08:54:06,336] Trial 31 finished with value: 0.45558733102575744 and parameters: {'jade_c': 0.13908704026999702, 'jade_num_diff_vectors': 1}. Best is trial 27 with value: 0.320113095431398.
+[INFO] ================================================================================
+[INFO] Trial 33 started
+[INFO]   Parameters: jade_c=0.082761, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.44%, cost=7.8393, optimal=7.8049, time=74.2s
+[INFO]   Instance 1: gap=0.08%, cost=8.1146, optimal=8.1083, time=74.2s
+[INFO]   Instance 2: gap=0.59%, cost=7.8306, optimal=7.7849, time=74.2s
+[INFO]   Instance 3: gap=0.51%, cost=7.8497, optimal=7.8098, time=74.2s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=74.2s
+[INFO]   Instance 5: gap=0.21%, cost=8.0490, optimal=8.0319, time=74.2s
+[INFO]   Instance 6: gap=0.18%, cost=7.7257, optimal=7.7118, time=74.2s
+[INFO]   Instance 7: gap=0.63%, cost=8.0422, optimal=7.9915, time=75.0s
+[INFO]   Instance 8: gap=0.88%, cost=7.8939, optimal=7.8250, time=75.4s
+[INFO]   Instance 9: gap=0.09%, cost=7.8569, optimal=7.8495, time=75.4s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=74.9s
+[INFO]   Instance 11: gap=0.38%, cost=7.9405, optimal=7.9105, time=74.2s
+[INFO]   Instance 12: gap=0.08%, cost=7.6036, optimal=7.5979, time=74.2s
+[INFO]   Instance 13: gap=0.45%, cost=7.8304, optimal=7.7950, time=74.2s
+[INFO]   Instance 14: gap=0.04%, cost=7.7905, optimal=7.7877, time=74.2s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=74.2s
+[INFO]   Instance 16: gap=0.36%, cost=7.9669, optimal=7.9384, time=74.1s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=74.1s
+[INFO]   Instance 18: gap=1.29%, cost=7.5008, optimal=7.4052, time=74.1s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=74.2s
+[INFO]   Trial 33 completed:
+[INFO]     Mean gap: 0.3921%
+[INFO]     Std gap: 0.3339%
+[INFO]     Total time: 1487.44s
+[INFO] ================================================================================
+[I 2025-11-17 09:18:53,841] Trial 32 finished with value: 0.3921324073348187 and parameters: {'jade_c': 0.08276051894511366, 'jade_num_diff_vectors': 1}. Best is trial 27 with value: 0.320113095431398.
+[INFO] ================================================================================
+[INFO] Trial 34 started
+[INFO]   Parameters: jade_c=0.211711, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.17%, cost=7.8182, optimal=7.8049, time=75.4s
+[INFO]   Instance 1: gap=0.03%, cost=8.1110, optimal=8.1083, time=75.4s
+[INFO]   Instance 2: gap=0.70%, cost=7.8393, optimal=7.7849, time=75.4s
+[INFO]   Instance 3: gap=0.38%, cost=7.8394, optimal=7.8098, time=75.4s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=74.5s
+[INFO]   Instance 5: gap=0.21%, cost=8.0490, optimal=8.0319, time=74.7s
+[INFO]   Instance 6: gap=0.02%, cost=7.7131, optimal=7.7118, time=75.4s
+[INFO]   Instance 7: gap=0.67%, cost=8.0454, optimal=7.9915, time=75.4s
+[INFO]   Instance 8: gap=0.95%, cost=7.8991, optimal=7.8250, time=75.4s
+[INFO]   Instance 9: gap=0.09%, cost=7.8568, optimal=7.8495, time=75.4s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=75.4s
+[INFO]   Instance 11: gap=0.18%, cost=7.9247, optimal=7.9105, time=75.4s
+[INFO]   Instance 12: gap=0.08%, cost=7.6036, optimal=7.5979, time=75.4s
+[INFO]   Instance 13: gap=0.48%, cost=7.8325, optimal=7.7950, time=75.4s
+[INFO]   Instance 14: gap=0.27%, cost=7.8089, optimal=7.7877, time=74.8s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=74.2s
+[INFO]   Instance 16: gap=0.49%, cost=7.9777, optimal=7.9384, time=74.2s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=74.2s
+[INFO]   Instance 18: gap=1.18%, cost=7.4925, optimal=7.4052, time=74.2s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=74.2s
+[INFO]   Trial 34 completed:
+[INFO]     Mean gap: 0.3770%
+[INFO]     Std gap: 0.3383%
+[INFO]     Total time: 1499.72s
+[INFO] ================================================================================
+[I 2025-11-17 09:43:53,629] Trial 33 finished with value: 0.37696588752526794 and parameters: {'jade_c': 0.21171057703015853, 'jade_num_diff_vectors': 1}. Best is trial 27 with value: 0.320113095431398.
+[INFO] ================================================================================
+[INFO] Trial 35 started
+[INFO]   Parameters: jade_c=0.117280, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.28%, cost=7.8269, optimal=7.8049, time=74.2s
+[INFO]   Instance 1: gap=0.19%, cost=8.1238, optimal=8.1083, time=74.9s
+[INFO]   Instance 2: gap=0.59%, cost=7.8306, optimal=7.7849, time=75.4s
+[INFO]   Instance 3: gap=0.51%, cost=7.8497, optimal=7.8098, time=75.4s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=75.4s
+[INFO]   Instance 5: gap=0.33%, cost=8.0584, optimal=8.0319, time=75.4s
+[INFO]   Instance 6: gap=0.18%, cost=7.7257, optimal=7.7118, time=75.4s
+[INFO]   Instance 7: gap=0.63%, cost=8.0422, optimal=7.9915, time=75.4s
+[INFO]   Instance 8: gap=0.88%, cost=7.8939, optimal=7.8250, time=74.5s
+[INFO]   Instance 9: gap=0.09%, cost=7.8569, optimal=7.8495, time=74.2s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=74.2s
+[INFO]   Instance 11: gap=0.29%, cost=7.9333, optimal=7.9105, time=74.6s
+[INFO]   Instance 12: gap=0.00%, cost=7.5982, optimal=7.5979, time=75.4s
+[INFO]   Instance 13: gap=0.27%, cost=7.8160, optimal=7.7950, time=75.4s
+[INFO]   Instance 14: gap=0.39%, cost=7.8185, optimal=7.7877, time=75.4s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=75.4s
+[INFO]   Instance 16: gap=0.34%, cost=7.9654, optimal=7.9384, time=74.9s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=74.2s
+[INFO]   Instance 18: gap=1.29%, cost=7.5006, optimal=7.4052, time=74.2s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=74.1s
+[INFO]   Trial 35 completed:
+[INFO]     Mean gap: 0.3953%
+[INFO]     Std gap: 0.3236%
+[INFO]     Total time: 1498.25s
+[INFO] ================================================================================
+[I 2025-11-17 10:08:51,933] Trial 34 finished with value: 0.39534250407367355 and parameters: {'jade_c': 0.1172796383940734, 'jade_num_diff_vectors': 1}. Best is trial 27 with value: 0.320113095431398.
+[INFO] ================================================================================
+[INFO] Trial 36 started
+[INFO]   Parameters: jade_c=0.358822, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.35%, cost=7.8322, optimal=7.8049, time=74.2s
+[INFO]   Instance 1: gap=0.31%, cost=8.1331, optimal=8.1083, time=74.3s
+[INFO]   Instance 2: gap=1.06%, cost=7.8676, optimal=7.7849, time=75.4s
+[INFO]   Instance 3: gap=0.51%, cost=7.8497, optimal=7.8098, time=75.2s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=75.4s
+[INFO]   Instance 5: gap=0.33%, cost=8.0585, optimal=8.0319, time=74.6s
+[INFO]   Instance 6: gap=0.02%, cost=7.7131, optimal=7.7118, time=74.7s
+[INFO]   Instance 7: gap=0.67%, cost=8.0454, optimal=7.9915, time=74.2s
+[INFO]   Instance 8: gap=1.02%, cost=7.9052, optimal=7.8250, time=74.2s
+[INFO]   Instance 9: gap=0.09%, cost=7.8569, optimal=7.8495, time=74.2s
+[INFO]   Instance 10: gap=0.01%, cost=7.6453, optimal=7.6443, time=74.2s
+[INFO]   Instance 11: gap=0.56%, cost=7.9548, optimal=7.9105, time=74.2s
+[INFO]   Instance 12: gap=0.09%, cost=7.6044, optimal=7.5979, time=75.2s
+[INFO]   Instance 13: gap=0.34%, cost=7.8214, optimal=7.7950, time=75.4s
+[INFO]   Instance 14: gap=0.04%, cost=7.7905, optimal=7.7877, time=75.4s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=74.9s
+[INFO]   Instance 16: gap=0.34%, cost=7.9654, optimal=7.9384, time=74.9s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=75.4s
+[INFO]   Instance 18: gap=1.13%, cost=7.4887, optimal=7.4052, time=75.4s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=74.2s
+[INFO]   Trial 36 completed:
+[INFO]     Mean gap: 0.3879%
+[INFO]     Std gap: 0.3587%
+[INFO]     Total time: 1495.55s
+[INFO] ================================================================================
+[I 2025-11-17 10:33:47,538] Trial 35 finished with value: 0.38786879404565155 and parameters: {'jade_c': 0.3588218817746394, 'jade_num_diff_vectors': 1}. Best is trial 27 with value: 0.320113095431398.
+[INFO] ================================================================================
+[INFO] Trial 37 started
+[INFO]   Parameters: jade_c=0.162663, jade_num_diff_vectors=2
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.51%, cost=7.8448, optimal=7.8049, time=74.2s
+[INFO]   Instance 1: gap=0.34%, cost=8.1356, optimal=8.1083, time=74.2s
+[INFO]   Instance 2: gap=0.78%, cost=7.8453, optimal=7.7849, time=74.9s
+[INFO]   Instance 3: gap=0.56%, cost=7.8534, optimal=7.8098, time=75.2s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=75.3s
+[INFO]   Instance 5: gap=0.36%, cost=8.0607, optimal=8.0319, time=75.3s
+[INFO]   Instance 6: gap=0.34%, cost=7.7384, optimal=7.7118, time=75.3s
+[INFO]   Instance 7: gap=0.67%, cost=8.0454, optimal=7.9915, time=75.3s
+[INFO]   Instance 8: gap=1.20%, cost=7.9193, optimal=7.8250, time=75.5s
+[INFO]   Instance 9: gap=0.14%, cost=7.8609, optimal=7.8495, time=74.6s
+[INFO]   Instance 10: gap=0.97%, cost=7.7181, optimal=7.6443, time=74.3s
+[INFO]   Instance 11: gap=0.56%, cost=7.9548, optimal=7.9105, time=74.3s
+[INFO]   Instance 12: gap=0.01%, cost=7.5990, optimal=7.5979, time=74.3s
+[INFO]   Instance 13: gap=0.54%, cost=7.8371, optimal=7.7950, time=74.3s
+[INFO]   Instance 14: gap=0.09%, cost=7.7944, optimal=7.7877, time=74.3s
+[INFO]   Instance 15: gap=0.02%, cost=7.6817, optimal=7.6803, time=74.2s
+[INFO]   Instance 16: gap=1.13%, cost=8.0284, optimal=7.9384, time=75.3s
+[INFO]   Instance 17: gap=0.74%, cost=8.0338, optimal=7.9748, time=75.5s
+[INFO]   Instance 18: gap=0.47%, cost=7.4400, optimal=7.4052, time=75.5s
+[INFO]   Instance 19: gap=0.35%, cost=7.5530, optimal=7.5263, time=74.9s
+[INFO]   Trial 37 completed:
+[INFO]     Mean gap: 0.4989%
+[INFO]     Std gap: 0.3350%
+[INFO]     Total time: 1496.61s
+[INFO] ================================================================================
+[I 2025-11-17 10:58:44,211] Trial 36 finished with value: 0.4988593154296261 and parameters: {'jade_c': 0.16266291968790736, 'jade_num_diff_vectors': 2}. Best is trial 27 with value: 0.320113095431398.
+[INFO] ================================================================================
+[INFO] Trial 38 started
+[INFO]   Parameters: jade_c=0.040980, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.52%, cost=7.8451, optimal=7.8049, time=74.2s
+[INFO]   Instance 1: gap=0.03%, cost=8.1110, optimal=8.1083, time=74.2s
+[INFO]   Instance 2: gap=0.70%, cost=7.8393, optimal=7.7849, time=74.2s
+[INFO]   Instance 3: gap=0.51%, cost=7.8497, optimal=7.8098, time=75.4s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=75.5s
+[INFO]   Instance 5: gap=0.18%, cost=8.0467, optimal=8.0319, time=75.4s
+[INFO]   Instance 6: gap=0.18%, cost=7.7257, optimal=7.7118, time=74.6s
+[INFO]   Instance 7: gap=0.63%, cost=8.0422, optimal=7.9915, time=74.1s
+[INFO]   Instance 8: gap=1.02%, cost=7.9052, optimal=7.8250, time=74.2s
+[INFO]   Instance 9: gap=0.09%, cost=7.8568, optimal=7.8495, time=74.9s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=74.3s
+[INFO]   Instance 11: gap=0.29%, cost=7.9333, optimal=7.9105, time=74.1s
+[INFO]   Instance 12: gap=0.00%, cost=7.5982, optimal=7.5979, time=74.1s
+[INFO]   Instance 13: gap=0.40%, cost=7.8261, optimal=7.7950, time=74.1s
+[INFO]   Instance 14: gap=0.60%, cost=7.8341, optimal=7.7877, time=74.2s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=74.2s
+[INFO]   Instance 16: gap=0.51%, cost=7.9792, optimal=7.9384, time=74.2s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=74.1s
+[INFO]   Instance 18: gap=1.39%, cost=7.5084, optimal=7.4052, time=74.2s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=74.2s
+[INFO]   Trial 38 completed:
+[INFO]     Mean gap: 0.4350%
+[INFO]     Std gap: 0.3637%
+[INFO]     Total time: 1488.44s
+[INFO] ================================================================================
+[I 2025-11-17 11:23:32,707] Trial 37 finished with value: 0.4350198620925482 and parameters: {'jade_c': 0.04098015279886222, 'jade_num_diff_vectors': 1}. Best is trial 27 with value: 0.320113095431398.
+[INFO] ================================================================================
+[INFO] Trial 39 started
+[INFO]   Parameters: jade_c=0.239465, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.01%, cost=7.8053, optimal=7.8049, time=74.2s
+[INFO]   Instance 1: gap=0.00%, cost=8.1083, optimal=8.1083, time=74.2s
+[INFO]   Instance 2: gap=0.59%, cost=7.8306, optimal=7.7849, time=74.1s
+[INFO]   Instance 3: gap=0.50%, cost=7.8487, optimal=7.8098, time=74.2s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=74.2s
+[INFO]   Instance 5: gap=0.12%, cost=8.0416, optimal=8.0319, time=74.2s
+[INFO]   Instance 6: gap=0.02%, cost=7.7131, optimal=7.7118, time=74.2s
+[INFO]   Instance 7: gap=0.63%, cost=8.0422, optimal=7.9915, time=75.4s
+[INFO]   Instance 8: gap=1.61%, cost=7.9511, optimal=7.8250, time=74.4s
+[INFO]   Instance 9: gap=0.09%, cost=7.8569, optimal=7.8495, time=74.2s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=74.2s
+[INFO]   Instance 11: gap=0.34%, cost=7.9371, optimal=7.9105, time=74.5s
+[INFO]   Instance 12: gap=0.00%, cost=7.5982, optimal=7.5979, time=74.2s
+[INFO]   Instance 13: gap=0.38%, cost=7.8249, optimal=7.7950, time=74.1s
+[INFO]   Instance 14: gap=0.52%, cost=7.8285, optimal=7.7877, time=75.4s
+[INFO]   Instance 15: gap=0.03%, cost=7.6825, optimal=7.6803, time=74.9s
+[INFO]   Instance 16: gap=0.34%, cost=7.9654, optimal=7.9384, time=74.1s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=74.9s
+[INFO]   Instance 18: gap=1.01%, cost=7.4797, optimal=7.4052, time=75.4s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=75.4s
+[INFO]   Trial 39 completed:
+[INFO]     Mean gap: 0.3911%
+[INFO]     Std gap: 0.4065%
+[INFO]     Total time: 1490.31s
+[INFO] ================================================================================
+[I 2025-11-17 11:48:23,075] Trial 38 finished with value: 0.3911298566023247 and parameters: {'jade_c': 0.2394649724188591, 'jade_num_diff_vectors': 1}. Best is trial 27 with value: 0.320113095431398.
+[INFO] ================================================================================
+[INFO] Trial 40 started
+[INFO]   Parameters: jade_c=0.089692, jade_num_diff_vectors=2
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.33%, cost=7.8307, optimal=7.8049, time=74.2s
+[INFO]   Instance 1: gap=0.45%, cost=8.1449, optimal=8.1083, time=74.2s
+[INFO]   Instance 2: gap=0.67%, cost=7.8373, optimal=7.7849, time=74.4s
+[INFO]   Instance 3: gap=0.56%, cost=7.8534, optimal=7.8098, time=75.2s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=74.5s
+[INFO]   Instance 5: gap=0.53%, cost=8.0747, optimal=8.0319, time=74.2s
+[INFO]   Instance 6: gap=0.21%, cost=7.7278, optimal=7.7118, time=74.2s
+[INFO]   Instance 7: gap=0.55%, cost=8.0356, optimal=7.9915, time=74.3s
+[INFO]   Instance 8: gap=1.31%, cost=7.9279, optimal=7.8250, time=74.3s
+[INFO]   Instance 9: gap=0.17%, cost=7.8629, optimal=7.8495, time=74.4s
+[INFO]   Instance 10: gap=0.54%, cost=7.6856, optimal=7.6443, time=75.3s
+[INFO]   Instance 11: gap=0.34%, cost=7.9371, optimal=7.9105, time=74.4s
+[INFO]   Instance 12: gap=0.01%, cost=7.5990, optimal=7.5979, time=74.3s
+[INFO]   Instance 13: gap=0.58%, cost=7.8401, optimal=7.7950, time=74.3s
+[INFO]   Instance 14: gap=0.74%, cost=7.8455, optimal=7.7877, time=74.3s
+[INFO]   Instance 15: gap=0.01%, cost=7.6812, optimal=7.6803, time=74.3s
+[INFO]   Instance 16: gap=0.87%, cost=8.0078, optimal=7.9384, time=74.3s
+[INFO]   Instance 17: gap=0.92%, cost=8.0482, optimal=7.9748, time=74.3s
+[INFO]   Instance 18: gap=0.57%, cost=7.4474, optimal=7.4052, time=75.3s
+[INFO]   Instance 19: gap=0.29%, cost=7.5483, optimal=7.5263, time=75.5s
+[INFO]   Trial 40 completed:
+[INFO]     Mean gap: 0.4928%
+[INFO]     Std gap: 0.3128%
+[INFO]     Total time: 1489.97s
+[INFO] ================================================================================
+[I 2025-11-17 12:13:13,104] Trial 39 finished with value: 0.49281887117936807 and parameters: {'jade_c': 0.08969199592077372, 'jade_num_diff_vectors': 2}. Best is trial 27 with value: 0.320113095431398.
+[INFO] ================================================================================
+[INFO] Trial 41 started
+[INFO]   Parameters: jade_c=0.295202, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.01%, cost=7.8053, optimal=7.8049, time=75.4s
+[INFO]   Instance 1: gap=0.08%, cost=8.1146, optimal=8.1083, time=75.4s
+[INFO]   Instance 2: gap=0.49%, cost=7.8233, optimal=7.7849, time=74.9s
+[INFO]   Instance 3: gap=0.37%, cost=7.8383, optimal=7.8098, time=74.1s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=74.4s
+[INFO]   Instance 5: gap=0.21%, cost=8.0490, optimal=8.0319, time=75.4s
+[INFO]   Instance 6: gap=0.18%, cost=7.7257, optimal=7.7118, time=75.4s
+[INFO]   Instance 7: gap=0.52%, cost=8.0334, optimal=7.9915, time=75.4s
+[INFO]   Instance 8: gap=0.88%, cost=7.8939, optimal=7.8250, time=74.3s
+[INFO]   Instance 9: gap=0.09%, cost=7.8569, optimal=7.8495, time=74.9s
+[INFO]   Instance 10: gap=0.06%, cost=7.6491, optimal=7.6443, time=74.2s
+[INFO]   Instance 11: gap=0.23%, cost=7.9283, optimal=7.9105, time=74.6s
+[INFO]   Instance 12: gap=0.00%, cost=7.5982, optimal=7.5979, time=75.5s
+[INFO]   Instance 13: gap=0.60%, cost=7.8416, optimal=7.7950, time=75.5s
+[INFO]   Instance 14: gap=0.27%, cost=7.8089, optimal=7.7877, time=75.5s
+[INFO]   Instance 15: gap=0.01%, cost=7.6807, optimal=7.6803, time=75.5s
+[INFO]   Instance 16: gap=0.49%, cost=7.9777, optimal=7.9384, time=75.5s
+[INFO]   Instance 17: gap=0.41%, cost=8.0076, optimal=7.9748, time=75.4s
+[INFO]   Instance 18: gap=1.26%, cost=7.4984, optimal=7.4052, time=75.4s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=75.4s
+[INFO]   Trial 41 completed:
+[INFO]     Mean gap: 0.3174%
+[INFO]     Std gap: 0.3180%
+[INFO]     Total time: 1502.15s
+[INFO] ================================================================================
+[I 2025-11-17 12:38:15,318] Trial 40 finished with value: 0.317447720122922 and parameters: {'jade_c': 0.2952015240297734, 'jade_num_diff_vectors': 1}. Best is trial 40 with value: 0.317447720122922.
+[INFO] ================================================================================
+[INFO] Trial 42 started
+[INFO]   Parameters: jade_c=0.309623, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.01%, cost=7.8053, optimal=7.8049, time=75.4s
+[INFO]   Instance 1: gap=0.19%, cost=8.1238, optimal=8.1083, time=75.2s
+[INFO]   Instance 2: gap=0.70%, cost=7.8393, optimal=7.7849, time=74.2s
+[INFO]   Instance 3: gap=0.57%, cost=7.8543, optimal=7.8098, time=74.2s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=74.2s
+[INFO]   Instance 5: gap=0.18%, cost=8.0467, optimal=8.0319, time=74.2s
+[INFO]   Instance 6: gap=0.16%, cost=7.7244, optimal=7.7118, time=74.2s
+[INFO]   Instance 7: gap=0.55%, cost=8.0356, optimal=7.9915, time=74.2s
+[INFO]   Instance 8: gap=1.02%, cost=7.9052, optimal=7.8250, time=74.2s
+[INFO]   Instance 9: gap=0.09%, cost=7.8569, optimal=7.8495, time=74.9s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=75.5s
+[INFO]   Instance 11: gap=0.29%, cost=7.9333, optimal=7.9105, time=75.4s
+[INFO]   Instance 12: gap=0.00%, cost=7.5982, optimal=7.5979, time=74.2s
+[INFO]   Instance 13: gap=0.39%, cost=7.8257, optimal=7.7950, time=74.2s
+[INFO]   Instance 14: gap=0.27%, cost=7.8089, optimal=7.7877, time=74.8s
+[INFO]   Instance 15: gap=0.54%, cost=7.7219, optimal=7.6803, time=74.9s
+[INFO]   Instance 16: gap=0.34%, cost=7.9654, optimal=7.9384, time=74.2s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=74.2s
+[INFO]   Instance 18: gap=1.49%, cost=7.5157, optimal=7.4052, time=74.1s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=75.4s
+[INFO]   Trial 42 completed:
+[INFO]     Mean gap: 0.4223%
+[INFO]     Std gap: 0.3699%
+[INFO]     Total time: 1491.90s
+[INFO] ================================================================================
+[I 2025-11-17 13:03:07,275] Trial 41 finished with value: 0.42230604241186853 and parameters: {'jade_c': 0.3096225714925145, 'jade_num_diff_vectors': 1}. Best is trial 40 with value: 0.317447720122922.
+[INFO] ================================================================================
+[INFO] Trial 43 started
+[INFO]   Parameters: jade_c=0.188488, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.01%, cost=7.8053, optimal=7.8049, time=75.4s
+[INFO]   Instance 1: gap=0.08%, cost=8.1146, optimal=8.1083, time=75.4s
+[INFO]   Instance 2: gap=0.70%, cost=7.8393, optimal=7.7849, time=75.4s
+[INFO]   Instance 3: gap=0.57%, cost=7.8543, optimal=7.8098, time=75.4s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=75.4s
+[INFO]   Instance 5: gap=0.85%, cost=8.0999, optimal=8.0319, time=75.2s
+[INFO]   Instance 6: gap=0.16%, cost=7.7244, optimal=7.7118, time=74.2s
+[INFO]   Instance 7: gap=0.67%, cost=8.0454, optimal=7.9915, time=74.2s
+[INFO]   Instance 8: gap=1.02%, cost=7.9052, optimal=7.8250, time=74.2s
+[INFO]   Instance 9: gap=0.09%, cost=7.8569, optimal=7.8495, time=74.4s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=74.2s
+[INFO]   Instance 11: gap=0.29%, cost=7.9333, optimal=7.9105, time=74.2s
+[INFO]   Instance 12: gap=0.00%, cost=7.5982, optimal=7.5979, time=74.7s
+[INFO]   Instance 13: gap=0.49%, cost=7.8334, optimal=7.7950, time=75.5s
+[INFO]   Instance 14: gap=0.27%, cost=7.8089, optimal=7.7877, time=75.4s
+[INFO]   Instance 15: gap=0.15%, cost=7.6916, optimal=7.6803, time=75.4s
+[INFO]   Instance 16: gap=0.49%, cost=7.9777, optimal=7.9384, time=74.3s
+[INFO]   Instance 17: gap=0.50%, cost=8.0145, optimal=7.9748, time=74.2s
+[INFO]   Instance 18: gap=1.53%, cost=7.5185, optimal=7.4052, time=74.2s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=74.8s
+[INFO]   Trial 43 completed:
+[INFO]     Mean gap: 0.4405%
+[INFO]     Std gap: 0.3898%
+[INFO]     Total time: 1496.35s
+[INFO] ================================================================================
+[I 2025-11-17 13:28:03,682] Trial 42 finished with value: 0.44049190429255924 and parameters: {'jade_c': 0.188487613940991, 'jade_num_diff_vectors': 1}. Best is trial 40 with value: 0.317447720122922.
+[INFO] ================================================================================
+[INFO] Trial 44 started
+[INFO]   Parameters: jade_c=0.219066, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.01%, cost=7.8053, optimal=7.8049, time=75.3s
+[INFO]   Instance 1: gap=0.03%, cost=8.1110, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=0.70%, cost=7.8393, optimal=7.7849, time=75.3s
+[INFO]   Instance 3: gap=0.51%, cost=7.8497, optimal=7.8098, time=75.3s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=75.5s
+[INFO]   Instance 5: gap=0.18%, cost=8.0467, optimal=8.0319, time=74.5s
+[INFO]   Instance 6: gap=0.19%, cost=7.7266, optimal=7.7118, time=74.3s
+[INFO]   Instance 7: gap=0.52%, cost=8.0334, optimal=7.9915, time=74.3s
+[INFO]   Instance 8: gap=1.08%, cost=7.9092, optimal=7.8250, time=74.6s
+[INFO]   Instance 9: gap=0.09%, cost=7.8569, optimal=7.8495, time=75.5s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=75.4s
+[INFO]   Instance 11: gap=0.56%, cost=7.9548, optimal=7.9105, time=74.3s
+[INFO]   Instance 12: gap=0.01%, cost=7.5990, optimal=7.5979, time=75.5s
+[INFO]   Instance 13: gap=0.29%, cost=7.8178, optimal=7.7950, time=74.5s
+[INFO]   Instance 14: gap=0.27%, cost=7.8089, optimal=7.7877, time=74.2s
+[INFO]   Instance 15: gap=0.16%, cost=7.6926, optimal=7.6803, time=74.3s
+[INFO]   Instance 16: gap=0.59%, cost=7.9854, optimal=7.9384, time=74.7s
+[INFO]   Instance 17: gap=0.63%, cost=8.0250, optimal=7.9748, time=75.3s
+[INFO]   Instance 18: gap=1.06%, cost=7.4836, optimal=7.4052, time=75.3s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=75.5s
+[INFO]   Trial 44 completed:
+[INFO]     Mean gap: 0.3914%
+[INFO]     Std gap: 0.3283%
+[INFO]     Total time: 1498.42s
+[INFO] ================================================================================
+[I 2025-11-17 13:53:02,167] Trial 43 finished with value: 0.39143089136925213 and parameters: {'jade_c': 0.2190662092132231, 'jade_num_diff_vectors': 1}. Best is trial 40 with value: 0.317447720122922.
+[INFO] ================================================================================
+[INFO] Trial 45 started
+[INFO]   Parameters: jade_c=0.287858, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.01%, cost=7.8053, optimal=7.8049, time=75.5s
+[INFO]   Instance 1: gap=0.02%, cost=8.1101, optimal=8.1083, time=75.4s
+[INFO]   Instance 2: gap=0.55%, cost=7.8273, optimal=7.7849, time=75.4s
+[INFO]   Instance 3: gap=0.83%, cost=7.8749, optimal=7.8098, time=75.5s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=75.5s
+[INFO]   Instance 5: gap=0.21%, cost=8.0490, optimal=8.0319, time=75.5s
+[INFO]   Instance 6: gap=0.18%, cost=7.7257, optimal=7.7118, time=75.5s
+[INFO]   Instance 7: gap=0.55%, cost=8.0356, optimal=7.9915, time=74.4s
+[INFO]   Instance 8: gap=0.95%, cost=7.8991, optimal=7.8250, time=74.3s
+[INFO]   Instance 9: gap=0.09%, cost=7.8569, optimal=7.8495, time=74.2s
+[INFO]   Instance 10: gap=0.29%, cost=7.6661, optimal=7.6443, time=74.2s
+[INFO]   Instance 11: gap=0.34%, cost=7.9371, optimal=7.9105, time=74.7s
+[INFO]   Instance 12: gap=0.00%, cost=7.5982, optimal=7.5979, time=75.5s
+[INFO]   Instance 13: gap=0.39%, cost=7.8257, optimal=7.7950, time=74.6s
+[INFO]   Instance 14: gap=0.74%, cost=7.8455, optimal=7.7877, time=74.5s
+[INFO]   Instance 15: gap=0.01%, cost=7.6807, optimal=7.6803, time=74.8s
+[INFO]   Instance 16: gap=0.34%, cost=7.9654, optimal=7.9384, time=74.3s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=74.2s
+[INFO]   Instance 18: gap=1.26%, cost=7.4984, optimal=7.4052, time=75.0s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=75.4s
+[INFO]   Trial 45 completed:
+[INFO]     Mean gap: 0.3821%
+[INFO]     Std gap: 0.3527%
+[INFO]     Total time: 1498.20s
+[INFO] ================================================================================
+[I 2025-11-17 14:18:00,429] Trial 44 finished with value: 0.38214227793231803 and parameters: {'jade_c': 0.28785787406707547, 'jade_num_diff_vectors': 1}. Best is trial 40 with value: 0.317447720122922.
+[INFO] ================================================================================
+[INFO] Trial 46 started
+[INFO]   Parameters: jade_c=0.353801, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.01%, cost=7.8053, optimal=7.8049, time=74.8s
+[INFO]   Instance 1: gap=0.02%, cost=8.1101, optimal=8.1083, time=75.3s
+[INFO]   Instance 2: gap=0.84%, cost=7.8504, optimal=7.7849, time=74.2s
+[INFO]   Instance 3: gap=0.38%, cost=7.8394, optimal=7.8098, time=74.2s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=74.2s
+[INFO]   Instance 5: gap=0.21%, cost=8.0490, optimal=8.0319, time=74.2s
+[INFO]   Instance 6: gap=0.02%, cost=7.7131, optimal=7.7118, time=74.2s
+[INFO]   Instance 7: gap=0.55%, cost=8.0356, optimal=7.9915, time=74.2s
+[INFO]   Instance 8: gap=0.45%, cost=7.8601, optimal=7.8250, time=74.4s
+[INFO]   Instance 9: gap=0.09%, cost=7.8568, optimal=7.8495, time=74.2s
+[INFO]   Instance 10: gap=1.09%, cost=7.7276, optimal=7.6443, time=74.4s
+[INFO]   Instance 11: gap=0.29%, cost=7.9333, optimal=7.9105, time=75.5s
+[INFO]   Instance 12: gap=0.01%, cost=7.5990, optimal=7.5979, time=75.4s
+[INFO]   Instance 13: gap=0.39%, cost=7.8257, optimal=7.7950, time=75.5s
+[INFO]   Instance 14: gap=0.69%, cost=7.8411, optimal=7.7877, time=74.5s
+[INFO]   Instance 15: gap=0.01%, cost=7.6807, optimal=7.6803, time=74.1s
+[INFO]   Instance 16: gap=0.49%, cost=7.9777, optimal=7.9384, time=74.2s
+[INFO]   Instance 17: gap=0.50%, cost=8.0145, optimal=7.9748, time=74.6s
+[INFO]   Instance 18: gap=1.17%, cost=7.4920, optimal=7.4052, time=75.5s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=75.4s
+[INFO]   Trial 46 completed:
+[INFO]     Mean gap: 0.3698%
+[INFO]     Std gap: 0.3517%
+[INFO]     Total time: 1492.94s
+[INFO] ================================================================================
+[I 2025-11-17 14:42:53,431] Trial 45 finished with value: 0.3698277459997079 and parameters: {'jade_c': 0.3538012885946016, 'jade_num_diff_vectors': 1}. Best is trial 40 with value: 0.317447720122922.
+[INFO] ================================================================================
+[INFO] Trial 47 started
+[INFO]   Parameters: jade_c=0.021239, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.28%, cost=7.8269, optimal=7.8049, time=75.4s
+[INFO]   Instance 1: gap=0.03%, cost=8.1110, optimal=8.1083, time=74.2s
+[INFO]   Instance 2: gap=0.70%, cost=7.8393, optimal=7.7849, time=75.0s
+[INFO]   Instance 3: gap=0.38%, cost=7.8396, optimal=7.8098, time=75.5s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=75.5s
+[INFO]   Instance 5: gap=0.16%, cost=8.0444, optimal=8.0319, time=75.5s
+[INFO]   Instance 6: gap=0.18%, cost=7.7258, optimal=7.7118, time=75.5s
+[INFO]   Instance 7: gap=0.67%, cost=8.0454, optimal=7.9915, time=75.1s
+[INFO]   Instance 8: gap=0.95%, cost=7.8991, optimal=7.8250, time=75.5s
+[INFO]   Instance 9: gap=0.09%, cost=7.8569, optimal=7.8495, time=75.5s
+[INFO]   Instance 10: gap=0.71%, cost=7.6985, optimal=7.6443, time=75.5s
+[INFO]   Instance 11: gap=0.34%, cost=7.9371, optimal=7.9105, time=75.5s
+[INFO]   Instance 12: gap=0.09%, cost=7.6044, optimal=7.5979, time=75.5s
+[INFO]   Instance 13: gap=0.37%, cost=7.8239, optimal=7.7950, time=75.5s
+[INFO]   Instance 14: gap=0.16%, cost=7.8003, optimal=7.7877, time=74.5s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=74.2s
+[INFO]   Instance 16: gap=0.59%, cost=7.9854, optimal=7.9384, time=74.2s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=74.2s
+[INFO]   Instance 18: gap=0.53%, cost=7.4447, optimal=7.4052, time=74.2s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=74.2s
+[INFO]   Trial 47 completed:
+[INFO]     Mean gap: 0.3562%
+[INFO]     Std gap: 0.2778%
+[INFO]     Total time: 1500.03s
+[INFO] ================================================================================
+[I 2025-11-17 15:07:53,525] Trial 46 finished with value: 0.3562405135501956 and parameters: {'jade_c': 0.021238842485665356, 'jade_num_diff_vectors': 1}. Best is trial 40 with value: 0.317447720122922.
+[INFO] ================================================================================
+[INFO] Trial 48 started
+[INFO]   Parameters: jade_c=0.010971, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.17%, cost=7.8182, optimal=7.8049, time=75.3s
+[INFO]   Instance 1: gap=0.03%, cost=8.1110, optimal=8.1083, time=75.5s
+[INFO]   Instance 2: gap=0.66%, cost=7.8365, optimal=7.7849, time=75.5s
+[INFO]   Instance 3: gap=0.51%, cost=7.8497, optimal=7.8098, time=75.4s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=74.4s
+[INFO]   Instance 5: gap=0.21%, cost=8.0490, optimal=8.0319, time=74.2s
+[INFO]   Instance 6: gap=0.18%, cost=7.7257, optimal=7.7118, time=74.2s
+[INFO]   Instance 7: gap=0.67%, cost=8.0454, optimal=7.9915, time=74.2s
+[INFO]   Instance 8: gap=0.88%, cost=7.8939, optimal=7.8250, time=74.2s
+[INFO]   Instance 9: gap=0.09%, cost=7.8568, optimal=7.8495, time=74.2s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=74.2s
+[INFO]   Instance 11: gap=0.34%, cost=7.9371, optimal=7.9105, time=74.2s
+[INFO]   Instance 12: gap=0.09%, cost=7.6044, optimal=7.5979, time=74.2s
+[INFO]   Instance 13: gap=0.39%, cost=7.8257, optimal=7.7950, time=74.2s
+[INFO]   Instance 14: gap=0.36%, cost=7.8158, optimal=7.7877, time=74.2s
+[INFO]   Instance 15: gap=0.16%, cost=7.6926, optimal=7.6803, time=74.2s
+[INFO]   Instance 16: gap=0.36%, cost=7.9669, optimal=7.9384, time=74.2s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=74.2s
+[INFO]   Instance 18: gap=1.24%, cost=7.4973, optimal=7.4052, time=74.3s
+[INFO]   Instance 19: gap=1.46%, cost=7.6360, optimal=7.5263, time=74.2s
+[INFO]   Trial 48 completed:
+[INFO]     Mean gap: 0.4724%
+[INFO]     Std gap: 0.3808%
+[INFO]     Total time: 1489.29s
+[INFO] ================================================================================
+[I 2025-11-17 15:32:42,877] Trial 47 finished with value: 0.47239594005135555 and parameters: {'jade_c': 0.010971416347413136, 'jade_num_diff_vectors': 1}. Best is trial 40 with value: 0.317447720122922.
+[INFO] ================================================================================
+[INFO] Trial 49 started
+[INFO]   Parameters: jade_c=0.017720, jade_num_diff_vectors=2
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.52%, cost=7.8457, optimal=7.8049, time=74.2s
+[INFO]   Instance 1: gap=0.33%, cost=8.1348, optimal=8.1083, time=74.3s
+[INFO]   Instance 2: gap=0.96%, cost=7.8597, optimal=7.7849, time=74.3s
+[INFO]   Instance 3: gap=0.56%, cost=7.8534, optimal=7.8098, time=74.3s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=74.3s
+[INFO]   Instance 5: gap=0.33%, cost=8.0585, optimal=8.0319, time=74.3s
+[INFO]   Instance 6: gap=0.21%, cost=7.7278, optimal=7.7118, time=74.2s
+[INFO]   Instance 7: gap=0.67%, cost=8.0454, optimal=7.9915, time=74.2s
+[INFO]   Instance 8: gap=1.18%, cost=7.9173, optimal=7.8250, time=74.3s
+[INFO]   Instance 9: gap=0.16%, cost=7.8618, optimal=7.8495, time=75.4s
+[INFO]   Instance 10: gap=0.45%, cost=7.6784, optimal=7.6443, time=75.3s
+[INFO]   Instance 11: gap=0.56%, cost=7.9548, optimal=7.9105, time=75.5s
+[INFO]   Instance 12: gap=0.09%, cost=7.6044, optimal=7.5979, time=74.9s
+[INFO]   Instance 13: gap=0.39%, cost=7.8257, optimal=7.7950, time=74.2s
+[INFO]   Instance 14: gap=0.38%, cost=7.8170, optimal=7.7877, time=74.3s
+[INFO]   Instance 15: gap=0.04%, cost=7.6830, optimal=7.6803, time=74.2s
+[INFO]   Instance 16: gap=0.87%, cost=8.0078, optimal=7.9384, time=74.3s
+[INFO]   Instance 17: gap=0.92%, cost=8.0482, optimal=7.9748, time=74.2s
+[INFO]   Instance 18: gap=0.89%, cost=7.4709, optimal=7.4052, time=74.3s
+[INFO]   Instance 19: gap=0.29%, cost=7.5483, optimal=7.5263, time=74.2s
+[INFO]   Trial 49 completed:
+[INFO]     Mean gap: 0.4986%
+[INFO]     Std gap: 0.3164%
+[INFO]     Total time: 1489.06s
+[INFO] ================================================================================
+[I 2025-11-17 15:57:31,994] Trial 48 finished with value: 0.49864494098917245 and parameters: {'jade_c': 0.017720492383304573, 'jade_num_diff_vectors': 2}. Best is trial 40 with value: 0.317447720122922.
+[INFO] ================================================================================
+[INFO] Trial 50 started
+[INFO]   Parameters: jade_c=0.038573, jade_num_diff_vectors=1
+[INFO]   Using all 20 instances for tuning
+[INFO]   Instance 0: gap=0.04%, cost=7.8080, optimal=7.8049, time=75.0s
+[INFO]   Instance 1: gap=0.03%, cost=8.1110, optimal=8.1083, time=74.2s
+[INFO]   Instance 2: gap=0.59%, cost=7.8306, optimal=7.7849, time=74.2s
+[INFO]   Instance 3: gap=0.57%, cost=7.8543, optimal=7.8098, time=74.2s
+[INFO]   Instance 4: gap=0.18%, cost=7.4368, optimal=7.4232, time=74.2s
+[INFO]   Instance 5: gap=0.18%, cost=8.0467, optimal=8.0319, time=74.2s
+[INFO]   Instance 6: gap=0.19%, cost=7.7266, optimal=7.7118, time=74.4s
+[INFO]   Instance 7: gap=0.63%, cost=8.0422, optimal=7.9915, time=75.4s
+[INFO]   Instance 8: gap=1.08%, cost=7.9092, optimal=7.8250, time=75.4s
+[INFO]   Instance 9: gap=0.09%, cost=7.8568, optimal=7.8495, time=75.4s
+[INFO]   Instance 10: gap=0.75%, cost=7.7014, optimal=7.6443, time=75.4s
+[INFO]   Instance 11: gap=0.34%, cost=7.9371, optimal=7.9105, time=74.8s
+[INFO]   Instance 12: gap=0.09%, cost=7.6044, optimal=7.5979, time=74.2s
+[INFO]   Instance 13: gap=0.49%, cost=7.8334, optimal=7.7950, time=75.3s
+[INFO]   Instance 14: gap=0.42%, cost=7.8204, optimal=7.7877, time=75.5s
+[INFO]   Instance 15: gap=0.00%, cost=7.6803, optimal=7.6803, time=75.3s
+[INFO]   Instance 16: gap=0.36%, cost=7.9669, optimal=7.9384, time=74.8s
+[INFO]   Instance 17: gap=0.70%, cost=8.0307, optimal=7.9748, time=75.5s
+[INFO]   Instance 18: gap=1.25%, cost=7.4976, optimal=7.4052, time=75.5s
+[INFO]   Instance 19: gap=0.00%, cost=7.5263, optimal=7.5263, time=75.4s
+[INFO]   Trial 50 completed:
+[INFO]     Mean gap: 0.3991%
+[INFO]     Std gap: 0.3488%
+[INFO]     Total time: 1498.34s
+[INFO] ================================================================================
+[I 2025-11-17 16:22:30,393] Trial 49 finished with value: 0.3990970186943732 and parameters: {'jade_c': 0.038572788214370685, 'jade_num_diff_vectors': 1}. Best is trial 40 with value: 0.317447720122922.
+[INFO] 
+[INFO] ================================================================================
+[INFO] OPTIMIZATION COMPLETED
+[INFO] ================================================================================
+[INFO] Total time: 74584.88s (1243.1 minutes)
+[INFO] Trials completed: 50
+[INFO] 
+[INFO] BEST PARAMETERS:
+[INFO]   jade_c: 0.295202
+[INFO]   jade_num_diff_vectors: 1
+[INFO]   Best mean gap: 0.3174%
+[INFO] 
+[INFO] Best parameters saved to: /home/superior/vini/ml_project/CVAE-Opt/runs/optuna_tune_16.11.2025_19-39-24/best_jade_params.json
+[INFO] 
+[INFO] Generating optimization visualizations...
+[INFO] Visualizations skipped (requires Chrome/Chromium for image export)
+[INFO] 
+[INFO] ================================================================================
+[INFO] NEXT STEPS:
+[INFO] 
+[INFO] To use the optimized parameters, run:
+[INFO]   uv run python search.py \
+[INFO]     --optimizer evox_jade \
+[INFO]     --jade_c 0.295202 \
+[INFO]     --jade_num_diff_vectors 1 \
+[INFO]     --model_path models/tsp_100_model_63108.pt \
+[INFO]     --instances_path instances/tsp/test/tsp100_20inst_w_optimal.pkl \
+[INFO]     --batch_sizes 600 \
+[INFO]     --save_plots
+[INFO] 
+[INFO] ================================================================================
