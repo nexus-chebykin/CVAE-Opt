@@ -504,10 +504,8 @@ class TransformerDecoder(nn.Module):
         # graph_emb: [batch, problem_size, embedding_dim]
         # node_idx: [batch, n]
         batch_size = node_idx.size(0)
-        n = node_idx.size(1)
         embedding_dim = graph_emb.size(2)
-
-        gathering_index = node_idx[:, :, None].expand(batch_size, n, embedding_dim)
+        gathering_index = node_idx[:, :, None].expand(batch_size, 1, embedding_dim)
         picked_nodes = graph_emb.gather(dim=1, index=gathering_index)
 
         return picked_nodes
@@ -565,25 +563,24 @@ class TransformerBasedDecoder(nn.Module):
         num_layers: int = 3
         num_heads: int = 8
         model_size: int = 128
-        expand_factor: int = 4
+        expand_factor: int = 1
 
         self.num_layers = num_layers
 
-        # Transformer layers
+        #Transformer layers
         self.layers = nn.ModuleList()
         for i in range(num_layers):
             layer = nn.ModuleDict({
-                'mha': nn.MultiheadAttention(embed_dim=model_size, num_heads=num_heads, dropout=0.0, batch_first=True),
-                'norm1': nn.LayerNorm(model_size),
+                'mha': nn.MultiheadAttention(embed_dim=model_size, num_heads=num_heads, dropout=0.2, batch_first=True),
                 'mlp': nn.Sequential(
                     nn.Linear(model_size, expand_factor * model_size),
-                    nn.ReLU(),
+                    nn.GELU(),
                     nn.Linear(expand_factor * model_size, model_size),
-                ),
-                'norm2': nn.LayerNorm(model_size),
+                )
             })
             self.layers.append(layer)
 
+        self._init_weights()
 
         self.transformer_decoder = TransformerDecoder(
             embedding_dim=model_size,
@@ -591,18 +588,40 @@ class TransformerBasedDecoder(nn.Module):
             latent_dim=search_space_size
         )
 
-        # cost_input_dim = model_size + search_space_size
-        # self.cost_predictor = nn.Sequential(
-        #     nn.Linear(cost_input_dim, 256),
-        #     nn.ReLU(),
-        #     nn.Linear(256, 128),
-        #     nn.ReLU(),
-        #     nn.Linear(128, 64),
-        #     nn.ReLU(),
-        #     nn.Linear(64, 1)  # Single output: predicted optimal cost
-        # )
+        cost_input_dim = model_size + search_space_size
+        self.cost_predictor = nn.Sequential(
+            nn.Linear(cost_input_dim, 256),
+            nn.ReLU(),
+            nn.Linear(256, 128),
+            nn.ReLU(),
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.Linear(64, 1)
+        )
 
-    def forward(self, instance, solution, Z, instance_hidden, config, teacher_forcing):
+    def _print_grad(self, name):
+        """Helper to print gradient stats during backward pass"""
+        def hook(grad):
+            if grad is None:
+                print(f"{name}: Gradient is None")
+                return
+            norm = grad.norm().item()
+            mean = grad.abs().mean().item()
+            has_nan = torch.isnan(grad).any().item()
+            print(f"{name} | Norm: {norm:.4f} | Mean: {mean:.4f} | Has NaN: {has_nan}")
+        return hook
+
+    def _init_weights(self):
+        """Initialize weights with smaller values to prevent gradient issues"""
+        for layer in self.layers:
+            # Scale down MLP weights
+            for module in layer['mlp']:
+                if isinstance(module, nn.Linear):
+                    nn.init.xavier_uniform_(module.weight, gain=0.1)  # Small gain
+                    if module.bias is not None:
+                        nn.init.zeros_(module.bias)
+
+    def forward(self, instance, solution, Z, instance_hidden, config, teacher_forcing, pred_cost = True):
         """
         Maintains compatibility with existing interface but uses transformer internally.
         """
@@ -612,18 +631,32 @@ class TransformerBasedDecoder(nn.Module):
 
         graph_emb = instance_hidden
 
+        # if graph_emb.requires_grad:
+        #     graph_emb.retain_grad()  # Required for intermediate tensors
+        #     graph_emb.register_hook(self._print_grad("GRAD BEFORE Layers (Input)"))
+
         for layer in self.layers:
             # Multi-head attention with residual
             attn_out, _ = layer['mha'](graph_emb, graph_emb, graph_emb)
-            graph_emb = layer['norm1'](graph_emb + attn_out)
+            graph_emb = graph_emb + 0.1*attn_out
 
             # Feed-forward network with residual
             mlp_out = layer['mlp'](graph_emb)
-            graph_emb = layer['norm2'](graph_emb + mlp_out)
+            graph_emb = graph_emb + 0.1*mlp_out
+        #
+        # if graph_emb.requires_grad:
+        #     graph_emb.retain_grad() # Required because graph_emb was overwritten
+        #     graph_emb.register_hook(self._print_grad("GRAD AFTER Layers (Output)"))
+
+
+        if pred_cost:
+            p_cost= self.cost_predictor(torch.cat((graph_emb.mean(dim=1), Z), 1))
+        else :
+            p_cost = None
+
 
 
         tour_idx, tour_logp, tour_prob = [solution[:, [0]]], [], []
-
 
         # Create mask for visited cities
         mask = torch.ones(batch_size, sequence_size, device=config.device)
@@ -641,8 +674,9 @@ class TransformerBasedDecoder(nn.Module):
             # Get logits for next city using transformer
             logits = self.transformer_decoder(graph_emb, current_tour, Z)
 
-            # Apply mask and get probabilities
-            probs = F.softmax(logits + mask.log(), dim=1)
+
+            probs = F.softmax(logits.masked_fill(mask == 0, -1e9), dim=1)
+
 
             if teacher_forcing:
                 # Use ground truth
@@ -665,7 +699,7 @@ class TransformerBasedDecoder(nn.Module):
         tour_idx = torch.cat(tour_idx, dim=1)
         tour_logp = torch.cat(tour_logp, dim=1)
 
-        return None, tour_idx, tour_logp
+        return None, tour_idx, tour_logp, p_cost
 
 class VAE_8(nn.Module):
     def __init__(self, config):
@@ -688,7 +722,9 @@ class VAE_8(nn.Module):
 
         self.encoder = TransEncoder(config.search_space_size)
         self.decoder = TransformerBasedDecoder(self.instance_embedding, config.search_space_size, mask_fn, update_fn)
-
+        # self.encoder = Encoder(self.instance_embedding, reference_embedding, encoder_attn, rnn, update_fn,
+        #                        config.search_space_size, hidden_size)
+        #
         # self.decoder = Decoder(self.instance_embedding, reference_embedding, encoder_attn, rnn, hidden_size,
         #                        config.search_space_size, mask_fn, update_fn)
 
@@ -702,18 +738,19 @@ class VAE_8(nn.Module):
     def forward(self, instance, solution_1, solution_2, config):
         instance_hidden = self.instance_embedding(instance)
         output_e = self.encoder(instance_hidden, solution_1)
+        #output_e = self.encoder(instance, solution_1, instance_hidden, config)
 
         Z, mu, log_var = output_e
 
-        output_prob, tour_idx, tour_logp = self.decoder(instance, solution_2, Z, instance_hidden, config,
+        output_prob, tour_idx, tour_logp, pred_costs = self.decoder(instance, solution_2, Z, instance_hidden, config,
                                                         True)
-        return output_prob, mu, log_var, Z, tour_idx, tour_logp
+        return output_prob, mu, log_var, Z, tour_idx, tour_logp, pred_costs
 
     def decode(self, instance, Z, config):
         if self.instance_hidden is None:
             self.instance_hidden = self.instance_embedding(instance)
-        output_prob, tour_idx, tour_logp = self.decoder(instance, self.dummy_solution, Z, self.instance_hidden, config,
-                                                        False)
+        output_prob, tour_idx, tour_logp, pred_costs = self.decoder(instance, self.dummy_solution, Z, self.instance_hidden, config,
+                                                        False, False)
         return output_prob, tour_idx, tour_logp
 
     def reset_decoder(self, batch_size, config):
