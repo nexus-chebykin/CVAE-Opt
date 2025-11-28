@@ -41,19 +41,29 @@ def get_config(args=None):
 
     # Optimizer selection
     parser.add_argument('--optimizer', type=str, default='de',
-                        choices=['de', 'cmaes', 'ipop_cmaes', 'bipop_cmaes', 'scipy_de', 'evox_jade', 'pygmo_pso_gen', 'evox_shade', 'evox_sade', 'evox_code', 'evox_ode', 'ngopt'],
-                        help='Optimizer to use: "de" (Differential Evolution), "cmaes" (CMA-ES), '
+                        choices=['de', 'de_vectorized', 'de_on_steroids', 'cmaes', 'ipop_cmaes', 'bipop_cmaes', 'scipy_de', 'evox_jade', 'pygmo_pso_gen', 'evox_shade', 'evox_sade', 'evox_code', 'evox_ode', 'ngopt', 'sobol_search'],
+                        help='Optimizer to use: "de" (Differential Evolution), "de_vectorized" (Vectorized DE), '
+                             '"de_on_steroids" (DE with multiple strategies), "cmaes" (CMA-ES), '
                              '"ipop_cmaes" (IPOP-CMA-ES), "bipop_cmaes" (BIPOP-CMA-ES), '
                              '"scipy_de" (SciPy DE with adaptive dithering), "evox_jade" (EvoX JADE), '
                              '"pygmo_pso_gen" (Pygmo PSO Generational), "evox_shade" (EvoX SHADE), '
                              '"evox_sade" (EvoX SaDE), "evox_code" (EvoX CoDE), "evox_ode" (EvoX ODE), '
-                             'or "ngopt" (Nevergrad NGOpt)')
+                             '"ngopt" (Nevergrad NGOpt), or "sobol_search" (Sobol quasi-random search)')
 
     # Differential Evolution parameters
     parser.add_argument('--de_mutate', default=0.3, type=float,
                         help='Mutation factor F for DE (default: 0.3)')
     parser.add_argument('--de_recombine', default=0.95, type=float,
                         help='Crossover rate CR for DE (default: 0.95)')
+
+    # DE on Steroids parameters
+    parser.add_argument('--steroids_strategy', default='rand1bin', type=str,
+                        choices=['rand1bin', 'rand2bin', 'best1bin', 'best2bin', 'currenttobest1bin', 'randtobest1bin'],
+                        help='Mutation strategy for DE on Steroids (default: rand1bin)')
+    parser.add_argument('--steroids_mutate', default=0.232165, type=float,
+                        help='Mutation factor F for DE on Steroids (default: 0.232165)')
+    parser.add_argument('--steroids_recombine', default=0.875693, type=float,
+                        help='Crossover rate CR for DE on Steroids (default: 0.875693)')
 
     # Scipy DE parameters
     parser.add_argument('--scipy_strategy', default='best1bin', type=str,
@@ -142,10 +152,18 @@ def get_config(args=None):
     parser.add_argument('--code_replace', default=True, action='store_true',
                         help='Enable replace mode for CoDE (default: True)')
 
+    # Sobol Search parameters
+    parser.add_argument('--sobol_scramble', default=True, action='store_true',
+                        help='Use Owen scrambling for Sobol sequences (improves high-dimensional performance, default: True)')
+
     # Optimizer comparison
     parser.add_argument('--compare_optimizers', default=False, action='store_true',
                         help='Compare all optimizers (DE, CMA-ES, IPOP-CMA-ES, BIPOP-CMA-ES, Pygmo-DE) with the same batch size. '
                              'Requires exactly one batch size.')
+    parser.add_argument('--compare_optimizer_list', type=str, default=None,
+                        help='Comma-separated list of optimizers to compare (e.g., "de,jade"). '
+                             'Available: de, de_vectorized, de_steroids, cmaes, ipop_cmaes, bipop_cmaes, scipy_de, jade, shade, sade, code, ode, sobol. '
+                             'If not specified, compares all optimizers. Requires --compare_optimizers.')
 
     # Initialization strategy
     parser.add_argument('--use_lhs_init', default=False, action='store_true',
@@ -173,6 +191,11 @@ def get_config(args=None):
             parser.error("--compare_optimizers requires exactly one batch size (use --batch_sizes 600)")
         if config.cmaes_sigma_sweep is not None:
             parser.error("--compare_optimizers cannot be used with --cmaes_sigma_sweep")
+
+    # Validate optimizer list selection
+    if config.compare_optimizer_list is not None:
+        if not config.compare_optimizers:
+            parser.error("--compare_optimizer_list requires --compare_optimizers")
 
     # Validate stopping criteria mode
     if config.stopping_criteria == 'time_of_de':
