@@ -124,6 +124,37 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             maxevaluations=maxevaluations,
             seed=config.seed
         )
+    elif config.optimizer == 'de_vectorized':
+        from de_vectorized import minimize
+        result_cost, result_tour, convergence_history, time_history, timing_breakdown = minimize(
+            decode,
+            (model, config, instance, cost_fn),
+            config.search_space_bound,
+            config.search_space_size,
+            popsize=batch_size,
+            mutate=config.de_mutate,
+            recombination=config.de_recombine,
+            maxiter=maxiter,
+            maxtime=maxtime,
+            maxevaluations=maxevaluations,
+            seed=config.seed
+        )
+    elif config.optimizer == 'de_on_steroids':
+        from de_on_steroids import minimize
+        result_cost, result_tour, convergence_history, time_history, timing_breakdown = minimize(
+            decode,
+            (model, config, instance, cost_fn),
+            config.search_space_bound,
+            config.search_space_size,
+            popsize=batch_size,
+            mutate=config.steroids_mutate,
+            recombination=config.steroids_recombine,
+            maxiter=maxiter,
+            maxtime=maxtime,
+            maxevaluations=maxevaluations,
+            seed=config.seed,
+            strategy=config.steroids_strategy
+        )
     elif config.optimizer == 'cmaes':
         from cmaes import minimize
         # Use provided sigma0 or fall back to config value
@@ -333,6 +364,22 @@ def solve_instance(model, instance, config, cost_fn, batch_size, sigma0=None,
             use_lhs=True,  # NGOpt always uses LHS for better initialization
             seed=config.seed
         )
+    elif config.optimizer == 'sobol_search':
+        from sobol_search import minimize
+        result_cost, result_tour, convergence_history, time_history, timing_breakdown = minimize(
+            decode,
+            (model, config, instance, cost_fn),
+            config.search_space_bound,
+            config.search_space_size,
+            popsize=batch_size,
+            mutate=config.de_mutate,  # Dummy parameter for interface compatibility
+            recombination=config.de_recombine,  # Dummy parameter for interface compatibility
+            maxiter=maxiter,
+            maxtime=maxtime,
+            maxevaluations=maxevaluations,
+            scramble=config.sobol_scramble,
+            seed=config.seed
+        )
     else:
         raise ValueError(f"Unknown optimizer: {config.optimizer}")
 
@@ -440,52 +487,53 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
     if optimizer_comparison_mode:
         # Optimizer comparison mode: run all optimizers with fixed batch size
         fixed_batch_size = config.batch_sizes[0]
-        logging.info(f"Running optimizer comparison mode with batch size {fixed_batch_size}")
-        logging.info(f"Comparing: DE, CMA-ES, IPOP-CMA-ES, BIPOP-CMA-ES, Scipy-DE, EvoX-JADE, EvoX-SHADE, EvoX-SaDE, EvoX-CoDE, EvoX-ODE (sigma={config.cmaes_sigma0})")
 
-        # Store results for each optimizer
-        all_results = {'DE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
-                              'ask_times': [], 'eval_times': [], 'tell_times': [],
-                              'instance_ids': [], 'optimal_values': []},
-                       'CMA-ES': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
-                                  'ask_times': [], 'eval_times': [], 'tell_times': [],
-                                  'instance_ids': [], 'optimal_values': []},
-                       'IPOP-CMA-ES': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
-                                       'ask_times': [], 'eval_times': [], 'tell_times': [],
-                                       'instance_ids': [], 'optimal_values': []},
-                       'BIPOP-CMA-ES': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
-                                        'ask_times': [], 'eval_times': [], 'tell_times': [],
-                                        'instance_ids': [], 'optimal_values': []},
-                       'Scipy-DE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
-                                    'ask_times': [], 'eval_times': [], 'tell_times': [],
-                                    'instance_ids': [], 'optimal_values': []},
-                       'EvoX-JADE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
-                                     'ask_times': [], 'eval_times': [], 'tell_times': [],
-                                     'instance_ids': [], 'optimal_values': []},
-                       'EvoX-SHADE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
-                                      'ask_times': [], 'eval_times': [], 'tell_times': [],
-                                      'instance_ids': [], 'optimal_values': []},
-                       'EvoX-SaDE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
-                                     'ask_times': [], 'eval_times': [], 'tell_times': [],
-                                     'instance_ids': [], 'optimal_values': []},
-                       'EvoX-CoDE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
-                                     'ask_times': [], 'eval_times': [], 'tell_times': [],
-                                     'instance_ids': [], 'optimal_values': []},
-                       'EvoX-ODE': {'gap_values': [], 'cost_values': [], 'runtime_values': [],
-                                    'ask_times': [], 'eval_times': [], 'tell_times': [],
-                                    'instance_ids': [], 'optimal_values': []}}
+        # Define mapping from short names to display names
+        optimizer_name_mapping = {
+            'de': 'DE',
+            'de_vectorized': 'DE-Vectorized',
+            'de_steroids': 'DE-Steroids',
+            'cmaes': 'CMA-ES',
+            'ipop_cmaes': 'IPOP-CMA-ES',
+            'bipop_cmaes': 'BIPOP-CMA-ES',
+            'scipy_de': 'Scipy-DE',
+            'jade': 'EvoX-JADE',
+            'shade': 'EvoX-SHADE',
+            'sade': 'EvoX-SaDE',
+            'code': 'EvoX-CoDE',
+            'ode': 'EvoX-ODE',
+            'sobol': 'Sobol-Search'
+        }
+
+        # Determine which optimizers to run
+        if config.compare_optimizer_list is not None:
+            # Parse comma-separated list
+            requested_optimizers = [opt.strip().lower() for opt in config.compare_optimizer_list.split(',')]
+            # Validate optimizer names
+            invalid_optimizers = [opt for opt in requested_optimizers if opt not in optimizer_name_mapping]
+            if invalid_optimizers:
+                raise ValueError(f"Invalid optimizer names: {invalid_optimizers}. "
+                                f"Available: {', '.join(optimizer_name_mapping.keys())}")
+            # Map to display names
+            optimizers_to_run = [optimizer_name_mapping[opt] for opt in requested_optimizers]
+        else:
+            # Default: run all optimizers
+            optimizers_to_run = ['DE', 'DE-Vectorized', 'DE-Steroids', 'CMA-ES', 'IPOP-CMA-ES',
+                                 'BIPOP-CMA-ES', 'Scipy-DE', 'EvoX-JADE', 'EvoX-SHADE', 'EvoX-SaDE',
+                                 'EvoX-CoDE', 'EvoX-ODE', 'Sobol-Search']
+
+        logging.info(f"Running optimizer comparison mode with batch size {fixed_batch_size}")
+        logging.info(f"Comparing: {', '.join(optimizers_to_run)}")
+
+        # Store results for each optimizer (dynamic based on selected optimizers)
+        all_results = {opt_name: {'gap_values': [], 'cost_values': [], 'runtime_values': [],
+                                   'ask_times': [], 'eval_times': [], 'tell_times': [],
+                                   'instance_ids': [], 'optimal_values': []}
+                       for opt_name in optimizers_to_run}
 
         # Accumulator for averaging convergence data across instances
-        all_instances_data = {'DE': {'convergence': [], 'time': []},
-                              'CMA-ES': {'convergence': [], 'time': []},
-                              'IPOP-CMA-ES': {'convergence': [], 'time': []},
-                              'BIPOP-CMA-ES': {'convergence': [], 'time': []},
-                              'Scipy-DE': {'convergence': [], 'time': []},
-                              'EvoX-JADE': {'convergence': [], 'time': []},
-                              'EvoX-SHADE': {'convergence': [], 'time': []},
-                              'EvoX-SaDE': {'convergence': [], 'time': []},
-                              'EvoX-CoDE': {'convergence': [], 'time': []},
-                              'EvoX-ODE': {'convergence': [], 'time': []}}
+        all_instances_data = {opt_name: {'convergence': [], 'time': []}
+                              for opt_name in optimizers_to_run}
     elif sigma_sweep_mode:
         # Sigma sweep mode: loop over sigma values with fixed batch size
         sweep_values = config.cmaes_sigma_sweep
@@ -527,7 +575,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
             else:
                 optimal_value = None
 
-            for optimizer_name in ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES', 'Scipy-DE', 'EvoX-JADE', 'EvoX-SHADE', 'EvoX-SaDE', 'EvoX-CoDE', 'EvoX-ODE']:
+            for optimizer_name in optimizers_to_run:
                 logging.info(f"  Optimizer: {optimizer_name}")
                 start_time = time.time()
 
@@ -535,6 +583,10 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 original_optimizer = config.optimizer
                 if optimizer_name == 'DE':
                     config.optimizer = 'de'
+                elif optimizer_name == 'DE-Vectorized':
+                    config.optimizer = 'de_vectorized'
+                elif optimizer_name == 'DE-Steroids':
+                    config.optimizer = 'de_on_steroids'
                 elif optimizer_name == 'CMA-ES':
                     config.optimizer = 'cmaes'
                 elif optimizer_name == 'IPOP-CMA-ES':
@@ -555,6 +607,8 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                     config.optimizer = 'evox_code'
                 elif optimizer_name == 'EvoX-ODE':
                     config.optimizer = 'evox_ode'
+                elif optimizer_name == 'Sobol-Search':
+                    config.optimizer = 'sobol_search'
 
                 # Determine stopping criteria based on mode
                 override_maxiter = None
@@ -729,6 +783,8 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
             # Format optimizer name for display
             optimizer_name_map = {
                 'de': 'DE',
+                'de_vectorized': 'DE-Vectorized',
+                'de_on_steroids': 'DE-Steroids',
                 'cmaes': 'CMA-ES',
                 'ipop_cmaes': 'IPOP-CMA-ES',
                 'bipop_cmaes': 'BIPOP-CMA-ES',
@@ -739,7 +795,8 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 'evox_sade': 'EvoX-SaDE',
                 'evox_code': 'EvoX-CoDE',
                 'evox_ode': 'EvoX-ODE',
-                'ngopt': 'NGOpt'
+                'ngopt': 'NGOpt',
+                'sobol_search': 'Sobol-Search'
             }
             optimizer_name = optimizer_name_map.get(config.optimizer, config.optimizer.upper())
 
@@ -778,7 +835,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
         if optimizer_comparison_mode:
             # Optimizer comparison mode: generate optimizer comparison plots (always, regardless of plot_mode)
             logging.info("Computing averaged convergence data across all instances for optimizer comparison...")
-            averaged_data = compute_averaged_convergence(all_instances_data, ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES', 'Scipy-DE', 'EvoX-JADE', 'EvoX-SHADE', 'EvoX-SaDE', 'EvoX-CoDE', 'EvoX-ODE'], optimal_values)
+            averaged_data = compute_averaged_convergence(all_instances_data, optimizers_to_run, optimal_values)
 
             # Generate optimizer comparison plots
             plot_optimizer_comparison_iterations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size)
@@ -801,6 +858,8 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
             # Format optimizer name for display
             optimizer_name_map = {
                 'de': 'DE',
+                'de_vectorized': 'DE-Vectorized',
+                'de_on_steroids': 'DE-Steroids',
                 'cmaes': 'CMA-ES',
                 'ipop_cmaes': 'IPOP-CMA-ES',
                 'bipop_cmaes': 'BIPOP-CMA-ES',
@@ -811,7 +870,8 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 'evox_sade': 'EvoX-SaDE',
                 'evox_code': 'EvoX-CoDE',
                 'evox_ode': 'EvoX-ODE',
-                'ngopt': 'NGOpt'
+                'ngopt': 'NGOpt',
+                'sobol_search': 'Sobol-Search'
             }
             optimizer_name = optimizer_name_map.get(config.optimizer, config.optimizer.upper())
 
@@ -826,7 +886,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
 
     if optimizer_comparison_mode:
         # Log results for each optimizer
-        for optimizer_name in ['DE', 'CMA-ES', 'IPOP-CMA-ES', 'BIPOP-CMA-ES', 'Scipy-DE', 'EvoX-JADE', 'EvoX-SHADE', 'EvoX-SaDE', 'EvoX-CoDE', 'EvoX-ODE']:
+        for optimizer_name in optimizers_to_run:
             results = all_results[optimizer_name]
             logging.info(f"\n{optimizer_name}:")
             logging.info(f"  Mean cost: {np.mean(results['cost_values']):.4f}")

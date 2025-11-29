@@ -1,40 +1,27 @@
 # ------------------------------------------------------------------------------+
-# Based on the implementation from
-# Nathan A. Rooy
-# A simple, bare bones, implementation of differential evolution with Python
-# August, 2017
+# Vectorized Differential Evolution Implementation
+# Based on the original de.py implementation by Nathan A. Rooy
 #
-# MIT License
+# This version replaces the per-individual loop with fully vectorized numpy
+# operations for improved performance.
 #
-# Copyright (c) 2017 Nathan Rooy
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# MIT License - See de.py for full license text
 # ------------------------------------------------------------------------------+
 
 import numpy as np
 import time
 
+
 def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mutate, recombination, maxiter, maxtime, maxevaluations=None, seed=1234):
+    """
+    Vectorized Differential Evolution optimizer.
+
+    Same interface as de.py but with fully vectorized mutation and crossover
+    operations for improved performance.
+    """
 
     # --- INITIALIZE A POPULATION (step #1) ----------------+
     start_time = time.time()
-    population_cost = np.ones((popsize)) * np.inf
     children = np.zeros((popsize, search_space_size))
     iterations_without_improvement = 0
     gen_best = np.inf
@@ -47,7 +34,7 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
     eval_time_total = 0.0
     tell_time_total = 0.0
 
-    # Set random seed for reproducibility
+    # Set random seed for reproducibility (using legacy MT19937 to match de.py)
     np.random.seed(seed)
 
     population = np.random.uniform(-search_space_bound, search_space_bound,
@@ -61,9 +48,12 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
     eval_time_total += time.time() - eval_start
 
     # Record initial best (iteration 0)
-    gen_best = min(population_cost)
+    gen_best = np.min(population_cost)
     convergence_history.append(gen_best)
     time_history.append(time.time() - start_time)
+
+    # Pre-allocate index array for random selection
+    all_indices = np.arange(popsize)
 
     # --- SOLVE --------------------------------------------+
 
@@ -83,30 +73,40 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
         if maxevaluations is not None and evaluations_done >= maxevaluations:
             break
 
-        # --- ASK: Generate candidate solutions ----------------+
+        # --- ASK: Generate candidate solutions (VECTORIZED) ----------------+
         ask_start = time.time()
 
-        # cycle through each individual in the population
-        for j in range(0, popsize):
-            # --- MUTATION (step #3.A) ---------------------+
+        # Generate random indices for all individuals at once
+        # For each individual j, we need 3 random indices != j
+        # Strategy: generate random indices and shift to avoid self-selection
+        r0 = np.random.randint(0, popsize - 1, size=popsize)
+        r1 = np.random.randint(0, popsize - 2, size=popsize)
+        r2 = np.random.randint(0, popsize - 3, size=popsize)
 
-            # select three random vector index positions [0, popsize), not including current vector (j)
-            candidates = list(range(0, popsize))
-            candidates.remove(j)
-            random_index = np.random.choice(candidates, 3, replace=False)
+        # Adjust indices to avoid selecting self (j) and previously selected indices
+        # For r0: if r0 >= j, increment by 1
+        r0 = np.where(r0 >= all_indices, r0 + 1, r0)
 
-            # subtract x3 from x2, and create a new vector (x_diff)
-            x_diff = population[random_index[1]] - population[random_index[2]]
+        # For r1: avoid j and r0
+        r1 = np.where(r1 >= np.minimum(all_indices, r0), r1 + 1, r1)
+        r1 = np.where(r1 >= np.maximum(all_indices, r0), r1 + 1, r1)
 
-            # multiply x_diff by the mutation factor (F) and add to x_1
-            child = population[random_index[0]] + mutate * x_diff
+        # For r2: avoid j, r0, and r1
+        sorted_exclude = np.sort(np.stack([all_indices, r0, r1], axis=1), axis=1)
+        r2 = np.where(r2 >= sorted_exclude[:, 0], r2 + 1, r2)
+        r2 = np.where(r2 >= sorted_exclude[:, 1], r2 + 1, r2)
+        r2 = np.where(r2 >= sorted_exclude[:, 2], r2 + 1, r2)
 
-            # --- RECOMBINATION (step #3.B) ----------------+
-            crossover = np.random.uniform(0, 1, search_space_size)
-            crossover = crossover > recombination
-            child[crossover] = population[j][crossover]
+        # --- MUTATION (step #3.A) - Vectorized ---------------------+
+        # child = x_r0 + F * (x_r1 - x_r2)
+        x_diff = population[r1] - population[r2]
+        children = population[r0] + mutate * x_diff
 
-            children[j] = child
+        # --- RECOMBINATION (step #3.B) - Vectorized ----------------+
+        # Generate crossover mask for all individuals at once
+        crossover_mask = np.random.uniform(0, 1, (popsize, search_space_size)) > recombination
+        # Where mask is True, keep parent gene; where False, keep mutant gene
+        children = np.where(crossover_mask, population, children)
 
         # Ensure bounds
         children = np.clip(children, -search_space_bound, search_space_bound)
@@ -124,7 +124,7 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
         tell_start = time.time()
 
         iterations_without_improvement += 1
-        if min(population_cost) > min(scores_trial):
+        if np.min(population_cost) > np.min(scores_trial):
             iterations_without_improvement = 0
 
         improvement = population_cost > scores_trial
@@ -134,7 +134,7 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
         tell_time_total += time.time() - tell_start
 
         # --- SCORE KEEPING --------------------------------+
-        gen_best = min(population_cost)  # fitness of best individual
+        gen_best = np.min(population_cost)  # fitness of best individual
         convergence_history.append(gen_best)
         time_history.append(time.time() - start_time)
 
@@ -147,4 +147,3 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
     }
 
     return gen_best, population[np.argmin(population_cost)], convergence_history, time_history, timing_breakdown
-

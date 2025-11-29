@@ -32,6 +32,7 @@
 #   8. bipop      - BIPOP-CMA-ES
 #   9. scipy_de   - SciPy DE
 #   10. jade      - EvoX JADE
+#   11. steroids  - DE on Steroids (6 mutation strategies)
 #
 # Outputs:
 #   - Individual tuning results for each optimizer
@@ -100,6 +101,11 @@ OPTIMIZERS = {
         'script': 'optuna_jade_tune.py',
         'name': 'EvoX JADE',
         'params': ['jade_c', 'jade_num_diff_vectors']
+    },
+    'steroids': {
+        'script': 'optuna_de_steroids_tune.py',
+        'name': 'DE-Steroids',
+        'params': ['strategy', 'mutate', 'recombination']
     }
 }
 
@@ -310,7 +316,7 @@ Examples:
     --n_trials 100 \\
     --resume
 
-Available optimizers: de, ode, code, shade, sade, jade, cmaes, ipop, bipop, scipy_de
+Available optimizers: de, ode, code, shade, sade, jade, cmaes, ipop, bipop, scipy_de, steroids
         """
     )
 
