@@ -19,6 +19,7 @@ def plot_convergence_comparison_iterations_pct(
     max_iterations,
     optimal_value,
     optimizer="DE",
+    model_type="original",
 ):
     """
     Plot comparison of convergence histories as optimality gap vs iterations.
@@ -62,10 +63,11 @@ def plot_convergence_comparison_iterations_pct(
             markersize=6,
         )
 
+    model_suffix = " (with regression)" if model_type == "newreg" else ""
     plt.xlabel("Iteration", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
-        f"Convergence Comparison [{optimizer}] - Instance {instance_idx} (Max Iterations: {max_iterations})",
+        f"Convergence Comparison [{optimizer}]{model_suffix} - Instance {instance_idx} (Max Iterations: {max_iterations})",
         fontsize=15,
         fontweight="bold",
     )
@@ -92,6 +94,7 @@ def plot_convergence_comparison_pct(
     max_iterations,
     optimal_value,
     optimizer="DE",
+    model_type="original",
 ):
     """
     Plot comparison of convergence histories as optimality gap vs evaluations.
@@ -136,10 +139,11 @@ def plot_convergence_comparison_pct(
             markersize=6,
         )
 
+    model_suffix = " (with regression)" if model_type == "newreg" else ""
     plt.xlabel("Decoder evaluations", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
-        f"Convergence Comparison [{optimizer}] - Instance {instance_idx} (Max Iterations: {max_iterations})",
+        f"Convergence Comparison [{optimizer}]{model_suffix} - Instance {instance_idx} (Max Iterations: {max_iterations})",
         fontsize=15,
         fontweight="bold",
     )
@@ -165,6 +169,7 @@ def plot_convergence_comparison_time_pct(
     max_iterations,
     optimal_value,
     optimizer="DE",
+    model_type="original",
 ):
     """
     Plot comparison of convergence histories as optimality gap vs wall-clock time.
@@ -207,10 +212,11 @@ def plot_convergence_comparison_time_pct(
             markersize=6,
         )
 
+    model_suffix = " (with regression)" if model_type == "newreg" else ""
     plt.xlabel("Wall-Clock Time (seconds)", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
-        f"Convergence Comparison [{optimizer}] - Instance {instance_idx} (Max Iterations: {max_iterations})",
+        f"Convergence Comparison [{optimizer}]{model_suffix} - Instance {instance_idx} (Max Iterations: {max_iterations})",
         fontsize=15,
         fontweight="bold",
     )
@@ -230,7 +236,7 @@ def plot_convergence_comparison_time_pct(
 
 
 def plot_average_convergence_iterations_pct(
-    averaged_data, output_path, max_iterations, num_instances, optimizer="DE"
+    averaged_data, output_path, max_iterations, num_instances, optimizer="DE", model_type="original"
 ):
     """
     Plot averaged optimality gap histories vs iterations.
@@ -265,10 +271,11 @@ def plot_average_convergence_iterations_pct(
             markersize=6,
         )
 
+    model_suffix = " (with regression)" if model_type == "newreg" else ""
     plt.xlabel("Iteration", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
-        f"Average Optimality Gap [{optimizer}] (Across {num_instances} Instances, Max Iterations: {max_iterations})",
+        f"Average Optimality Gap [{optimizer}]{model_suffix} (Across {num_instances} Instances, Max Iterations: {max_iterations})",
         fontsize=15,
         fontweight="bold",
     )
@@ -286,7 +293,7 @@ def plot_average_convergence_iterations_pct(
 
 
 def plot_average_convergence_evaluations_pct(
-    averaged_data, output_path, max_iterations, num_instances, optimizer="DE"
+    averaged_data, output_path, max_iterations, num_instances, optimizer="DE", model_type="original"
 ):
     """
     Plot averaged optimality gap histories vs evaluations.
@@ -322,10 +329,11 @@ def plot_average_convergence_evaluations_pct(
             markersize=6,
         )
 
+    model_suffix = " (with regression)" if model_type == "newreg" else ""
     plt.xlabel("Decoder evaluations", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
-        f"Average Optimality Gap [{optimizer}] (Across {num_instances} Instances, Max Iterations: {max_iterations})",
+        f"Average Optimality Gap [{optimizer}]{model_suffix} (Across {num_instances} Instances, Max Iterations: {max_iterations})",
         fontsize=15,
         fontweight="bold",
     )
@@ -343,7 +351,7 @@ def plot_average_convergence_evaluations_pct(
 
 
 def plot_average_convergence_time_pct(
-    averaged_data, output_path, max_iterations, num_instances, optimizer="DE"
+    averaged_data, output_path, max_iterations, num_instances, optimizer="DE", model_type="original"
 ):
     """
     Plot averaged optimality gap histories vs wall-clock time.
@@ -377,10 +385,11 @@ def plot_average_convergence_time_pct(
             markersize=6,
         )
 
+    model_suffix = " (with regression)" if model_type == "newreg" else ""
     plt.xlabel("Wall-Clock Time (seconds)", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
-        f"Average Optimality Gap [{optimizer}] (Across {num_instances} Instances, Max Iterations: {max_iterations})",
+        f"Average Optimality Gap [{optimizer}]{model_suffix} (Across {num_instances} Instances, Max Iterations: {max_iterations})",
         fontsize=15,
         fontweight="bold",
     )
@@ -398,7 +407,7 @@ def plot_average_convergence_time_pct(
 
 
 def plot_sigma_comparison_iterations_pct(
-    averaged_data, output_path, max_iterations, num_instances, batch_size
+    averaged_data, output_path, max_iterations, num_instances, batch_size, model_type="original"
 ):
     """
     Plot CMA-ES sigma comparison as optimality gap vs iterations.
@@ -433,10 +442,11 @@ def plot_sigma_comparison_iterations_pct(
             markersize=6,
         )
 
+    model_suffix = " (with regression)" if model_type == "newreg" else ""
     plt.xlabel("Iteration", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
-        f"CMA-ES Sigma Comparison - Average Optimality Gap (Batch Size: {batch_size}, Across {num_instances} Instances, Max Iterations: {max_iterations})",
+        f"CMA-ES Sigma Comparison{model_suffix} - Average Optimality Gap (Batch Size: {batch_size}, Across {num_instances} Instances, Max Iterations: {max_iterations})",
         fontsize=15,
         fontweight="bold",
     )
@@ -454,7 +464,7 @@ def plot_sigma_comparison_iterations_pct(
 
 
 def plot_sigma_comparison_evaluations_pct(
-    averaged_data, output_path, max_iterations, num_instances, batch_size
+    averaged_data, output_path, max_iterations, num_instances, batch_size, model_type="original"
 ):
     """
     Plot CMA-ES sigma comparison as optimality gap vs evaluations.
@@ -490,10 +500,11 @@ def plot_sigma_comparison_evaluations_pct(
             markersize=6,
         )
 
+    model_suffix = " (with regression)" if model_type == "newreg" else ""
     plt.xlabel("Decoder evaluations", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
-        f"CMA-ES Sigma Comparison - Average Optimality Gap (Batch Size: {batch_size}, Across {num_instances} Instances, Max Iterations: {max_iterations})",
+        f"CMA-ES Sigma Comparison{model_suffix} - Average Optimality Gap (Batch Size: {batch_size}, Across {num_instances} Instances, Max Iterations: {max_iterations})",
         fontsize=15,
         fontweight="bold",
     )
@@ -511,7 +522,7 @@ def plot_sigma_comparison_evaluations_pct(
 
 
 def plot_sigma_comparison_time_pct(
-    averaged_data, output_path, max_iterations, num_instances, batch_size
+    averaged_data, output_path, max_iterations, num_instances, batch_size, model_type="original"
 ):
     """
     Plot CMA-ES sigma comparison as optimality gap vs wall-clock time.
@@ -545,10 +556,11 @@ def plot_sigma_comparison_time_pct(
             markersize=6,
         )
 
+    model_suffix = " (with regression)" if model_type == "newreg" else ""
     plt.xlabel("Wall-Clock Time (seconds)", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
-        f"CMA-ES Sigma Comparison - Average Optimality Gap (Batch Size: {batch_size}, Across {num_instances} Instances, Max Iterations: {max_iterations})",
+        f"CMA-ES Sigma Comparison{model_suffix} - Average Optimality Gap (Batch Size: {batch_size}, Across {num_instances} Instances, Max Iterations: {max_iterations})",
         fontsize=15,
         fontweight="bold",
     )
@@ -566,7 +578,7 @@ def plot_sigma_comparison_time_pct(
 
 
 def plot_optimizer_comparison_iterations_pct(
-    optimizer_data, output_path, max_iterations, num_instances, batch_size
+    optimizer_data, output_path, max_iterations, num_instances, batch_size, model_type="original"
 ):
     """
     Plot optimizer comparison as optimality gap vs iterations.
@@ -600,10 +612,11 @@ def plot_optimizer_comparison_iterations_pct(
             markersize=6,
         )
 
+    model_suffix = " (with regression)" if model_type == "newreg" else ""
     plt.xlabel("Iteration", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
-        f"Average Optimality Gap (Batch Size: {batch_size}, Across {num_instances} Instances, Max Iterations: {max_iterations})",
+        f"Average Optimality Gap{model_suffix} (Batch Size: {batch_size}, Across {num_instances} Instances, Max Iterations: {max_iterations})",
         fontsize=15,
         fontweight="bold",
     )
@@ -621,7 +634,7 @@ def plot_optimizer_comparison_iterations_pct(
 
 
 def plot_optimizer_comparison_evaluations_pct(
-    optimizer_data, output_path, max_iterations, num_instances, batch_size
+    optimizer_data, output_path, max_iterations, num_instances, batch_size, model_type="original"
 ):
     """
     Plot optimizer comparison as optimality gap vs evaluations.
@@ -656,10 +669,11 @@ def plot_optimizer_comparison_evaluations_pct(
             markersize=6,
         )
 
+    model_suffix = " (with regression)" if model_type == "newreg" else ""
     plt.xlabel("Decoder evaluations", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
-        f"Average Optimality Gap (Batch Size: {batch_size}, Across {num_instances} Instances, Max Iterations: {max_iterations})",
+        f"Average Optimality Gap{model_suffix} (Batch Size: {batch_size}, Across {num_instances} Instances, Max Iterations: {max_iterations})",
         fontsize=15,
         fontweight="bold",
     )
@@ -677,7 +691,7 @@ def plot_optimizer_comparison_evaluations_pct(
 
 
 def plot_optimizer_comparison_time_pct(
-    optimizer_data, output_path, max_iterations, num_instances, batch_size
+    optimizer_data, output_path, max_iterations, num_instances, batch_size, model_type="original"
 ):
     """
     Plot optimizer comparison as optimality gap vs wall-clock time.
@@ -710,10 +724,11 @@ def plot_optimizer_comparison_time_pct(
             markersize=6,
         )
 
+    model_suffix = " (with regression)" if model_type == "newreg" else ""
     plt.xlabel("Wall-Clock Time (seconds)", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
-        f"Average Optimality Gap (Batch Size: {batch_size}, Across {num_instances} Instances, Max Iterations: {max_iterations})",
+        f"Average Optimality Gap{model_suffix} (Batch Size: {batch_size}, Across {num_instances} Instances, Max Iterations: {max_iterations})",
         fontsize=15,
         fontweight="bold",
     )
@@ -739,6 +754,7 @@ def plot_optimizer_comparison_iterations_pct_per_instance(
     optimal_value,
     problem,
     problem_size,
+    model_type="original",
 ):
     """
     Plot optimizer comparison for a single instance as optimality gap vs iterations.
@@ -785,10 +801,11 @@ def plot_optimizer_comparison_iterations_pct_per_instance(
             markersize=6,
         )
 
+    model_suffix = " (with regression)" if model_type == "newreg" else ""
     plt.xlabel("Iteration", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
-        f"Instance {instance_idx} ({problem}{problem_size}, Batch Size: {batch_size}, Max Iterations: {max_iterations})",
+        f"Instance {instance_idx}{model_suffix} ({problem}{problem_size}, Batch Size: {batch_size}, Max Iterations: {max_iterations})",
         fontsize=15,
         fontweight="bold",
     )
@@ -814,6 +831,7 @@ def plot_optimizer_comparison_evaluations_pct_per_instance(
     optimal_value,
     problem,
     problem_size,
+    model_type="original",
 ):
     """
     Plot optimizer comparison for a single instance as optimality gap vs evaluations.
@@ -861,10 +879,11 @@ def plot_optimizer_comparison_evaluations_pct_per_instance(
             markersize=6,
         )
 
+    model_suffix = " (with regression)" if model_type == "newreg" else ""
     plt.xlabel("Decoder evaluations", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
-        f"Instance {instance_idx} ({problem}{problem_size}, Batch Size: {batch_size}, Max Iterations: {max_iterations})",
+        f"Instance {instance_idx}{model_suffix} ({problem}{problem_size}, Batch Size: {batch_size}, Max Iterations: {max_iterations})",
         fontsize=15,
         fontweight="bold",
     )
@@ -890,6 +909,7 @@ def plot_optimizer_comparison_time_pct_per_instance(
     optimal_value,
     problem,
     problem_size,
+    model_type="original",
 ):
     """
     Plot optimizer comparison for a single instance as optimality gap vs wall-clock time.
@@ -935,10 +955,11 @@ def plot_optimizer_comparison_time_pct_per_instance(
             markersize=6,
         )
 
+    model_suffix = " (with regression)" if model_type == "newreg" else ""
     plt.xlabel("Wall-Clock Time (seconds)", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
-        f"Instance {instance_idx} ({problem}{problem_size}, Batch Size: {batch_size}, Max Iterations: {max_iterations})",
+        f"Instance {instance_idx}{model_suffix} ({problem}{problem_size}, Batch Size: {batch_size}, Max Iterations: {max_iterations})",
         fontsize=15,
         fontweight="bold",
     )

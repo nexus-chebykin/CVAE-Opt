@@ -39,6 +39,12 @@ def get_config(args=None):
     parser.add_argument('--seed', type=int, default=1234,
                         help='Random seed for reproducibility (default: 1234)')
 
+    # Model architecture selection
+    parser.add_argument('--model_type', type=str, default='original',
+                        choices=['original', 'newreg'],
+                        help='Model architecture: "original" (GRU-based, works with all problems) or '
+                             '"newreg" (Transformer with cost regression, ONLY for TSP-100 with latent_dim=100)')
+
     # Optimizer selection
     parser.add_argument('--optimizer', type=str, default='de',
                         choices=['de', 'de_vectorized', 'de_on_steroids', 'cmaes', 'ipop_cmaes', 'bipop_cmaes', 'scipy_de', 'evox_jade', 'pygmo_pso_gen', 'evox_shade', 'evox_sade', 'evox_code', 'evox_ode', 'ngopt', 'sobol_search'],

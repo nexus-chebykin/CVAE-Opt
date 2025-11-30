@@ -691,13 +691,13 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
             if config.save_plots and config.plot_mode == 'per_instance':
                 plot_optimizer_comparison_iterations_pct_per_instance(
                     convergence_data, search_output_dir, config.search_iterations,
-                    fixed_batch_size, i, optimal_value, config.problem, config.problem_size)
+                    fixed_batch_size, i, optimal_value, config.problem, config.problem_size, config.model_type)
                 plot_optimizer_comparison_evaluations_pct_per_instance(
                     convergence_data, search_output_dir, config.search_iterations,
-                    fixed_batch_size, i, optimal_value, config.problem, config.problem_size)
+                    fixed_batch_size, i, optimal_value, config.problem, config.problem_size, config.model_type)
                 plot_optimizer_comparison_time_pct_per_instance(
                     convergence_data, search_output_dir, config.search_iterations,
-                    fixed_batch_size, i, optimal_value, config.problem, config.problem_size)
+                    fixed_batch_size, i, optimal_value, config.problem, config.problem_size, config.model_type)
         elif sigma_sweep_mode:
             # Run search for each sigma value with fixed batch size
             for sigma_value in sweep_values:
@@ -809,14 +809,14 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
 
             # Create percentage-based comparison plots (all batch sizes on same graph)
             if len(config.batch_sizes) > 1:
-                plot_convergence_comparison_iterations_pct(i, convergence_data, instances_dir, config.search_iterations, optimal_value, optimizer_name)
-                plot_convergence_comparison_pct(i, convergence_data, instances_dir, config.search_iterations, optimal_value, optimizer_name)
-                plot_convergence_comparison_time_pct(i, convergence_data, instances_dir, config.search_iterations, optimal_value, optimizer_name)
+                plot_convergence_comparison_iterations_pct(i, convergence_data, instances_dir, config.search_iterations, optimal_value, optimizer_name, config.model_type)
+                plot_convergence_comparison_pct(i, convergence_data, instances_dir, config.search_iterations, optimal_value, optimizer_name, config.model_type)
+                plot_convergence_comparison_time_pct(i, convergence_data, instances_dir, config.search_iterations, optimal_value, optimizer_name, config.model_type)
             else:
                 # If single batch size, still create plots but they'll only have one curve
-                plot_convergence_comparison_iterations_pct(i, convergence_data, instances_dir, config.search_iterations, optimal_value, optimizer_name)
-                plot_convergence_comparison_pct(i, convergence_data, instances_dir, config.search_iterations, optimal_value, optimizer_name)
-                plot_convergence_comparison_time_pct(i, convergence_data, instances_dir, config.search_iterations, optimal_value, optimizer_name)
+                plot_convergence_comparison_iterations_pct(i, convergence_data, instances_dir, config.search_iterations, optimal_value, optimizer_name, config.model_type)
+                plot_convergence_comparison_pct(i, convergence_data, instances_dir, config.search_iterations, optimal_value, optimizer_name, config.model_type)
+                plot_convergence_comparison_time_pct(i, convergence_data, instances_dir, config.search_iterations, optimal_value, optimizer_name, config.model_type)
 
     # Generate averaged plots
     # For optimizer_comparison_mode and sigma_sweep_mode, always generate averaged plots regardless of plot_mode
@@ -838,18 +838,18 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
             averaged_data = compute_averaged_convergence(all_instances_data, optimizers_to_run, optimal_values)
 
             # Generate optimizer comparison plots
-            plot_optimizer_comparison_iterations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size)
-            plot_optimizer_comparison_evaluations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size)
-            plot_optimizer_comparison_time_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size)
+            plot_optimizer_comparison_iterations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size, config.model_type)
+            plot_optimizer_comparison_evaluations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size, config.model_type)
+            plot_optimizer_comparison_time_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size, config.model_type)
         elif sigma_sweep_mode:
             # Sigma sweep mode: generate sigma comparison plots (always, regardless of plot_mode)
             logging.info("Computing averaged convergence data across all instances for sigma sweep...")
             averaged_data = compute_averaged_convergence(all_instances_data, sweep_values, optimal_values)
 
             # Generate sigma comparison plots
-            plot_sigma_comparison_iterations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size)
-            plot_sigma_comparison_evaluations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size)
-            plot_sigma_comparison_time_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size)
+            plot_sigma_comparison_iterations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size, config.model_type)
+            plot_sigma_comparison_evaluations_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size, config.model_type)
+            plot_sigma_comparison_time_pct(averaged_data, search_output_dir, config.search_iterations, len(instances), fixed_batch_size, config.model_type)
         elif config.plot_mode == 'average' and len(config.batch_sizes) > 1:
             # Normal mode with average plot_mode: generate batch size comparison plots
             logging.info("Computing averaged convergence data across all instances...")
@@ -876,9 +876,9 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
             optimizer_name = optimizer_name_map.get(config.optimizer, config.optimizer.upper())
 
             # Generate averaged percentage plots
-            plot_average_convergence_iterations_pct(averaged_data, average_dir, config.search_iterations, len(instances), optimizer_name)
-            plot_average_convergence_evaluations_pct(averaged_data, average_dir, config.search_iterations, len(instances), optimizer_name)
-            plot_average_convergence_time_pct(averaged_data, average_dir, config.search_iterations, len(instances), optimizer_name)
+            plot_average_convergence_iterations_pct(averaged_data, average_dir, config.search_iterations, len(instances), optimizer_name, config.model_type)
+            plot_average_convergence_evaluations_pct(averaged_data, average_dir, config.search_iterations, len(instances), optimizer_name, config.model_type)
+            plot_average_convergence_time_pct(averaged_data, average_dir, config.search_iterations, len(instances), optimizer_name, config.model_type)
 
     # Log final results
     logging.info("=" * 60)
