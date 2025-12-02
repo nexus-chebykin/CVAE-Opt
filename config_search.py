@@ -41,9 +41,10 @@ def get_config(args=None):
 
     # Model architecture selection
     parser.add_argument('--model_type', type=str, default='original',
-                        choices=['original', 'newreg'],
-                        help='Model architecture: "original" (GRU-based, works with all problems) or '
-                             '"newreg" (Transformer with cost regression, ONLY for TSP-100 with latent_dim=100)')
+                        choices=['original', 'newreg', 'transformer'],
+                        help='Model architecture: "original" (GRU-based, works with all problems), '
+                             '"newreg" (Transformer with cost regression, ONLY for TSP-100 with latent_dim=100), or '
+                             '"transformer" (Transformer without regression, ONLY for TSP-100 with latent_dim=100)')
 
     # Optimizer selection
     parser.add_argument('--optimizer', type=str, default='de',

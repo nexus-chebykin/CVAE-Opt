@@ -496,7 +496,6 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
             'cmaes': 'CMA-ES',
             'ipop_cmaes': 'IPOP-CMA-ES',
             'bipop_cmaes': 'BIPOP-CMA-ES',
-            'scipy_de': 'Scipy-DE',
             'jade': 'EvoX-JADE',
             'shade': 'EvoX-SHADE',
             'sade': 'EvoX-SaDE',
@@ -519,7 +518,7 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
         else:
             # Default: run all optimizers
             optimizers_to_run = ['DE', 'DE-Vectorized', 'DE-Steroids', 'CMA-ES', 'IPOP-CMA-ES',
-                                 'BIPOP-CMA-ES', 'Scipy-DE', 'EvoX-JADE', 'EvoX-SHADE', 'EvoX-SaDE',
+                                 'BIPOP-CMA-ES', 'EvoX-JADE', 'EvoX-SHADE', 'EvoX-SaDE',
                                  'EvoX-CoDE', 'EvoX-ODE', 'Sobol-Search']
 
         logging.info(f"Running optimizer comparison mode with batch size {fixed_batch_size}")
@@ -595,8 +594,6 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                     config.optimizer = 'bipop_cmaes'
                 elif optimizer_name == 'Pygmo-DE':
                     config.optimizer = 'pygmo_de'
-                elif optimizer_name == 'Scipy-DE':
-                    config.optimizer = 'scipy_de'
                 elif optimizer_name == 'EvoX-JADE':
                     config.optimizer = 'evox_jade'
                 elif optimizer_name == 'EvoX-SHADE':
@@ -788,7 +785,6 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 'cmaes': 'CMA-ES',
                 'ipop_cmaes': 'IPOP-CMA-ES',
                 'bipop_cmaes': 'BIPOP-CMA-ES',
-                'scipy_de': 'Scipy-DE',
                 'evox_jade': 'EvoX-JADE',
                 'pygmo_pso_gen': 'Pygmo-PSO-Gen',
                 'evox_shade': 'EvoX-SHADE',
@@ -863,7 +859,6 @@ def solve_instance_set(model, config, instances, solutions=None, verbose=True):
                 'cmaes': 'CMA-ES',
                 'ipop_cmaes': 'IPOP-CMA-ES',
                 'bipop_cmaes': 'BIPOP-CMA-ES',
-                'scipy_de': 'Scipy-DE',
                 'evox_jade': 'EvoX-JADE',
                 'pygmo_pso_gen': 'Pygmo-PSO-Gen',
                 'evox_shade': 'EvoX-SHADE',

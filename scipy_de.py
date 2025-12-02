@@ -177,8 +177,8 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
             callback=callback,
             workers=1,  # No parallelization (GPU handles batching)
             polish=False,  # Disable final polish step (not useful for discrete problems)
-            atol=0,  # Disable absolute tolerance stopping
-            tol=0.0,  # Disable relative tolerance stopping
+            atol=1000.0,  # Set very high to prevent convergence-based stopping
+            tol=1000.0,   # Convergence check: std(pop) <= atol + tol*|mean(pop)|. High values prevent early stop.
             updating=updating,  # Tunable update strategy ('deferred' or 'immediate')
             init='latinhypercube',  # FIXED: Use Latin Hypercube Sampling for initialization
             seed=seed  # Use provided seed (passed from config.seed)

@@ -15,12 +15,11 @@ import time
 STRATEGIES = ['rand1bin', 'rand2bin', 'best1bin', 'best2bin', 'currenttobest1bin', 'randtobest1bin']
 
 
-def _generate_random_indices(rng, popsize, num_indices, all_indices):
+def _generate_random_indices(popsize, num_indices, all_indices):
     """
     Generate random indices for mutation, ensuring no duplicates and no self-selection.
 
     Args:
-        rng: numpy random generator
         popsize: population size
         num_indices: number of random indices needed per individual
         all_indices: array of indices [0, 1, ..., popsize-1]
@@ -32,7 +31,7 @@ def _generate_random_indices(rng, popsize, num_indices, all_indices):
 
     for i in range(num_indices):
         # Generate random indices avoiding already selected ones
-        r = rng.integers(0, popsize - 1 - i, size=popsize)
+        r = np.random.randint(0, popsize - 1 - i, size=popsize)
 
         # Sort excluded indices for efficient adjustment
         if i == 0:
@@ -97,11 +96,11 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
     eval_time_total = 0.0
     tell_time_total = 0.0
 
-    # Set random seed for reproducibility
-    rng = np.random.default_rng(seed)
+    # Set random seed for reproducibility (using legacy MT19937 to match de.py)
+    np.random.seed(seed)
 
-    population = rng.uniform(-search_space_bound, search_space_bound,
-                             (popsize, search_space_size))
+    population = np.random.uniform(-search_space_bound, search_space_bound,
+                                   (popsize, search_space_size))
 
     # Evaluate initial population
     eval_start = time.time()
@@ -151,36 +150,36 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize,
         # Generate random indices based on strategy requirements
         if strategy == 'rand1bin':
             # b' = x_r0 + F * (x_r1 - x_r2)
-            r0, r1, r2 = _generate_random_indices(rng, popsize, 3, all_indices)
+            r0, r1, r2 = _generate_random_indices(popsize, 3, all_indices)
             children = population[r0] + mutate * (population[r1] - population[r2])
 
         elif strategy == 'rand2bin':
             # b' = x_r0 + F * (x_r1 + x_r2 - x_r3 - x_r4)
-            r0, r1, r2, r3, r4 = _generate_random_indices(rng, popsize, 5, all_indices)
+            r0, r1, r2, r3, r4 = _generate_random_indices(popsize, 5, all_indices)
             children = population[r0] + mutate * (population[r1] + population[r2] - population[r3] - population[r4])
 
         elif strategy == 'best1bin':
             # b' = x_best + F * (x_r0 - x_r1)
-            r0, r1 = _generate_random_indices(rng, popsize, 2, all_indices)
+            r0, r1 = _generate_random_indices(popsize, 2, all_indices)
             children = x_best + mutate * (population[r0] - population[r1])
 
         elif strategy == 'best2bin':
             # b' = x_best + F * (x_r0 + x_r1 - x_r2 - x_r3)
-            r0, r1, r2, r3 = _generate_random_indices(rng, popsize, 4, all_indices)
+            r0, r1, r2, r3 = _generate_random_indices(popsize, 4, all_indices)
             children = x_best + mutate * (population[r0] + population[r1] - population[r2] - population[r3])
 
         elif strategy == 'currenttobest1bin':
             # b' = x_i + F * (x_best - x_i) + F * (x_r0 - x_r1)
-            r0, r1 = _generate_random_indices(rng, popsize, 2, all_indices)
+            r0, r1 = _generate_random_indices(popsize, 2, all_indices)
             children = population + mutate * (x_best - population) + mutate * (population[r0] - population[r1])
 
         elif strategy == 'randtobest1bin':
             # b' = x_r0 + F * (x_best - x_r0) + F * (x_r1 - x_r2)
-            r0, r1, r2 = _generate_random_indices(rng, popsize, 3, all_indices)
+            r0, r1, r2 = _generate_random_indices(popsize, 3, all_indices)
             children = population[r0] + mutate * (x_best - population[r0]) + mutate * (population[r1] - population[r2])
 
         # --- RECOMBINATION (step #3.B) - Binomial Crossover ----------------+
-        crossover_mask = rng.uniform(0, 1, (popsize, search_space_size)) > recombination
+        crossover_mask = np.random.uniform(0, 1, (popsize, search_space_size)) > recombination
         # Where mask is True, keep parent gene; where False, keep mutant gene
         children = np.where(crossover_mask, population, children)
 

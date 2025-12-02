@@ -2,7 +2,7 @@
 # Plotting functions for optimizer convergence analysis
 #
 # Extracted from search_control.py for better organization
-# Supports comparison across batch sizes, optimizers (DE, CMA-ES, IPOP-CMA-ES, BIPOP-CMA-ES, Pygmo-DE, Scipy-DE),
+# Supports comparison across batch sizes, optimizers (DE, CMA-ES, IPOP-CMA-ES, BIPOP-CMA-ES, Pygmo-DE),
 # and CMA-ES sigma values
 # ------------------------------------------------------------------------------+
 
@@ -63,7 +63,12 @@ def plot_convergence_comparison_iterations_pct(
             markersize=6,
         )
 
-    model_suffix = " (with regression)" if model_type == "newreg" else ""
+    if model_type == "newreg":
+        model_suffix = " (with regression)"
+    elif model_type == "transformer":
+        model_suffix = " (transformer)"
+    else:
+        model_suffix = ""
     plt.xlabel("Iteration", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
@@ -139,7 +144,12 @@ def plot_convergence_comparison_pct(
             markersize=6,
         )
 
-    model_suffix = " (with regression)" if model_type == "newreg" else ""
+    if model_type == "newreg":
+        model_suffix = " (with regression)"
+    elif model_type == "transformer":
+        model_suffix = " (transformer)"
+    else:
+        model_suffix = ""
     plt.xlabel("Decoder evaluations", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
@@ -212,7 +222,12 @@ def plot_convergence_comparison_time_pct(
             markersize=6,
         )
 
-    model_suffix = " (with regression)" if model_type == "newreg" else ""
+    if model_type == "newreg":
+        model_suffix = " (with regression)"
+    elif model_type == "transformer":
+        model_suffix = " (transformer)"
+    else:
+        model_suffix = ""
     plt.xlabel("Wall-Clock Time (seconds)", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
@@ -271,7 +286,12 @@ def plot_average_convergence_iterations_pct(
             markersize=6,
         )
 
-    model_suffix = " (with regression)" if model_type == "newreg" else ""
+    if model_type == "newreg":
+        model_suffix = " (with regression)"
+    elif model_type == "transformer":
+        model_suffix = " (transformer)"
+    else:
+        model_suffix = ""
     plt.xlabel("Iteration", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
@@ -329,7 +349,12 @@ def plot_average_convergence_evaluations_pct(
             markersize=6,
         )
 
-    model_suffix = " (with regression)" if model_type == "newreg" else ""
+    if model_type == "newreg":
+        model_suffix = " (with regression)"
+    elif model_type == "transformer":
+        model_suffix = " (transformer)"
+    else:
+        model_suffix = ""
     plt.xlabel("Decoder evaluations", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
@@ -385,7 +410,12 @@ def plot_average_convergence_time_pct(
             markersize=6,
         )
 
-    model_suffix = " (with regression)" if model_type == "newreg" else ""
+    if model_type == "newreg":
+        model_suffix = " (with regression)"
+    elif model_type == "transformer":
+        model_suffix = " (transformer)"
+    else:
+        model_suffix = ""
     plt.xlabel("Wall-Clock Time (seconds)", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
@@ -442,7 +472,12 @@ def plot_sigma_comparison_iterations_pct(
             markersize=6,
         )
 
-    model_suffix = " (with regression)" if model_type == "newreg" else ""
+    if model_type == "newreg":
+        model_suffix = " (with regression)"
+    elif model_type == "transformer":
+        model_suffix = " (transformer)"
+    else:
+        model_suffix = ""
     plt.xlabel("Iteration", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
@@ -500,7 +535,12 @@ def plot_sigma_comparison_evaluations_pct(
             markersize=6,
         )
 
-    model_suffix = " (with regression)" if model_type == "newreg" else ""
+    if model_type == "newreg":
+        model_suffix = " (with regression)"
+    elif model_type == "transformer":
+        model_suffix = " (transformer)"
+    else:
+        model_suffix = ""
     plt.xlabel("Decoder evaluations", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
@@ -556,7 +596,12 @@ def plot_sigma_comparison_time_pct(
             markersize=6,
         )
 
-    model_suffix = " (with regression)" if model_type == "newreg" else ""
+    if model_type == "newreg":
+        model_suffix = " (with regression)"
+    elif model_type == "transformer":
+        model_suffix = " (transformer)"
+    else:
+        model_suffix = ""
     plt.xlabel("Wall-Clock Time (seconds)", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
@@ -595,7 +640,7 @@ def plot_optimizer_comparison_iterations_pct(
     plt.figure(figsize=(12, 7))
 
     # Define colors for optimizers (supports 8 optimizers now)
-    colors = {"DE": "#E63946", "DE-Vectorized": "#FF5733", "DE-Steroids": "#C70039", "CMA-ES": "#2A9D8F", "IPOP-CMA-ES": "#F1A208", "BIPOP-CMA-ES": "#6A4C93", "Scipy-DE": "#264653", "EvoX-JADE": "#8B4789", "Pygmo-PSO-Gen": "#FF6B9D", "EvoX-SHADE": "#E07A5F", "EvoX-SaDE": "#4ECDC4", "EvoX-CoDE": "#F4A261", "EvoX-ODE": "#95B8D1", "NGOpt": "#E74C3C", "Sobol-Search": "#3DDC84"}
+    colors = {"DE": "#E63946", "DE-Vectorized": "#FF5733", "DE-Steroids": "#C70039", "CMA-ES": "#2A9D8F", "IPOP-CMA-ES": "#F1A208", "BIPOP-CMA-ES": "#6A4C93", "EvoX-JADE": "#8B4789", "Pygmo-PSO-Gen": "#FF6B9D", "EvoX-SHADE": "#E07A5F", "EvoX-SaDE": "#4ECDC4", "EvoX-CoDE": "#F4A261", "EvoX-ODE": "#95B8D1", "NGOpt": "#E74C3C", "Sobol-Search": "#3DDC84"}
 
     # Plot each optimizer (data already contains gap percentages)
     for optimizer_name, (gap_history, time_history) in sorted(optimizer_data.items()):
@@ -612,7 +657,12 @@ def plot_optimizer_comparison_iterations_pct(
             markersize=6,
         )
 
-    model_suffix = " (with regression)" if model_type == "newreg" else ""
+    if model_type == "newreg":
+        model_suffix = " (with regression)"
+    elif model_type == "transformer":
+        model_suffix = " (transformer)"
+    else:
+        model_suffix = ""
     plt.xlabel("Iteration", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
@@ -651,7 +701,7 @@ def plot_optimizer_comparison_evaluations_pct(
     plt.figure(figsize=(12, 7))
 
     # Define colors for optimizers (supports 8 optimizers now)
-    colors = {"DE": "#E63946", "DE-Vectorized": "#FF5733", "DE-Steroids": "#C70039", "CMA-ES": "#2A9D8F", "IPOP-CMA-ES": "#F1A208", "BIPOP-CMA-ES": "#6A4C93", "Scipy-DE": "#264653", "EvoX-JADE": "#8B4789", "Pygmo-PSO-Gen": "#FF6B9D", "EvoX-SHADE": "#E07A5F", "EvoX-SaDE": "#4ECDC4", "EvoX-CoDE": "#F4A261", "EvoX-ODE": "#95B8D1", "NGOpt": "#E74C3C", "Sobol-Search": "#3DDC84"}
+    colors = {"DE": "#E63946", "DE-Vectorized": "#FF5733", "DE-Steroids": "#C70039", "CMA-ES": "#2A9D8F", "IPOP-CMA-ES": "#F1A208", "BIPOP-CMA-ES": "#6A4C93", "EvoX-JADE": "#8B4789", "Pygmo-PSO-Gen": "#FF6B9D", "EvoX-SHADE": "#E07A5F", "EvoX-SaDE": "#4ECDC4", "EvoX-CoDE": "#F4A261", "EvoX-ODE": "#95B8D1", "NGOpt": "#E74C3C", "Sobol-Search": "#3DDC84"}
 
     # Plot each optimizer (data already contains gap percentages)
     for optimizer_name, (gap_history, time_history) in sorted(optimizer_data.items()):
@@ -669,7 +719,12 @@ def plot_optimizer_comparison_evaluations_pct(
             markersize=6,
         )
 
-    model_suffix = " (with regression)" if model_type == "newreg" else ""
+    if model_type == "newreg":
+        model_suffix = " (with regression)"
+    elif model_type == "transformer":
+        model_suffix = " (transformer)"
+    else:
+        model_suffix = ""
     plt.xlabel("Decoder evaluations", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
@@ -708,7 +763,7 @@ def plot_optimizer_comparison_time_pct(
     plt.figure(figsize=(12, 7))
 
     # Define colors for optimizers (supports 8 optimizers now)
-    colors = {"DE": "#E63946", "DE-Vectorized": "#FF5733", "DE-Steroids": "#C70039", "CMA-ES": "#2A9D8F", "IPOP-CMA-ES": "#F1A208", "BIPOP-CMA-ES": "#6A4C93", "Scipy-DE": "#264653", "EvoX-JADE": "#8B4789", "Pygmo-PSO-Gen": "#FF6B9D", "EvoX-SHADE": "#E07A5F", "EvoX-SaDE": "#4ECDC4", "EvoX-CoDE": "#F4A261", "EvoX-ODE": "#95B8D1", "NGOpt": "#E74C3C", "Sobol-Search": "#3DDC84"}
+    colors = {"DE": "#E63946", "DE-Vectorized": "#FF5733", "DE-Steroids": "#C70039", "CMA-ES": "#2A9D8F", "IPOP-CMA-ES": "#F1A208", "BIPOP-CMA-ES": "#6A4C93", "EvoX-JADE": "#8B4789", "Pygmo-PSO-Gen": "#FF6B9D", "EvoX-SHADE": "#E07A5F", "EvoX-SaDE": "#4ECDC4", "EvoX-CoDE": "#F4A261", "EvoX-ODE": "#95B8D1", "NGOpt": "#E74C3C", "Sobol-Search": "#3DDC84"}
 
     # Plot each optimizer (data already contains gap percentages)
     for optimizer_name, (gap_history, time_history) in sorted(optimizer_data.items()):
@@ -724,7 +779,12 @@ def plot_optimizer_comparison_time_pct(
             markersize=6,
         )
 
-    model_suffix = " (with regression)" if model_type == "newreg" else ""
+    if model_type == "newreg":
+        model_suffix = " (with regression)"
+    elif model_type == "transformer":
+        model_suffix = " (transformer)"
+    else:
+        model_suffix = ""
     plt.xlabel("Wall-Clock Time (seconds)", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
@@ -778,7 +838,7 @@ def plot_optimizer_comparison_iterations_pct_per_instance(
     plt.figure(figsize=(12, 7))
 
     # Define colors for optimizers (supports 8 optimizers now)
-    colors = {"DE": "#E63946", "DE-Vectorized": "#FF5733", "DE-Steroids": "#C70039", "CMA-ES": "#2A9D8F", "IPOP-CMA-ES": "#F1A208", "BIPOP-CMA-ES": "#6A4C93", "Scipy-DE": "#264653", "EvoX-JADE": "#8B4789", "Pygmo-PSO-Gen": "#FF6B9D", "EvoX-SHADE": "#E07A5F", "EvoX-SaDE": "#4ECDC4", "EvoX-CoDE": "#F4A261", "EvoX-ODE": "#95B8D1", "NGOpt": "#E74C3C", "Sobol-Search": "#3DDC84"}
+    colors = {"DE": "#E63946", "DE-Vectorized": "#FF5733", "DE-Steroids": "#C70039", "CMA-ES": "#2A9D8F", "IPOP-CMA-ES": "#F1A208", "BIPOP-CMA-ES": "#6A4C93", "EvoX-JADE": "#8B4789", "Pygmo-PSO-Gen": "#FF6B9D", "EvoX-SHADE": "#E07A5F", "EvoX-SaDE": "#4ECDC4", "EvoX-CoDE": "#F4A261", "EvoX-ODE": "#95B8D1", "NGOpt": "#E74C3C", "Sobol-Search": "#3DDC84"}
 
     # Plot each optimizer
     for optimizer_name, (convergence_history, time_history) in sorted(
@@ -801,7 +861,12 @@ def plot_optimizer_comparison_iterations_pct_per_instance(
             markersize=6,
         )
 
-    model_suffix = " (with regression)" if model_type == "newreg" else ""
+    if model_type == "newreg":
+        model_suffix = " (with regression)"
+    elif model_type == "transformer":
+        model_suffix = " (transformer)"
+    else:
+        model_suffix = ""
     plt.xlabel("Iteration", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
@@ -855,7 +920,7 @@ def plot_optimizer_comparison_evaluations_pct_per_instance(
     plt.figure(figsize=(12, 7))
 
     # Define colors for optimizers (supports 8 optimizers now)
-    colors = {"DE": "#E63946", "DE-Vectorized": "#FF5733", "DE-Steroids": "#C70039", "CMA-ES": "#2A9D8F", "IPOP-CMA-ES": "#F1A208", "BIPOP-CMA-ES": "#6A4C93", "Scipy-DE": "#264653", "EvoX-JADE": "#8B4789", "Pygmo-PSO-Gen": "#FF6B9D", "EvoX-SHADE": "#E07A5F", "EvoX-SaDE": "#4ECDC4", "EvoX-CoDE": "#F4A261", "EvoX-ODE": "#95B8D1", "NGOpt": "#E74C3C", "Sobol-Search": "#3DDC84"}
+    colors = {"DE": "#E63946", "DE-Vectorized": "#FF5733", "DE-Steroids": "#C70039", "CMA-ES": "#2A9D8F", "IPOP-CMA-ES": "#F1A208", "BIPOP-CMA-ES": "#6A4C93", "EvoX-JADE": "#8B4789", "Pygmo-PSO-Gen": "#FF6B9D", "EvoX-SHADE": "#E07A5F", "EvoX-SaDE": "#4ECDC4", "EvoX-CoDE": "#F4A261", "EvoX-ODE": "#95B8D1", "NGOpt": "#E74C3C", "Sobol-Search": "#3DDC84"}
 
     # Plot each optimizer
     for optimizer_name, (convergence_history, time_history) in sorted(
@@ -879,7 +944,12 @@ def plot_optimizer_comparison_evaluations_pct_per_instance(
             markersize=6,
         )
 
-    model_suffix = " (with regression)" if model_type == "newreg" else ""
+    if model_type == "newreg":
+        model_suffix = " (with regression)"
+    elif model_type == "transformer":
+        model_suffix = " (transformer)"
+    else:
+        model_suffix = ""
     plt.xlabel("Decoder evaluations", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(
@@ -933,7 +1003,7 @@ def plot_optimizer_comparison_time_pct_per_instance(
     plt.figure(figsize=(12, 7))
 
     # Define colors for optimizers (supports 8 optimizers now)
-    colors = {"DE": "#E63946", "DE-Vectorized": "#FF5733", "DE-Steroids": "#C70039", "CMA-ES": "#2A9D8F", "IPOP-CMA-ES": "#F1A208", "BIPOP-CMA-ES": "#6A4C93", "Scipy-DE": "#264653", "EvoX-JADE": "#8B4789", "Pygmo-PSO-Gen": "#FF6B9D", "EvoX-SHADE": "#E07A5F", "EvoX-SaDE": "#4ECDC4", "EvoX-CoDE": "#F4A261", "EvoX-ODE": "#95B8D1", "NGOpt": "#E74C3C", "Sobol-Search": "#3DDC84"}
+    colors = {"DE": "#E63946", "DE-Vectorized": "#FF5733", "DE-Steroids": "#C70039", "CMA-ES": "#2A9D8F", "IPOP-CMA-ES": "#F1A208", "BIPOP-CMA-ES": "#6A4C93", "EvoX-JADE": "#8B4789", "Pygmo-PSO-Gen": "#FF6B9D", "EvoX-SHADE": "#E07A5F", "EvoX-SaDE": "#4ECDC4", "EvoX-CoDE": "#F4A261", "EvoX-ODE": "#95B8D1", "NGOpt": "#E74C3C", "Sobol-Search": "#3DDC84"}
 
     # Plot each optimizer
     for optimizer_name, (convergence_history, time_history) in sorted(
@@ -955,7 +1025,12 @@ def plot_optimizer_comparison_time_pct_per_instance(
             markersize=6,
         )
 
-    model_suffix = " (with regression)" if model_type == "newreg" else ""
+    if model_type == "newreg":
+        model_suffix = " (with regression)"
+    elif model_type == "transformer":
+        model_suffix = " (transformer)"
+    else:
+        model_suffix = ""
     plt.xlabel("Wall-Clock Time (seconds)", fontsize=13)
     plt.ylabel("Optimality Gap (%)", fontsize=13)
     plt.title(

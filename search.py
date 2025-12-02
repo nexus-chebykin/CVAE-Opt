@@ -12,30 +12,32 @@ import search_control
 from utils import read_instance_pkl
 from VAE_8 import VAE_8
 from VAE_8_newReg import VAE_8 as VAE_8_newReg
+from VAE_8_transformer import VAE_8 as VAE_8_transformer
 
 
 def validate_model_compatibility(config, model_data):
     """Validate that model_type matches checkpoint requirements."""
-    if config.model_type == 'newreg':
+    if config.model_type in ['newreg', 'transformer']:
         problem = model_data.get('problem', config.problem)
         problem_size = model_data.get('problem_size', config.problem_size)
         search_space_size = config.search_space_size
 
         errors = []
         if problem != 'TSP':
-            errors.append(f"newreg model requires problem=TSP, got {problem}")
+            errors.append(f"{config.model_type} model requires problem=TSP, got {problem}")
         if problem_size != 100:
-            errors.append(f"newreg model requires problem_size=100, got {problem_size}")
+            errors.append(f"{config.model_type} model requires problem_size=100, got {problem_size}")
         if search_space_size != 100:
-            errors.append(f"newreg model requires latent_dim=100, got {search_space_size}")
+            errors.append(f"{config.model_type} model requires latent_dim=100, got {search_space_size}")
 
         if errors:
-            error_msg = "VAE_8_newReg compatibility check FAILED:\n  " + "\n  ".join(errors)
-            error_msg += "\n\nThe 'newreg' model is specifically designed for TSP-100 with 100-dimensional latent space."
+            model_name = 'VAE_8_newReg' if config.model_type == 'newreg' else 'VAE_8_transformer'
+            error_msg = f"{model_name} compatibility check FAILED:\n  " + "\n  ".join(errors)
+            error_msg += f"\n\nThe '{config.model_type}' model is specifically designed for TSP-100 with 100-dimensional latent space."
             error_msg += "\nFor other configurations, use --model_type original"
             raise ValueError(error_msg)
 
-        logging.info("✓ VAE_8_newReg compatibility validated: TSP-100, latent_dim=100")
+        logging.info(f"✓ {config.model_type} model compatibility validated: TSP-100, latent_dim=100")
 
 
 if __name__ == "__main__":
@@ -83,19 +85,25 @@ if __name__ == "__main__":
     if not config.problem_size:
         config.problem_size = model_data['problem_size']
 
-    # Validate compatibility for newreg model
-    if config.model_type == 'newreg':
+    # Validate compatibility for newreg and transformer models
+    if config.model_type in ['newreg', 'transformer']:
         validate_model_compatibility(config, model_data)
 
     # Instantiate the correct model architecture
     if config.model_type == 'newreg':
         model = VAE_8_newReg(config).to(config.device)
         logging.info("Using VAE_8_newReg (Transformer with cost regression)")
+        model.load_state_dict(model_data['parameters'])
+    elif config.model_type == 'transformer':
+        model = VAE_8_transformer(config).to(config.device)
+        logging.info("Using VAE_8_transformer (Transformer without regression)")
+        # Load with strict=False to ignore cost_predictor weights in checkpoint
+        model.load_state_dict(model_data['parameters'], strict=False)
     else:
         model = VAE_8(config).to(config.device)
         logging.info("Using VAE_8 (Original GRU-based)")
+        model.load_state_dict(model_data['parameters'])
 
-    model.load_state_dict(model_data['parameters'])
     model.eval()
 
     instances, solutions = read_instance_pkl(config)

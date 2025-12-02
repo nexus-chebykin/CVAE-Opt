@@ -4787,3 +4787,7 @@ KeyboardInterrupt
   with DifferentialEvolutionSolver(func, bounds, args=args,
 /home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/scipy/optimize/_differentialevolution.py:487: UserWarning: differential_evolution: the 'vectorized' keyword has overridden updating='immediate' to updating='deferred'
   with DifferentialEvolutionSolver(func, bounds, args=args,
+/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/scipy/optimize/_differentialevolution.py:487: UserWarning: differential_evolution: the 'vectorized' keyword has overridden updating='immediate' to updating='deferred'
+  with DifferentialEvolutionSolver(func, bounds, args=args,
+/home/superior/vini/ml_project/CVAE-Opt/.venv/lib/python3.11/site-packages/scipy/optimize/_differentialevolution.py:487: UserWarning: differential_evolution: the 'vectorized' keyword has overridden updating='immediate' to updating='deferred'
+  with DifferentialEvolutionSolver(func, bounds, args=args,

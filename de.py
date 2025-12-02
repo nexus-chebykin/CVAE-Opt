@@ -27,6 +27,7 @@
 # SOFTWARE.
 # ------------------------------------------------------------------------------+
 
+import random
 import numpy as np
 import time
 
@@ -47,8 +48,9 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
     eval_time_total = 0.0
     tell_time_total = 0.0
 
-    # Set random seed for reproducibility
+    # Set random seed for reproducibility (seed both RNG systems)
     np.random.seed(seed)
+    random.seed(seed)
 
     population = np.random.uniform(-search_space_bound, search_space_bound,
                                    (popsize, search_space_size))
@@ -93,7 +95,7 @@ def minimize(cost_func, args, search_space_bound, search_space_size, popsize, mu
             # select three random vector index positions [0, popsize), not including current vector (j)
             candidates = list(range(0, popsize))
             candidates.remove(j)
-            random_index = np.random.choice(candidates, 3, replace=False)
+            random_index = random.sample(candidates, 3)
 
             # subtract x3 from x2, and create a new vector (x_diff)
             x_diff = population[random_index[1]] - population[random_index[2]]
